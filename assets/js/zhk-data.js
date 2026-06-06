@@ -32,12 +32,12 @@ window.ATAMURA_ZHK = [
     "statusDetail": "",
     "hero_image": "assets/img/zhk/atmosfera/005.jpg",
     "gallery": [
-      "assets/img/zhk/atmosfera/b-001.jpg",
+      "assets/img/zhk/atmosfera/001.jpg",
       "assets/img/zhk/atmosfera/002.jpg",
       "assets/img/zhk/atmosfera/008.jpg",
-      "assets/img/zhk/atmosfera/b-005.jpg",
+      "assets/img/zhk/atmosfera/012.jpg",
       "assets/img/zhk/atmosfera/010.jpg",
-      "assets/img/zhk/atmosfera/b-008.jpg"
+      "assets/img/zhk/atmosfera/018.jpg"
     ],
     "realPhotos": 20,
     "site": "https://atmo.atamuragroup.kz",
