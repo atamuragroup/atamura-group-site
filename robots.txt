@@ -1,4 +1,4 @@
 User-agent: *
-Disallow: /
+Allow: /
 
-# Soft-launch: сайт закрыт от индексации до завершения доводки. Снять — заменить на Allow: / + Sitemap.
+# Soft-launch: meta robots = noindex,nofollow на всех страницах. Sitemap не публикуется до публичного открытия.
