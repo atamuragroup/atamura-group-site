@@ -80,10 +80,10 @@
     margin: 0; padding-bottom: 80px;
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Jost', 'Futura PT', 'Futura', -apple-system, system-ui, sans-serif;
+    font-family: 'Montserrat', 'Futura PT', 'Futura', -apple-system, system-ui, sans-serif;
     font-size: var(--t-body); line-height: 1.45;
     -webkit-font-smoothing: antialiased;
-    font-feature-settings: "ss03", "cv11";
+    font-feature-settings: normal;
     transition: background 200ms;
   }
   img { display: block; max-width: 100%; height: auto; }
