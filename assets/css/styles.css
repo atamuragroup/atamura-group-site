@@ -1086,15 +1086,20 @@
   .ty-check { width: 84px; height: 84px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); display: grid; place-items: center; margin: 0 auto var(--s-5); }
 
   @media (max-width: 980px) {
-    .zk-layout, .content-grid { grid-template-columns: 1fr; }
+    /* minmax(0,1fr) вместо 1fr: иначе минимум трека = ширина контента, и широкий блок
+       (.faq-list и т.п.) распирал колонку шире экрана → гориз. скролл на телефоне (RU и KK). */
+    .zk-layout, .content-grid { grid-template-columns: minmax(0, 1fr); }
+    .zk-main { min-width: 0; }
     .zk-aside { position: static; }
-    .zk-stats, .stat-row { grid-template-columns: 1fr 1fr; gap: var(--s-3) var(--s-4); }
+    .zk-stats, .stat-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-3) var(--s-4); }
+    /* длинные казахские подписи статистики (напр. «Жоспарламалар») не должны распирать колонку */
+    .zk-stat { min-width: 0; overflow-wrap: anywhere; }
   }
   @media (max-width: 600px) {
     .zk-gallery { grid-template-columns: 1fr 1fr; }
     .zk-gallery .zk-gtile:first-child { grid-column: span 2; grid-row: span 1; }
     .feat-grid { grid-template-columns: 1fr; }
-    .zk-stats, .stat-row { grid-template-columns: 1fr 1fr; gap: var(--s-3) var(--s-4); }
+    .zk-stats, .stat-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s-3) var(--s-4); }
   }
 
   /* ============ КАТАЛОГ КВАРТИР (/flats) ============ */
