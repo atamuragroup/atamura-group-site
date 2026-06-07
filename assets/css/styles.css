@@ -80,10 +80,10 @@
     margin: 0; padding-bottom: 80px;
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Montserrat', 'Futura PT', 'Futura', -apple-system, system-ui, sans-serif;
+    font-family: 'Jost', 'Montserrat', 'Futura PT', 'Futura', -apple-system, system-ui, sans-serif;
     font-size: var(--t-body); line-height: 1.45;
     -webkit-font-smoothing: antialiased;
-    font-feature-settings: normal;
+    font-feature-settings: "ss03", "cv11";
     transition: background 200ms;
   }
   img { display: block; max-width: 100%; height: auto; }
@@ -196,6 +196,10 @@
   .lang-opt[aria-pressed="true"] { background: var(--brand); color: #fff; }
   .lang-opt:not([aria-pressed="true"]) { opacity: 0.62; }
   .lang-opt:not([aria-pressed="true"]):hover { opacity: 1; }
+  /* Переключатель языка в мобильном drawer (в шапке он скрыт на мобиле) */
+  .drawer-lang { display: flex; justify-content: center; padding: var(--s-3) 0 var(--s-4); border-bottom: 1px solid var(--line); margin-bottom: var(--s-2); }
+  .drawer-lang .lang-switch { gap: 4px; padding: 3px; }
+  .drawer-lang .lang-opt { font-size: 15px; padding: 9px 22px; }
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 14px); background: var(--dark-cta); color: #fff; font-size: 14px; font-weight: 500; line-height: 1.4; padding: 12px 18px; border-radius: 12px; box-shadow: 0 12px 32px rgba(0,0,0,0.22); z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease, transform 0.25s ease; max-width: min(92vw, 440px); text-align: center; }
   .toast.is-on { opacity: 1; transform: translate(-50%, 0); }
   .phone-block { text-align: right; line-height: 1.2; }
@@ -879,8 +883,9 @@
 
   body.drawer-open { overflow: hidden; }
 
-  /* Плотное desktop-меню (8 пунктов + контакты) умещается в одну строку только на широких экранах. Ниже 1240px — бургер, чтобы меню не давило логотип. */
-  @media (max-width: 1240px) {
+  /* Плотное desktop-меню (8 пунктов + контакты + переключатель языка) умещается в одну строку только на широких экранах.
+     Ниже 1360px — бургер, чтобы шапка не переполнялась (KK-переключатель Рус/Qaz добавил ширины; раньше порог был 1240). */
+  @media (max-width: 1360px) {
     .nav-main { display: none; }
     .burger { display: inline-flex; }
   }

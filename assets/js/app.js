@@ -720,7 +720,6 @@
      без data-i18n в разметке. Динамический контент ловит MutationObserver. Выбор хранится в localStorage. */
   var LANG_KEY = "atamura_lang";
   function bindLang() {
-    var sw = document.querySelector(".lang-switch");
     var DICT = window.__I18N_KK__ || {};
     var HAS_DICT = false; for (var _k in DICT) { if (DICT.hasOwnProperty(_k)) { HAS_DICT = true; break; } }
     var ATTRS = ["aria-label", "placeholder", "title", "alt"];
@@ -797,14 +796,14 @@
       lang = next;
       document.documentElement.lang = next;
       if (document.body) walk(document.body, next === "kk");
-      if (sw) [].forEach.call(sw.querySelectorAll(".lang-opt"), function (b) {
+      [].forEach.call(document.querySelectorAll(".lang-opt"), function (b) {
         b.setAttribute("aria-pressed", b.getAttribute("data-lang") === next ? "true" : "false");
       });
       try { localStorage.setItem(LANG_KEY, next); } catch (e) {}
     }
 
-    if (sw) sw.addEventListener("click", function (e) {
-      var b = e.target.closest(".lang-opt"); if (!b) return;
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest(".lang-opt"); if (!b) return;
       var L = b.getAttribute("data-lang");
       if (L === "kk" && !HAS_DICT) { toast("Қазақ нұсқасы — жақында. Словарь не загрузился."); return; }
       setLang(L);
@@ -814,7 +813,7 @@
     // Восстанавливаем выбор пользователя
     var saved = null; try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
     if (saved === "kk" && HAS_DICT) setLang("kk");
-    else { document.documentElement.lang = "ru"; if (sw) [].forEach.call(sw.querySelectorAll(".lang-opt"), function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-lang") === "ru" ? "true" : "false"); }); }
+    else { document.documentElement.lang = "ru"; [].forEach.call(document.querySelectorAll(".lang-opt"), function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-lang") === "ru" ? "true" : "false"); }); }
 
     // Перевод динамически добавленного контента (каталог, карточки ЖК) — только когда активен kk
     if (window.MutationObserver && document.body) {
