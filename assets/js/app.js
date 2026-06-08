@@ -812,7 +812,7 @@
 
     // Восстанавливаем выбор пользователя
     var saved = null; try { saved = localStorage.getItem(LANG_KEY); } catch (e) {}
-    if (saved === "kk" && HAS_DICT) setLang("kk");
+    if ((saved === "kk" || /(^|\/)kk\//.test(location.pathname)) && HAS_DICT) setLang("kk");
     else { document.documentElement.lang = "ru"; [].forEach.call(document.querySelectorAll(".lang-opt"), function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-lang") === "ru" ? "true" : "false"); }); }
 
     // Перевод динамически добавленного контента (каталог, карточки ЖК) — только когда активен kk
