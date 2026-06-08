@@ -104,6 +104,11 @@
   html[lang="kk"] .herosearch .hs-chip { font-size: 14px; }
   html[lang="kk"] .herosearch .hs-go { font-size: 13px; padding-left: 16px; padding-right: 16px; }
   @media (max-width: 1023px) { html[lang="kk"] .herosearch .hs-go { flex: 1 1 100%; justify-content: center; } }
+  /* Казахские кнопки в карточках квартир («Көрсетілімге жазылу», «WhatsApp-та есептеу») длиннее русских:
+     грид 1fr auto раздувался и 2-я кнопка обрезалась краем карточки (overflow:hidden). Складываем в столбик
+     (одна колонка) + разрешаем перенос текста — обе кнопки помещаются. */
+  html[lang="kk"] .flat-actions { grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  html[lang="kk"] .flat-actions > * { white-space: normal; min-width: 0; }
   img { display: block; max-width: 100%; height: auto; }
   a { color: inherit; text-decoration: none; }
   button { font: inherit; cursor: pointer; }
