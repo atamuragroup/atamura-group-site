@@ -433,6 +433,9 @@
   .pcard-loc .walk::before { content: ''; display: inline-block; width: 12px; height: 12px; background: currentColor; margin-right: 4px; vertical-align: middle; mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><circle cx='6' cy='2' r='1.4' fill='black'/><path d='M6 4l-2 3 2 1v3M6 4l2 3' fill='none' stroke='black' stroke-width='1.2' stroke-linecap='round'/></svg>") center/contain no-repeat; }
   .pcard-price { font-size: 13px; color: var(--ink-soft); text-align: right; flex-shrink: 0; }
   .pcard-price strong { font-size: 18px; font-weight: 700; color: var(--ink); margin: 0 4px; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+  /* #3 markup-review: сданные/скоро — длинный статус как компактная подпись (не 18px-цена), чтобы не налезал на .pcard-info */
+  .pcard-price.is-status { font-size: 12px; max-width: 13ch; line-height: 1.25; }
+  .pcard-price.is-status strong { font-size: 12px; font-weight: 600; color: var(--ink-soft); margin: 0; letter-spacing: 0; }
 
   /* ============ "Поможем с выбором" CTA ============ */
   .help-cta {
@@ -1345,7 +1348,9 @@
     .home-hero { min-height: 100svh; align-items: flex-end; }
     .home-hero::before { height: 120px; }
     .home-hero-inner { padding: 0 20px 92px; text-align: center; }
-    .home-hero .hh-scrim { background: linear-gradient(180deg, oklch(0% 0 0 / 0.42) 0%, oklch(0% 0 0 / 0.1) 42%, oklch(0% 0 0 / 0.78) 100%); }
+    /* #1 markup-review: градиентная подложка под текстом героя — гарантирует контраст поверх любого фото-слайда */
+    .home .home-hero-inner::before { content: ""; position: absolute; left: 0; right: 0; top: 22%; bottom: 0; z-index: -1; pointer-events: none; background: linear-gradient(180deg, transparent 0%, oklch(10% 0.02 250 / 0.5) 42%, oklch(7% 0.02 250 / 0.92) 100%); }
+    .home-hero .hh-scrim { background: linear-gradient(180deg, oklch(0% 0 0 / 0.42) 0%, oklch(0% 0 0 / 0.12) 38%, oklch(0% 0 0 / 0.82) 100%); }
     .hh-title { font-size: clamp(36px, 9.5vw, 50px); }
     .hh-meta { font-size: 12px; line-height: 1.45; }
     .floater { bottom: 18px; right: 14px; }
