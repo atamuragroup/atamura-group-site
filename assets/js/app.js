@@ -429,9 +429,9 @@
     var area = f.areaMin === f.areaMax ? f.areaMin + " м²" : f.areaMin + "–" + f.areaMax + " м²";
     var img = f.image ? '<img src="' + f.image + '" alt="' + rl + ' в ЖК ' + f.zkName + '" loading="lazy">' : "";
     var srok = f.srok ? '<span class="flat-status">' + f.srok + "</span>" : "";
-    var waText = "Здравствуйте! Интересует ЖК " + f.zkName + ", " + rl.toLowerCase() + " (от " + money(f.priceFrom) + " ₸). Пришлите варианты и расчёт платежа.";
+    var waText = "Здравствуйте! Меня заинтересовала квартира в ЖК «" + f.zkName + "». Планировка: " + rl + ". Площадь: " + area + ". Стоимость: от " + money(f.priceFrom) + " ₸. Подскажите, пожалуйста, актуальна ли эта квартира и какие есть условия покупки?";
     var fid = flatId(f), isf = isFav(f);
-    var heart = '<button class="flat-fav' + (isf ? ' is-on' : '') + '" type="button" data-fav="' + fid + '" aria-pressed="' + (isf ? 'true' : 'false') + '" aria-label="' + (isf ? 'Убрать из избранного' : 'В избранное') + '"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-4.35-9.2-8.05C1 10.6 1.4 7.4 3.9 6.1c1.9-1 4.1-.4 5.3 1.2L12 10l2.8-2.7c1.2-1.6 3.4-2.2 5.3-1.2 2.5 1.3 2.9 4.5 1.1 6.85C18.5 16.65 12 21 12 21z"/></svg></button>';
+    var heart = '<button class="flat-fav' + (isf ? ' is-on' : '') + '" type="button" data-fav="' + fid + '" aria-pressed="' + (isf ? 'true' : 'false') + '" aria-label="' + (isf ? 'Убрать из избранного' : 'В избранное') + '"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>';
     return '<article class="flat" data-zk="' + f.zk + '">' + heart +
       '<a class="flat-photo" href="' + rel("zk/" + f.zk + ".html") + '">' + img + srok + "</a>" +
       '<div class="flat-body">' +
@@ -439,8 +439,8 @@
         '<div class="flat-price"><strong>от ' + money(f.priceFrom) + ' ₸</strong><span>взнос 20% → от ' + money(f.payFrom) + " ₸/мес · 7-20-25</span></div>" +
         '<div class="flat-meta"><span>ЖК ' + f.zkName + '</span><span>·</span><span>' + f.segment + "</span></div>" +
         '<div class="flat-actions">' +
-          '<a class="btn btn-brand btn-sm" href="' + rel("zk/" + f.zk + ".html") + '#zk-form">Записаться на показ</a>' +
-          '<a class="btn btn-outline btn-sm" href="https://wa.me/' + WA_PHONE + "?text=" + encodeURIComponent(waText) + '" target="_blank" rel="noopener" data-wa="catalog">Расчёт в WhatsApp</a>' +
+          '<a class="btn btn-brand btn-sm" href="https://wa.me/' + WA_PHONE + "?text=" + encodeURIComponent(waText) + '" target="_blank" rel="noopener" data-wa="catalog-plan">Получить планировку и цену</a>' +
+          '<a class="btn btn-outline btn-sm" href="' + rel("zk/" + f.zk + ".html") + '">Подробнее о ЖК</a>' +
         "</div>" +
       "</div></article>";
   }
@@ -458,7 +458,8 @@
     });
     var prices = ALL.map(function (f) { return f.priceFrom; });
     var PMIN = Math.min.apply(null, prices), PMAX = Math.max.apply(null, prices);
-    var state = { rooms: [], zk: "", pmax: PMAX, deal: "", srok: "", sort: "price-asc", fav: false };
+    var FINISH_ZK = ["aura", "aqsai"]; // #13: ЖК с чистовой отделкой «под ключ» (по премиум-карточке «Опция в Aura и Aqsai Resort»)
+    var state = { rooms: [], zk: "", pmax: PMAX, deal: "", srok: "", sort: "price-asc", fav: false, finish: false };
 
     var q = new URLSearchParams(location.search);
     if (q.get("rooms")) state.rooms = q.get("rooms").split(",").filter(Boolean);
@@ -468,6 +469,7 @@
     if (q.get("srok")) state.srok = q.get("srok");
     if (q.get("sort")) state.sort = q.get("sort");
     if (q.get("fav")) state.fav = true;
+    if (q.get("finish")) state.finish = true;
 
     var ROOM_OPTS = ROOM_ORDER.filter(function (r) { return ALL.some(function (f) { return f.rooms === r; }) || UPCOMING[r]; });
     var ZK_OPTS = []; ALL.forEach(function (f) { if (!ZK_OPTS.some(function (z) { return z.slug === f.zk; })) ZK_OPTS.push({ slug: f.zk, name: f.zkName }); });
@@ -484,12 +486,13 @@
         '<div class="cat-field"><label>Срок сдачи</label><select id="cat-srok"><option value="">Любой</option>' +
           SROK_OPTS.map(function (s) { return '<option value="' + s + '">' + s + "</option>"; }).join("") + "</select></div>" +
         '<div class="cat-field cat-field-wide"><label>Бюджет до <output id="cat-pmax-v"></output></label><input type="range" id="cat-pmax" min="' + PMIN + '" max="' + PMAX + '" step="500000" value="' + state.pmax + '"></div>' +
+        '<div class="cat-field cat-field-finish"><label>Отделка</label><button class="cat-chip" type="button" id="cat-finish" aria-pressed="false">Чистовая под ключ</button></div>' +
         '<div class="cat-field"><label>Сортировка</label><select id="cat-sort"><option value="price-asc">Сначала дешевле</option><option value="price-desc">Сначала дороже</option><option value="area-desc">Больше площадь</option></select></div>' +
         '<button class="cat-reset" type="button" id="cat-reset">Сбросить</button>' +
       "</div>" +
       '<div class="cat-head"><div class="cat-head-l"><h2 class="cat-count" id="cat-count" aria-live="polite"></h2>' +
         '<p class="cat-note">Цена — «от». Точную стоимость и подходящие квартиры подберёт менеджер.</p></div>' +
-        '<button class="cat-fav-toggle" type="button" id="cat-fav" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-4.35-9.2-8.05C1 10.6 1.4 7.4 3.9 6.1c1.9-1 4.1-.4 5.3 1.2L12 10l2.8-2.7c1.2-1.6 3.4-2.2 5.3-1.2 2.5 1.3 2.9 4.5 1.1 6.85C18.5 16.65 12 21 12 21z"/></svg>Избранное<span class="cat-fav-n" id="cat-fav-n"></span></button></div>' +
+        '<button class="cat-fav-toggle" type="button" id="cat-fav" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Избранное<span class="cat-fav-n" id="cat-fav-n"></span></button></div>' +
       '<div class="cat-grid" id="cat-grid"></div>' +
       '<div class="cat-empty" id="cat-empty" hidden><span id="cat-empty-msg">Под эти параметры вариантов нет.</span> <a class="btn btn-outline btn-sm" id="cat-empty-link" hidden></a></div>';
 
@@ -500,6 +503,7 @@
       zkS.value = state.zk; dealS.value = state.deal; srokS.value = state.srok; sortS.value = state.sort; pmaxR.value = state.pmax;
       pmaxV.textContent = money(state.pmax) + " ₸";
       byId("cat-rooms").querySelectorAll(".cat-chip").forEach(function (b) { b.classList.toggle("is-on", state.rooms.indexOf(b.getAttribute("data-room")) >= 0); });
+      var cf = byId("cat-finish"); if (cf) { cf.classList.toggle("is-on", state.finish); cf.setAttribute("aria-pressed", state.finish ? "true" : "false"); }
       var ft = byId("cat-fav"); if (ft) { ft.classList.toggle("is-on", state.fav); ft.setAttribute("aria-pressed", state.fav ? "true" : "false"); }
     }
     function writeURL() {
@@ -511,6 +515,7 @@
       if (state.pmax < PMAX) p.set("pmax", state.pmax);
       if (state.sort !== "price-asc") p.set("sort", state.sort);
       if (state.fav) p.set("fav", "1");
+      if (state.finish) p.set("finish", "1");
       history.replaceState(null, "", location.pathname + (p.toString() ? "?" + p.toString() : ""));
     }
     function apply() {
@@ -522,6 +527,7 @@
         if (state.deal && (f.deal || []).indexOf(state.deal) < 0) return false;
         if (state.srok && f.srok !== state.srok) return false;
         if (f.priceFrom > state.pmax) return false;
+        if (state.finish && FINISH_ZK.indexOf(f.zk) < 0) return false;
         return true;
       });
       list.sort(function (a, b) {
@@ -543,7 +549,7 @@
         if (em) em.textContent = roomLabel(upRoom) + " — в новых ЖК " + zs.map(function (z) { return z.name; }).join(" и ") + ". Старт продаж скоро — оставьте заявку, сообщим первыми.";
         if (elink) { elink.hidden = false; elink.textContent = "Смотреть ЖК " + zs[0].name; elink.setAttribute("href", rel("zk/" + zs[0].slug + ".html")); }
       } else {
-        if (em) em.textContent = "Под эти параметры вариантов нет.";
+        if (em) em.textContent = "";
         if (elink) elink.hidden = true;
       }
       writeURL();
@@ -561,7 +567,8 @@
     dealS.addEventListener("change", function () { state.deal = dealS.value; apply(); });
     srokS.addEventListener("change", function () { state.srok = srokS.value; apply(); });
     sortS.addEventListener("change", function () { state.sort = sortS.value; apply(); });
-    byId("cat-reset").addEventListener("click", function () { state = { rooms: [], zk: "", pmax: PMAX, deal: "", srok: "", sort: "price-asc", fav: false }; syncControls(); apply(); });
+    var finBtn = byId("cat-finish"); if (finBtn) finBtn.addEventListener("click", function () { state.finish = !state.finish; finBtn.classList.toggle("is-on", state.finish); finBtn.setAttribute("aria-pressed", state.finish ? "true" : "false"); apply(); });
+    byId("cat-reset").addEventListener("click", function () { state = { rooms: [], zk: "", pmax: PMAX, deal: "", srok: "", sort: "price-asc", fav: false, finish: false }; syncControls(); apply(); });
     var catEmptyReset = byId("cat-empty-reset"); if (catEmptyReset) catEmptyReset.addEventListener("click", function () { byId("cat-reset").click(); });
     grid.addEventListener("click", function (e) {
       var favBtn = e.target.closest(".flat-fav");
