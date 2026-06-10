@@ -960,4 +960,13 @@
       if (t.closest('a[href*="t.me/"]')) { track("telegram_click", {}); }
     }, true);
   });
+
+  /* #36 markup-review: footer columns accordion on mobile (like BI) */
+  document.addEventListener("DOMContentLoaded", function () {
+    if (!(window.matchMedia && matchMedia("(max-width: 760px)").matches)) return;
+    var hs = document.querySelectorAll(".foot-col h4");
+    for (var i = 0; i < hs.length; i++) {
+      (function (h) { h.addEventListener("click", function () { h.parentNode.classList.toggle("is-open"); }); })(hs[i]);
+    }
+  });
 })();

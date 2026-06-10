@@ -1375,3 +1375,12 @@
     font-weight: 600;
   }
   .hh-title { font-weight: 600; }
+
+/* #36 markup-review: footer columns accordion on mobile (like BI) */
+@media (max-width: 760px) {
+  .foot-col h4 { cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+  .foot-col h4::after { content: "+"; font-weight: 400; font-size: 18px; line-height: 1; opacity: .6; }
+  .foot-col.is-open h4::after { content: "\2013"; }
+  .foot-col ul { max-height: 0; overflow: hidden; transition: max-height .28s ease; }
+  .foot-col.is-open ul { max-height: 520px; }
+}
