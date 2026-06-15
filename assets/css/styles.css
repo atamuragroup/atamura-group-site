@@ -1,16 +1,17 @@
 
   :root {
     /* Base palette — ATAMŪRA Brandbook 2024 */
-    --bg:        #F7F5EE;                  /* warm off-white, brandbook-tinted */
-    --card:      #FBFBFB;                  /* brandbook white */
-    --ink:       #1E1E1E;                  /* brandbook black (NOT pure black) */
-    --ink-soft:  #4A4A4A;
-    --ink-mute:  #6E6E6E;
-    --line:      #E0DDD3;
-    --line-soft: #ECEAE2;
-    --black:     #1E1E1E;
-    --navy:      #284157;                  /* brandbook dark navy — было НЕ определено → выбранные чипы становились невидимыми */
-    --teal:      #007484;                  /* = brand teal — тоже было НЕ определено (цвет «Консультация» при скролле) */
+    --bg:        #F1F4F5;                  /* warm off-white, brandbook-tinted */
+    --card:      #FFFFFF;                  /* brandbook white */
+    --ink:       #081F3A;                  /* brandbook black (NOT pure black) */
+    --ink-soft:  #3C4C5C;
+    --ink-mute:  #6A7682;
+    --line:      #D8DEE1;
+    --line-soft: #E7ECEE;
+    --black:     #081F3A;
+    --navy:      #081F3A;                  /* brandbook dark navy — было НЕ определено → выбранные чипы становились невидимыми */
+    --teal:      #00BCC8;
+    --coral:     #FF2125;                  /* Сигнальный коралл — ТОЛЬКО промо/реклама */                  /* = brand teal — тоже было НЕ определено (цвет «Консультация» при скролле) */
     --grey:      #BCBCBC;                  /* brandbook grey */
     --green:     oklch(62% 0.16 145);
     --tg:        oklch(62% 0.13 230);
@@ -40,38 +41,38 @@
 
   /* ============ THEME A: Бирюза + Золото (Brandbook combination 2: teal-led) ============ */
   [data-theme="teal"] {
-    --brand:        #007484;               /* brandbook dark teal */
-    --brand-deep:   #005763;
-    --brand-soft:   #E0EEF0;
+    --brand:        #00BCC8;               /* brandbook dark teal */
+    --brand-deep:   #0094A0;
+    --brand-soft:   #D8F3F6;
     --brand-on:     #FBFBFB;
-    --accent:       #CFB372;               /* brandbook gold */
-    --accent-soft:  #EFE6CD;
-    --accent-deep:  #A88E48;
-    --accent-on:    #1E1E1E;
-    --cta-orange:   #D86700;               /* brandbook contrast orange (paired with teal) */
-    --dark-cta:     #284157;               /* brandbook dark navy */
+    --accent:       #D0B473;               /* brandbook gold */
+    --accent-soft:  #F0E7D2;
+    --accent-deep:  #B0925A;
+    --accent-on:    #081F3A;
+    --cta-orange:   #FF2125;               /* brandbook contrast orange (paired with teal) */
+    --dark-cta:     #081F3A;               /* Ночная степь */
     --pop-eyebrow-bg: var(--accent-soft);
     --pop-eyebrow-fg: var(--accent-on);
-    --ai-grad-1:    #007484;
-    --ai-grad-2:    #CFB372;
+    --ai-grad-1:    #00BCC8;
+    --ai-grad-2:    #D0B473;
   }
 
   /* ============ THEME B: Навы + Золото (Brandbook combination 3: navy-led) ============ */
   [data-theme="blue"] {
-    --brand:        #284157;               /* brandbook dark navy */
-    --brand-deep:   #1A2B3A;
+    --brand:        #081F3A;               /* brandbook dark navy */
+    --brand-deep:   #04101F;
     --brand-soft:   #E5EAF0;
     --brand-on:     #FBFBFB;
-    --accent:       #CFB372;               /* brandbook gold (constant accent) */
-    --accent-soft:  #EFE6CD;
-    --accent-deep:  #A88E48;
-    --accent-on:    #1E1E1E;
+    --accent:       #D0B473;               /* brandbook gold (constant accent) */
+    --accent-soft:  #F0E7D2;
+    --accent-deep:  #B0925A;
+    --accent-on:    #081F3A;
     --cta-orange:   #866638;               /* brandbook brown-gold paired with navy */
     --dark-cta:     #1A2B3A;
     --pop-eyebrow-bg: var(--accent-soft);
     --pop-eyebrow-fg: var(--accent-on);
-    --ai-grad-1:    #284157;
-    --ai-grad-2:    #CFB372;
+    --ai-grad-1:    #081F3A;
+    --ai-grad-2:    #D0B473;
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -148,8 +149,8 @@
     content: ''; width: 10px; height: 10px;
     border-radius: 50%;
   }
-  .theme-btn[data-theme="teal"]::before { background: #007484; }
-  .theme-btn[data-theme="blue"]::before { background: #284157; }
+  .theme-btn[data-theme="teal"]::before { background: #00BCC8; }
+  .theme-btn[data-theme="blue"]::before { background: #081F3A; }
   .theme-btn.is-on {
     background: oklch(98% 0 0); color: var(--ink);
   }
@@ -1087,8 +1088,8 @@
   .zk-map-legend { display: flex; flex-wrap: wrap; gap: 12px 16px; margin-top: 12px; padding: 12px 16px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md); font-size: 12px; color: var(--ink-soft); }
   .legend-item { display: inline-flex; align-items: center; gap: 6px; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-  .legend-dot.is-navy { background: #284157; }
-  .legend-dot.is-teal { background: #007484; }
+  .legend-dot.is-navy { background: #081F3A; }
+  .legend-dot.is-teal { background: #00BCC8; }
   .legend-dot.is-violet { background: #7c3aed; }
   .legend-dot.is-green { background: #16a34a; }
   .legend-dot.is-red { background: #dc2626; }
