@@ -249,6 +249,60 @@
     });
   }
 
+  /* ---------- Попап «Скоро старт продаж» (#104) ----------
+     Клик по карточке ЖК со статусом «Скоро» (.badge.is-status.is-light) открывает форму
+     заявки в лист ожидания вместо перехода на страницу. Лид уходит в site-lead + localStorage. */
+  (function () {
+    var pop = byId("soonPopup");
+    if (!pop) return;
+    var form = pop.querySelector(".soon-form");
+    var stageForm = pop.querySelector('[data-soon-stage="form"]');
+    var stageOk = pop.querySelector('[data-soon-stage="success"]');
+    var nameInput = form ? form.querySelector('input[name="name"]') : null;
+    var phoneInput = form ? form.querySelector('input[name="phone"]') : null;
+    var honeyInput = form ? form.querySelector('input[name="company"]') : null;
+    var titleEl = pop.querySelector("[data-soon-title]");
+    var src = "soon";
+    if (form) bindPhones(form);
+
+    document.addEventListener("click", function (e) {
+      var card = e.target.closest && e.target.closest("a.pcard");
+      if (!card || !card.querySelector(".badge.is-status.is-light")) return;
+      e.preventDefault();
+      var href = card.getAttribute("href") || "";
+      var slug = (href.match(/zk\/([a-z-]+)\.html/) || [])[1] || "unknown";
+      src = "soon-" + slug;
+      var nm = card.querySelector(".pcard-name");
+      if (titleEl && nm) { titleEl.textContent = nm.textContent; titleEl.hidden = false; }
+      if (stageForm) stageForm.hidden = false;
+      if (stageOk) stageOk.hidden = true;
+      pop.classList.add("is-on");
+      track("soon_open", { source: src });
+      setTimeout(function () { if (nameInput) nameInput.focus(); }, 80);
+    });
+
+    if (!form) return;
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (honeyInput && honeyInput.value) return;
+      if (phoneInput && !phoneValid(phoneInput.value)) { showFieldError(phoneInput, "Введите номер: +7 7XX XXX-XX-XX"); phoneInput.focus(); return; }
+      var data = {};
+      new FormData(form).forEach(function (v, k) { if (k !== "company") data[k] = v; });
+      data.source = src;
+      data.page = location.pathname;
+      data.ref = document.referrer || "прямой заход";
+      data.utm = location.search || "";
+      data.ts = new Date().toISOString();
+      try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
+      track("soon_submit", { source: src, page: data.page });
+      if (stageForm) stageForm.hidden = true;
+      if (stageOk) stageOk.hidden = false;
+      if (LEAD_WEBHOOK) {
+        fetch(LEAD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true }).catch(function () {});
+      }
+    });
+  })();
+
   /* ---------- Карточка ЖК (.pcard) ---------- */
   function pcard(z) {
     var photo = imgsrc(z.hero_image || (z.gallery && z.gallery[0]) || "");

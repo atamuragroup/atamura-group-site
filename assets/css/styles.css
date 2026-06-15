@@ -80,17 +80,19 @@
     margin: 0; padding-bottom: 80px;
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Jost', 'Montserrat', 'Futura PT', 'Futura', -apple-system, system-ui, sans-serif;
+    font-family: 'Arimo', 'Jost', -apple-system, system-ui, sans-serif;
     font-size: var(--t-body); line-height: 1.45;
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "ss03", "cv11";
     transition: background 200ms;
   }
+  /* markup #106: Geologica для всех заголовков и подзаголовков, Arimo для текста */
+  h1, h2, h3, h4, h5, h6 { font-family: 'Geologica', 'Jost', -apple-system, system-ui, sans-serif; }
   /* Казахский режим: единый шрифт Montserrat. Jost НЕ содержит ә ғ қ ң ө ұ ү һ і —
      эти буквы подменялись на fallback и «плясали» внутри слов. Montserrat покрывает казахский
      полностью и единообразно. Русский (Jost) и заголовки (Cormorant) не затрагиваются. */
   html[lang="kk"] body {
-    font-family: 'Montserrat', 'Futura PT', 'Futura', -apple-system, system-ui, sans-serif;
+    font-family: 'Arimo', 'Montserrat', -apple-system, system-ui, sans-serif;
     font-feature-settings: normal;
   }
   /* Montserrat заметно шире Jost — верхнее меню из 8 пунктов слегка ужимаем, чтобы оно помещалось в строку. */
@@ -574,7 +576,7 @@
   .pagehero-slide.is-on { opacity: 1; }
   .pagehero-scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, oklch(0% 0 0 /.34) 0%, oklch(0% 0 0 /.66) 100%); pointer-events: none; }
   .pagehero-multi .pagehero-inner { position: relative; z-index: 2; }
-  .features-strip h3 { font-family: "Cormorant", Georgia, serif; font-size: clamp(24px, 2.8vw, 34px); font-weight: 600; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 var(--s-6); color: var(--ink); }
+  .features-strip h3 { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(24px, 2.8vw, 34px); font-weight: 600; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 var(--s-6); color: var(--ink); }
   .features-strip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-5) var(--s-6); align-items: start; }
   .features-strip-item { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; flex: 0 0 calc(25% - var(--s-6)); max-width: 200px; min-width: 130px; }
   .features-strip-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--accent-soft); color: var(--brand); }
@@ -598,14 +600,14 @@
   .catalog-showcase-inner { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: clamp(28px, 4vw, 56px); position: relative; z-index: 1; }
   .catalog-showcase-content { color: #fff; max-width: 56ch; }
   .catalog-showcase .catalog-eyebrow { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin: 0 0 var(--s-2); }
-  .catalog-showcase-title { font-family: "Cormorant", Georgia, serif; font-size: clamp(28px, 3.4vw, 42px); font-weight: 600; line-height: 1.05; letter-spacing: 0.005em; margin: 0 0 var(--s-3); color: #fff; }
+  .catalog-showcase-title { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(28px, 3.4vw, 42px); font-weight: 600; line-height: 1.05; letter-spacing: 0.005em; margin: 0 0 var(--s-3); color: #fff; }
   .catalog-showcase-sub { font-size: 14px; line-height: 1.55; color: rgba(255,255,255,0.72); margin: 0 0 var(--s-4); }
   .catalog-cover { display: block; width: clamp(160px, 18vw, 220px); aspect-ratio: 0.75 / 1; position: relative; border-radius: 6px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.55), 0 12px 30px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(207,179,114,0.45); transform: perspective(1000px) rotateY(-8deg) rotateX(3deg) rotateZ(-1.2deg); transition: transform 500ms cubic-bezier(.2,.8,.25,1); flex-shrink: 0; }
   .catalog-cover:hover { transform: perspective(1000px) rotateY(0) rotateX(0) rotateZ(0); }
   .catalog-cover picture, .catalog-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .catalog-cover-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: clamp(16px, 2.5vw, 24px) clamp(12px, 2vw, 20px); background: linear-gradient(180deg, rgba(15,26,38,0.86) 0%, rgba(15,26,38,0.4) 35%, rgba(15,26,38,0.5) 65%, rgba(15,26,38,0.92) 100%); color: #fff; text-align: center; pointer-events: none; }
   .catalog-cover-eyebrow { font-size: 8px; font-weight: 700; letter-spacing: 0.3em; color: var(--accent); text-transform: uppercase; }
-  .catalog-cover-brand { font-family: "Cormorant", Georgia, serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; letter-spacing: 0.06em; line-height: 1; margin: auto 0; color: #fff; }
+  .catalog-cover-brand { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; letter-spacing: 0.06em; line-height: 1; margin: auto 0; color: #fff; }
   .catalog-cover-logo-frame { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 100%; }
   .catalog-cover-logo { display: block; width: 62%; max-width: 130px; height: auto; object-fit: contain; opacity: 0.96; }
   .catalog-cover-tag { font-size: 8px; font-weight: 600; letter-spacing: 0.2em; color: rgba(255,255,255,0.78); text-transform: uppercase; }
@@ -623,7 +625,7 @@
   /* Компактный вариант для странички ЖК — карточка внутри потока */
   .catalog-card { background: var(--brand); color: var(--brand-on); border-radius: var(--r-lg); padding: var(--s-6) var(--s-7); margin: var(--s-7) 0; display: flex; align-items: center; justify-content: space-between; gap: var(--s-5); flex-wrap: wrap; }
   .catalog-card-text { flex: 1 1 280px; min-width: 0; }
-  .catalog-card h3 { font-family: "Cormorant", Georgia, serif; font-size: clamp(20px, 2vw, 26px); font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--brand-on); }
+  .catalog-card h3 { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(20px, 2vw, 26px); font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--brand-on); }
   .catalog-card p { font-size: 13px; color: oklch(90% 0.01 230); margin: 0; line-height: 1.5; }
   .catalog-card .btn { min-height: 48px; flex-shrink: 0; }
   @media (max-width: 768px) {
@@ -643,11 +645,23 @@
   .catalog-popup .popup-form .input-pill { background: var(--bg); border: 1px solid var(--line); }
   .catalog-popup .popup-form .btn-block { width: 100%; min-height: 50px; font-size: 14px; }
   .catalog-popup .popup-form .honey { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
+  /* ============ SOON POPUP (#104 — лист ожидания для проектов «Скоро») ============ */
+  .soon-popup .popup { max-width: 460px; }
+  .soon-popup .popup-stage[hidden] { display: none; }
+  .soon-popup .soon-form { display: grid; gap: var(--s-3); margin-top: var(--s-4); }
+  .soon-popup .soon-form input[type="tel"], .soon-popup .soon-form input[name="name"] {
+    min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px; font: inherit; background: #fff; color: var(--ink); width: 100%; box-sizing: border-box;
+  }
+  .soon-popup .soon-form .btn-block { width: 100%; min-height: 50px; font-size: 14px; }
+  .soon-popup .field-err { font-size: 12px; color: #c0392b; margin: 4px 4px 0; line-height: 1.3; }
+  .soon-popup input[aria-invalid="true"] { border-color: #c0392b; background: #fef2f2; }
+  .soon-popup [data-soon-title]:not([hidden])::before { content: " · "; }
+  .soon-popup .popup-fineprint { font-size: 11px; color: var(--ink-soft); margin: 6px 0 0; text-align: center; }
   /* ============ FOOTER ============ */
   .foot { background: var(--bg); border-top: 1px solid var(--line); padding-block: var(--sect-py); }
   .foot-cta { display: flex; align-items: center; justify-content: space-between; gap: var(--s-5); padding: var(--s-6) var(--s-7); margin-bottom: var(--s-8); background: var(--brand); color: var(--brand-on); border-radius: var(--r-lg); flex-wrap: wrap; }
   .foot-cta-text { flex: 1 1 320px; min-width: 0; }
-  .foot-cta h3 { font-family: "Cormorant", Georgia, serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em; line-height: 1.15; color: var(--brand-on); }
+  .foot-cta h3 { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em; line-height: 1.15; color: var(--brand-on); }
   .foot-cta p { font-size: 14px; color: oklch(88% 0.01 230); margin: 0; max-width: 56ch; line-height: 1.5; }
   .foot-cta .foot-cta-btns { display: flex; gap: var(--s-2); flex-wrap: wrap; }
   .foot-cta .btn { min-height: 48px; padding: 14px 26px; font-size: 14px; flex-shrink: 0; }
@@ -1370,7 +1384,7 @@
   /* Засечные заголовки — Cormorant (премиум / «наследие»). Текст, интерфейс и числа остаются Jost. */
   .hh-title, .sect-title, .pagehero-title, .zk-h2,
   .content h2, .reviews h2, .news h2, .premium-row h2, .mortgage-info h2, .help-cta h3 {
-    font-family: 'Cormorant', Georgia, 'Times New Roman', serif;
+    font-family: 'Geologica', 'Cormorant', Georgia, serif;
     letter-spacing: 0;
     font-weight: 600;
   }
