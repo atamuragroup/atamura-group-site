@@ -1107,6 +1107,8 @@
   .zk-aside { position: sticky; top: 96px; }
   .zk-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: var(--s-6); box-shadow: var(--shadow-card); }
   .zk-card-price { font-size: 26px; font-weight: 700; color: var(--brand-deep); letter-spacing: -0.02em; }
+  /* markup #88: стандартная карта заявки в aside ЖК */
+  .zk-card-title { font-size: 19px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.2; margin: 0 0 var(--s-3); color: var(--ink); }
   .zk-card-note { font-size: 13px; color: var(--ink-soft); margin: var(--s-3) 0 var(--s-5); line-height: 1.5; }
   .zk-card .lead-form { display: grid; gap: var(--s-3); }
   .zk-card .btn { width: 100%; }
