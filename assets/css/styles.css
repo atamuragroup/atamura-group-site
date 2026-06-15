@@ -816,8 +816,9 @@
     .foot .foot-col-projects ul,
     .foot .foot-col-purchase ul { display: grid; grid-template-columns: 1fr 1fr; gap: 8px var(--s-5); justify-items: center; max-width: 320px; margin: 0 auto; }
     .foot .foot-grid > div:first-child > a.logo { justify-content: center; }
+    /* markup #67: телефон офисов и расписание — по левому краю */
     .foot .foot-grid > div:first-child .foot-phone,
-    .foot .foot-grid > div:first-child .foot-hours { text-align: center; }
+    .foot .foot-grid > div:first-child .foot-hours { text-align: left; }
     .foot-bottom { justify-content: center; text-align: center; }
     /* === Промо — 3 карточки → горизонтальная карусель, бренд-цвет на is-discount === */
     .premium-grid { grid-template-columns: none !important; }
@@ -1429,6 +1430,11 @@
 @media (max-width: 760px){ .pagehero .crumbs { justify-content: flex-start; text-align: left; } .pagehero-title, .pagehero-lead { text-align: left; margin-left: 0; } }
 /* #42: заголовок заметно крупнее крошек/адреса */
 .pagehero-title { font-size: clamp(26px, 5vw, 40px); line-height: 1.1; }
+
+/* markup #76/#82: хиро на страницах ЖК — крупный квадрат (моб), широкий баннер (десктоп) */
+.pagehero-zk { aspect-ratio: 1 / 1; display: flex; align-items: flex-end; padding: 0 0 clamp(20px,6vw,40px) !important; }
+.pagehero-zk .pagehero-inner { width: 100%; }
+@media (min-width: 768px) { .pagehero-zk { aspect-ratio: 16 / 7; } }
 
 /* #45/#49/#55 markup-review: лид-форма (имя+телефон) в footer-CTA */
 .foot-cta-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; max-width: 560px; }
