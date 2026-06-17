@@ -548,9 +548,17 @@
         '<p class="cat-note">Цена — «от». Точную стоимость и подходящие квартиры подберёт менеджер.</p></div>' +
         '<button class="cat-fav-toggle" type="button" id="cat-fav" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Избранное<span class="cat-fav-n" id="cat-fav-n"></span></button></div>' +
       '<div class="cat-grid" id="cat-grid"></div>' +
-      '<div class="cat-empty" id="cat-empty" hidden><span id="cat-empty-msg">Под эти параметры вариантов нет.</span> <a class="btn btn-outline btn-sm" id="cat-empty-link" hidden></a></div>';
+      '<div class="cat-empty" id="cat-empty" hidden><span id="cat-empty-msg">Под эти параметры вариантов нет.</span> <a class="btn btn-outline btn-sm" id="cat-empty-link" hidden></a></div>' +
+      '<div class="cat-more-wrap"><button class="btn btn-outline cat-more" type="button" id="cat-more" hidden>Показать ещё</button></div>';
 
-    var grid = byId("cat-grid"), count = byId("cat-count"), empty = byId("cat-empty");
+    var grid = byId("cat-grid"), count = byId("cat-count"), empty = byId("cat-empty"), moreBtn = byId("cat-more");
+    /* #129: пагинация каталога — по 8 карточек, «Показать ещё» открывает следующие 8 */
+    var SHOW_STEP = 8, shown = SHOW_STEP, lastList = [];
+    function paintGrid() {
+      grid.innerHTML = lastList.slice(0, shown).map(flatCard).join("");
+      if (moreBtn) moreBtn.hidden = lastList.length <= shown;
+    }
+    if (moreBtn) moreBtn.addEventListener("click", function () { shown += SHOW_STEP; paintGrid(); });
     var pmaxR = byId("cat-pmax"), pmaxV = byId("cat-pmax-v"), zkS = byId("cat-zk"), dealS = byId("cat-deal"), srokS = byId("cat-srok"), sortS = byId("cat-sort");
 
     function syncControls() {
@@ -590,7 +598,7 @@
         return a.priceFrom - b.priceFrom;
       });
       count.textContent = list.length + " " + plural(list.length, "вариант", "варианта", "вариантов");
-      grid.innerHTML = list.map(flatCard).join("");
+      shown = SHOW_STEP; lastList = list; paintGrid();
       empty.hidden = list.length > 0;
       grid.hidden = list.length === 0;
       var em = byId("cat-empty-msg"), elink = byId("cat-empty-link");
@@ -989,9 +997,47 @@
     });
   }
 
+  /* #126: фулскрин-лайтбокс для галерей ЖК (клик по фото → перемотка ‹ ›, Esc, клик вне) */
+  function bindLightbox() {
+    var galImgs = function (gal) { return Array.prototype.slice.call(gal.querySelectorAll("img")); };
+    var box = null, imgs = [], idx = 0, imgEl = null;
+    function build() {
+      box = document.createElement("div");
+      box.className = "lightbox";
+      box.innerHTML =
+        '<button class="lightbox-close" type="button" aria-label="Закрыть">&times;</button>' +
+        '<button class="lightbox-nav lightbox-prev" type="button" aria-label="Назад">&#8249;</button>' +
+        '<img class="lightbox-img" alt="" />' +
+        '<button class="lightbox-nav lightbox-next" type="button" aria-label="Вперёд">&#8250;</button>' +
+        '<div class="lightbox-count"></div>';
+      document.body.appendChild(box);
+      imgEl = box.querySelector(".lightbox-img");
+      box.querySelector(".lightbox-close").addEventListener("click", close);
+      box.querySelector(".lightbox-prev").addEventListener("click", function (e) { e.stopPropagation(); go(-1); });
+      box.querySelector(".lightbox-next").addEventListener("click", function (e) { e.stopPropagation(); go(1); });
+      box.addEventListener("click", function (e) { if (e.target === box) close(); });
+    }
+    function show() { imgEl.src = imgs[idx]; box.querySelector(".lightbox-count").textContent = (idx + 1) + " / " + imgs.length; }
+    function go(d) { idx = (idx + d + imgs.length) % imgs.length; show(); }
+    function open(list, i) { if (!box) build(); imgs = list; idx = i; show(); box.classList.add("is-on"); document.body.style.overflow = "hidden"; }
+    function close() { if (box) box.classList.remove("is-on"); document.body.style.overflow = ""; }
+    document.addEventListener("click", function (e) {
+      var img = e.target.closest && e.target.closest(".zk-gallery img");
+      if (!img) return;
+      var gal = img.closest(".zk-gallery");
+      var list = galImgs(gal).map(function (im) { return im.currentSrc || im.src; });
+      open(list, galImgs(gal).indexOf(img));
+    });
+    document.addEventListener("keydown", function (e) {
+      if (!box || !box.classList.contains("is-on")) return;
+      if (e.key === "Escape") close(); else if (e.key === "ArrowLeft") go(-1); else if (e.key === "ArrowRight") go(1);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     renderZhkDetail();
     renderCatalog();
+    bindLightbox();
     bindHeroSearch();
     bindAiHelper();
     bindForms(document);
