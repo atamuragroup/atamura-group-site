@@ -493,7 +493,7 @@
         '<div class="flat-price"><strong>от ' + money(f.priceFrom) + ' ₸</strong><span>взнос 20% → от ' + money(f.payFrom) + " ₸/мес · 7-20-25</span></div>" +
         '<div class="flat-meta"><span>ЖК ' + f.zkName + '</span><span>·</span><span>' + f.segment + "</span></div>" +
         '<div class="flat-actions">' +
-          '<a class="btn btn-brand btn-sm" href="https://wa.me/' + WA_PHONE + "?text=" + encodeURIComponent(waText) + '" target="_blank" rel="noopener" data-wa="catalog-plan">Получить планировку и цену</a>' +
+          '<a class="btn btn-brand btn-sm" href="https://wa.me/' + WA_PHONE + "?text=" + encodeURIComponent(waText) + '" target="_blank" rel="noopener" data-wa="catalog-plan">Получить консультацию</a>' +
           '<a class="btn btn-outline btn-sm" href="' + rel("zk/" + f.zk + ".html") + '">Подробнее о ЖК</a>' +
         "</div>" +
       "</div></article>";

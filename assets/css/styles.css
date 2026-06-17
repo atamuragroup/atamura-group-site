@@ -195,14 +195,14 @@
     display: inline-flex; align-items: center; gap: 12px;
     color: var(--ink);
   }
-  /* Логотип ATAMURA GROUP — оригинал из брендбука (прозрачный PNG) */
-  .logo-img { height: 46px; width: auto; min-width: 70px; display: block; flex-shrink: 0; }
+  /* Логотип ATAMURA GROUP — горизонтальный SVG-локап (1715×216), markup #131/#124 */
+  .logo-img { height: 30px; width: auto; min-width: 0; display: block; flex-shrink: 0; }
   .logo-text { display: none; }
   /* small variant for footer */
-  .logo.is-sm .logo-img { height: 40px; min-width: 0; } /* футер: снять min-width, иначе узкое лого растягивается (сплющивается) */
-  /* В drawer (мобильное меню) логотип без рамки/outline и без min-width-ghost-box */
+  .logo.is-sm .logo-img { height: 26px; min-width: 0; }
+  /* В drawer (мобильное меню) логотип без рамки/outline */
   .drawer .logo { border: 0; outline: 0; }
-  .drawer .logo-img { border: 0; outline: 0; min-width: 0; height: 44px; }
+  .drawer .logo-img { border: 0; outline: 0; min-width: 0; height: 28px; }
 
   /* nav */
   .nav-main { display: flex; gap: clamp(8px, 1vw, 16px); align-items: center; font-size: 13px; font-weight: 500; }
@@ -1455,3 +1455,22 @@
 @media (max-width: 760px){ #projects .grid-3 { grid-template-columns: 1fr; } }
 /* #56 markup-review: заголовок ЖК — под баннером (как BI) */
 .zk-pagetitle { font-size: clamp(26px, 5vw, 38px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 var(--s-3); color: var(--ink); }
+
+/* ============ markup batch 2026-06-17 ============ */
+/* #108/#112: фон всех заявочных форм → Ночная степь #081F3A; #109: текст белый */
+.foot-cta { background: #081F3A; }
+.foot-cta-consent { color: oklch(82% 0.02 230); }
+.zk-card, .lead-form-card { background: #081F3A; border-color: rgba(255,255,255,0.12); }
+.zk-card .zk-card-title, .lead-form-card h3 { color: #fff; }
+.zk-card .zk-card-note, .lead-form-card p { color: oklch(90% 0.012 230); }
+.zk-card .popup-fineprint, .zk-card .popup-fineprint a,
+.lead-form-card .popup-fineprint, .lead-form-card .popup-fineprint a { color: oklch(80% 0.02 230); }
+.zk-card > div[style*="ink-soft"] { color: oklch(82% 0.02 230) !important; }
+/* #113/#114/#115/#117: фон кнопок-заявок → бирюза #00BCC8 */
+.btn-accent { background: #00BCC8; color: #052b33; }
+.btn-accent:hover { background: #00a9b4; }
+/* #118: число «10%» в акции → бирюза */
+.pct-hl { color: #00BCC8; }
+/* #123: скруглить углы всех хиро-баннеров */
+.pagehero { border-radius: var(--r-lg); overflow: hidden; }
+.pagehero-zk { border-radius: var(--r-lg); overflow: hidden; }
