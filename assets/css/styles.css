@@ -1511,3 +1511,19 @@
 .pagehero-zk { position: relative; }
 .pagehero-zk::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(180deg, transparent 52%, rgba(8,31,58,0.58) 100%); }
 .pagehero-zk .pagehero-inner { position: relative; z-index: 1; }
+/* #145: мобильная шапка — белая полоса сверху, фото ЖК/героя ПОД ней (desktop не трогаем) */
+@media (max-width: 768px) {
+  .head, .head.over, .head.over.is-stuck {
+    position: sticky !important; top: 0 !important; z-index: 60 !important;
+    background: #fff !important; backdrop-filter: none !important;
+    border-bottom: 1px solid var(--line) !important; box-shadow: 0 1px 8px rgba(8,31,58,0.06) !important;
+  }
+  .head-row { padding: 10px 16px !important; }
+  /* на белой шапке — тёмный (navy) логотип, не белый */
+  .head.over .logo-w, .head .logo-w { display: none !important; }
+  .head.over .logo-n, .head .logo-n { display: block !important; }
+  /* переключатель языков тёмным на белом */
+  .head .lang-switch { border-color: rgba(8,31,58,0.25) !important; }
+  .head .lang-opt { color: var(--ink) !important; }
+  .head .lang-opt[aria-pressed="true"] { color: #fff !important; }
+}

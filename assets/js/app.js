@@ -1034,22 +1034,25 @@
     });
   }
 
-  /* #135/#137/#141: всплывающая форма «Оставить заявку» (динамический DOM, отправка в site-lead).
-     Любая кнопка с [data-open-lead] открывает форму. Источник — data-lead-source. */
+  /* #144/#146: ЕДИНАЯ универсальная форма «Поможем с выбором» (динамический DOM).
+     Любая кнопка [data-open-lead] открывает попап с выбором: WhatsApp или «Заказать звонок» (форма имя+тел → site-lead). */
+  var LEAD_WA = "https://wa.me/77006410499?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%AF%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0%20Atamura.%20%D0%A5%D0%BE%D1%82%D0%B5%D0%BB%D0%BE%D1%81%D1%8C%20%D0%B1%D1%8B%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8E.&utm_source=site&utm_medium=whatsapp&utm_campaign=atamura";
   function bindLeadPopup() {
-    var box = null, nameI = null, phoneI = null, honey = null, stageForm = null, stageOk = null, src = "zaivka";
+    var box = null, nameI = null, phoneI = null, honey = null, stIntro = null, stForm = null, stOk = null, src = "zaivka";
     function build() {
       var kk = document.documentElement.lang === "kk";
       var T = kk ? {
-        eyebrow: "Өтінім", title: "Өтінім қалдыру",
-        text: "Атыңыз бен телефоныңызды қалдырыңыз — ATAMURA менеджері қоңырау шалып, пәтер таңдап, ипотеканы есептейді.",
-        name: "Атыңыз", send: "Жіберу", fine1: "Басу арқылы сіз ", finePdn: "ДК өңдеуге", fine2: " келісесіз.",
-        okEyebrow: "Дайын", okTitle: "Рақмет! Өтінім қабылданды", okText: "ATAMURA менеджері жұмыс уақытында сізбен хабарласады.", close: "Жабу",
+        eyebrow: "Көмек", title: "Таңдауға көмектесеміз",
+        text: "ATAMURA менеджері бюджетіңізге сай нұсқаларды таңдап, сатылым кеңсесінде кеңеске жазады.",
+        wa: "WhatsApp-қа жазу", call: "Қоңырау тапсырыс беру", name: "Атыңыз", send: "Жіберу",
+        fine1: "Басу арқылы сіз ", finePdn: "ДК өңдеуге", fine2: " келісесіз.",
+        okTitle: "Рақмет! Өтінім қабылданды", okText: "ATAMURA менеджері жұмыс уақытында сізбен хабарласады.", close: "Жабу",
       } : {
-        eyebrow: "Заявка", title: "Оставить заявку",
-        text: "Оставьте имя и телефон — менеджер ATAMURA перезвонит, подберёт квартиру и рассчитает ипотеку.",
-        name: "Ваше имя", send: "Отправить", fine1: "Нажимая, вы соглашаетесь с ", finePdn: "обработкой ПДн", fine2: ".",
-        okEyebrow: "Готово", okTitle: "Спасибо! Заявка принята", okText: "Менеджер ATAMURA свяжется с вами в рабочее время.", close: "Закрыть",
+        eyebrow: "Помощь", title: "Поможем с выбором",
+        text: "Менеджер ATAMURA подберёт варианты под ваш бюджет и запишет на консультацию в офис продаж.",
+        wa: "Написать в WhatsApp", call: "Заказать звонок", name: "Ваше имя", send: "Отправить",
+        fine1: "Нажимая, вы соглашаетесь с ", finePdn: "обработкой ПДн", fine2: ".",
+        okTitle: "Спасибо! Заявка принята", okText: "Менеджер ATAMURA свяжется с вами в рабочее время.", close: "Закрыть",
       };
       box = document.createElement("div");
       box.className = "popup-overlay lead-popup";
@@ -1057,24 +1060,27 @@
       box.innerHTML =
         '<div class="popup"><button class="popup-close" type="button" aria-label="' + T.close + '">' +
         '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l8 8M11 3L3 11"/></svg></button>' +
-        '<div class="popup-stage" data-lead-stage="form"><span class="popup-eyebrow">' + T.eyebrow + '</span>' +
+        '<div class="popup-stage" data-lead-stage="intro"><span class="popup-eyebrow">' + T.eyebrow + '</span>' +
         '<h3>' + T.title + '</h3><p>' + T.text + '</p>' +
+        '<a class="btn btn-light btn-block" href="' + LEAD_WA + '" target="_blank" rel="noopener" data-wa="lead-popup">' + T.wa + '</a>' +
+        '<button type="button" class="btn btn-accent btn-block" data-lead-tocall style="margin-top:8px">' + T.call + '</button></div>' +
+        '<div class="popup-stage" data-lead-stage="form" hidden><span class="popup-eyebrow">' + T.eyebrow + '</span><h3>' + T.call + '</h3>' +
         '<form class="lead-pop-form" novalidate>' +
         '<input type="text" name="name" autocomplete="name" placeholder="' + T.name + '" />' +
         '<input type="tel" name="phone" required placeholder="+7 (7__) ___-__-__" />' +
         '<input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />' +
         '<button type="submit" class="btn btn-accent btn-block">' + T.send + '</button>' +
         '<p class="popup-fineprint">' + T.fine1 + '<a href="' + rel("privacy.html") + '">' + T.finePdn + '</a>' + T.fine2 + '</p></form></div>' +
-        '<div class="popup-stage" data-lead-stage="success" hidden><span class="popup-eyebrow">' + T.okEyebrow + '</span>' +
-        '<h3>' + T.okTitle + '</h3><p>' + T.okText + '</p>' +
+        '<div class="popup-stage" data-lead-stage="success" hidden><h3>' + T.okTitle + '</h3><p>' + T.okText + '</p>' +
         '<button type="button" class="btn btn-light btn-block" data-lead-close>' + T.close + '</button></div></div>';
       document.body.appendChild(box);
       var form = box.querySelector(".lead-pop-form");
       nameI = form.querySelector('input[name="name"]'); phoneI = form.querySelector('input[name="phone"]'); honey = form.querySelector('input[name="company"]');
-      stageForm = box.querySelector('[data-lead-stage="form"]'); stageOk = box.querySelector('[data-lead-stage="success"]');
+      stIntro = box.querySelector('[data-lead-stage="intro"]'); stForm = box.querySelector('[data-lead-stage="form"]'); stOk = box.querySelector('[data-lead-stage="success"]');
       bindPhones(form);
       box.querySelector(".popup-close").addEventListener("click", close);
       box.querySelector("[data-lead-close]").addEventListener("click", close);
+      box.querySelector("[data-lead-tocall]").addEventListener("click", function () { stIntro.hidden = true; stForm.hidden = false; setTimeout(function () { nameI.focus(); }, 60); });
       box.addEventListener("click", function (e) { if (e.target === box) close(); });
       form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -1083,7 +1089,7 @@
         var data = { name: (nameI.value || "").trim(), phone: phoneI.value, source: src, page: location.pathname, ref: document.referrer || "прямой заход", utm: location.search || "", ts: new Date().toISOString() };
         try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
         track("lead_submit", { source: src, page: data.page });
-        stageForm.hidden = true; stageOk.hidden = false;
+        stForm.hidden = true; stOk.hidden = false;
         if (LEAD_WEBHOOK) fetch(LEAD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true }).catch(function () {});
       });
     }
@@ -1094,10 +1100,9 @@
       e.preventDefault();
       if (!box) build();
       src = btn.getAttribute("data-lead-source") || "zaivka";
-      stageForm.hidden = false; stageOk.hidden = true;
+      stIntro.hidden = false; stForm.hidden = true; stOk.hidden = true;
       box.classList.add("is-on");
       track("lead_open", { source: src });
-      setTimeout(function () { if (nameI) nameI.focus(); }, 80);
     });
   }
 
