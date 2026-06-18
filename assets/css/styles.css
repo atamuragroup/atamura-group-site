@@ -1494,3 +1494,20 @@
 /* #129: «Показать ещё» */
 .cat-more-wrap { text-align: center; margin-top: var(--s-5); }
 .cat-more { min-width: 200px; }
+/* #135/#137/#141: попап «Оставить заявку» */
+.lead-popup .popup { max-width: 460px; }
+.lead-popup .popup-stage[hidden] { display: none; }
+.lead-popup .lead-pop-form { display: grid; gap: var(--s-3); margin-top: var(--s-4); }
+.lead-popup .lead-pop-form input[type="tel"], .lead-popup .lead-pop-form input[name="name"] {
+  min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 8px; font: inherit; background: #fff; color: var(--ink); width: 100%; box-sizing: border-box;
+}
+.lead-popup .btn-block { width: 100%; min-height: 50px; }
+.lead-popup .field-err { font-size: 12px; color: #c0392b; margin: 4px 4px 0; }
+.lead-popup input[aria-invalid="true"] { border-color: #c0392b; background: #fef2f2; }
+.lead-popup .popup-fineprint { font-size: 11px; color: var(--ink-soft); margin: 6px 0 0; text-align: center; }
+/* #132: логотип на мобиле — в длину не больше половины экрана */
+@media (max-width: 600px) { .logo-img { height: 22px; max-width: 48vw; object-fit: contain; object-position: left center; } }
+/* #139: лёгкий нижний градиент на хиро ЖК — крошки/бейджи читаемы на светлом фото */
+.pagehero-zk { position: relative; }
+.pagehero-zk::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; background: linear-gradient(180deg, transparent 52%, rgba(8,31,58,0.58) 100%); }
+.pagehero-zk .pagehero-inner { position: relative; z-index: 1; }

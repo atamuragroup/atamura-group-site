@@ -1034,10 +1034,78 @@
     });
   }
 
+  /* #135/#137/#141: всплывающая форма «Оставить заявку» (динамический DOM, отправка в site-lead).
+     Любая кнопка с [data-open-lead] открывает форму. Источник — data-lead-source. */
+  function bindLeadPopup() {
+    var box = null, nameI = null, phoneI = null, honey = null, stageForm = null, stageOk = null, src = "zaivka";
+    function build() {
+      var kk = document.documentElement.lang === "kk";
+      var T = kk ? {
+        eyebrow: "Өтінім", title: "Өтінім қалдыру",
+        text: "Атыңыз бен телефоныңызды қалдырыңыз — ATAMURA менеджері қоңырау шалып, пәтер таңдап, ипотеканы есептейді.",
+        name: "Атыңыз", send: "Жіберу", fine1: "Басу арқылы сіз ", finePdn: "ДК өңдеуге", fine2: " келісесіз.",
+        okEyebrow: "Дайын", okTitle: "Рақмет! Өтінім қабылданды", okText: "ATAMURA менеджері жұмыс уақытында сізбен хабарласады.", close: "Жабу",
+      } : {
+        eyebrow: "Заявка", title: "Оставить заявку",
+        text: "Оставьте имя и телефон — менеджер ATAMURA перезвонит, подберёт квартиру и рассчитает ипотеку.",
+        name: "Ваше имя", send: "Отправить", fine1: "Нажимая, вы соглашаетесь с ", finePdn: "обработкой ПДн", fine2: ".",
+        okEyebrow: "Готово", okTitle: "Спасибо! Заявка принята", okText: "Менеджер ATAMURA свяжется с вами в рабочее время.", close: "Закрыть",
+      };
+      box = document.createElement("div");
+      box.className = "popup-overlay lead-popup";
+      box.id = "leadPopup";
+      box.innerHTML =
+        '<div class="popup"><button class="popup-close" type="button" aria-label="' + T.close + '">' +
+        '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l8 8M11 3L3 11"/></svg></button>' +
+        '<div class="popup-stage" data-lead-stage="form"><span class="popup-eyebrow">' + T.eyebrow + '</span>' +
+        '<h3>' + T.title + '</h3><p>' + T.text + '</p>' +
+        '<form class="lead-pop-form" novalidate>' +
+        '<input type="text" name="name" autocomplete="name" placeholder="' + T.name + '" />' +
+        '<input type="tel" name="phone" required placeholder="+7 (7__) ___-__-__" />' +
+        '<input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />' +
+        '<button type="submit" class="btn btn-accent btn-block">' + T.send + '</button>' +
+        '<p class="popup-fineprint">' + T.fine1 + '<a href="' + rel("privacy.html") + '">' + T.finePdn + '</a>' + T.fine2 + '</p></form></div>' +
+        '<div class="popup-stage" data-lead-stage="success" hidden><span class="popup-eyebrow">' + T.okEyebrow + '</span>' +
+        '<h3>' + T.okTitle + '</h3><p>' + T.okText + '</p>' +
+        '<button type="button" class="btn btn-light btn-block" data-lead-close>' + T.close + '</button></div></div>';
+      document.body.appendChild(box);
+      var form = box.querySelector(".lead-pop-form");
+      nameI = form.querySelector('input[name="name"]'); phoneI = form.querySelector('input[name="phone"]'); honey = form.querySelector('input[name="company"]');
+      stageForm = box.querySelector('[data-lead-stage="form"]'); stageOk = box.querySelector('[data-lead-stage="success"]');
+      bindPhones(form);
+      box.querySelector(".popup-close").addEventListener("click", close);
+      box.querySelector("[data-lead-close]").addEventListener("click", close);
+      box.addEventListener("click", function (e) { if (e.target === box) close(); });
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (honey && honey.value) return;
+        if (!phoneValid(phoneI.value)) { showFieldError(phoneI, "Введите номер: +7 7XX XXX-XX-XX"); phoneI.focus(); return; }
+        var data = { name: (nameI.value || "").trim(), phone: phoneI.value, source: src, page: location.pathname, ref: document.referrer || "прямой заход", utm: location.search || "", ts: new Date().toISOString() };
+        try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
+        track("lead_submit", { source: src, page: data.page });
+        stageForm.hidden = true; stageOk.hidden = false;
+        if (LEAD_WEBHOOK) fetch(LEAD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true }).catch(function () {});
+      });
+    }
+    function close() { if (box) box.classList.remove("is-on"); }
+    document.addEventListener("click", function (e) {
+      var btn = e.target.closest && e.target.closest("[data-open-lead]");
+      if (!btn) return;
+      e.preventDefault();
+      if (!box) build();
+      src = btn.getAttribute("data-lead-source") || "zaivka";
+      stageForm.hidden = false; stageOk.hidden = true;
+      box.classList.add("is-on");
+      track("lead_open", { source: src });
+      setTimeout(function () { if (nameI) nameI.focus(); }, 80);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     renderZhkDetail();
     renderCatalog();
     bindLightbox();
+    bindLeadPopup();
     bindHeroSearch();
     bindAiHelper();
     bindForms(document);
