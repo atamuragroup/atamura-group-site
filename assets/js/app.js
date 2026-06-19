@@ -47,8 +47,8 @@
 
   /* Отзывы жильцов по ЖК (verbatim, как на главной). Показываем на странице ЖК, если есть. */
   var ZK_REVIEWS = {
-    atmosfera: { stars: "★★★★★", text: "Заехали в Атмосферу в марте. Двор не как в рекламе, а лучше: реально спокойно, дети играют, охрана работает. Поддержка отвечает в WhatsApp за 10 минут.", name: "Аида Н.", sub: "ЖК Атмосфера, 2 комн.", av: "АН" },
-    aura: { stars: "★★★★★", text: "Сравнивал 4 застройщика. Atamura единственные, кто сразу показал точную стоимость с отделкой и ипотекой — без «от» и «примерно». Купили в Aura.", name: "Мирас К.", sub: "ЖК Aura, 3 комн.", av: "МК" },
+    atmosfera: { stars: "★★★★★", text: "Заехали в Атмосферу в марте. Двор не как в рекламе, а лучше: реально спокойно, дети играют, охрана работает. Поддержка отвечает в WhatsApp за 10 минут.", name: "Аида Н.", sub: "Атмосфера, 2 комн.", av: "АН" },
+    aura: { stars: "★★★★★", text: "Сравнивал 4 застройщика. Atamura единственные, кто сразу показал точную стоимость с отделкой и ипотекой — без «от» и «примерно». Купили в Aura.", name: "Мирас К.", sub: "Aura, 3 комн.", av: "МК" },
     aqsai: { stars: "★★★★☆", text: "Брали таунхаус в Aqsai. Сдали с задержкой 2 месяца, но честно предупредили. После заселения мелкие косяки исправили без споров.", name: "Дамир Т.", sub: "Aqsai Resort, таунхаус", av: "ДТ" }
   };
 
@@ -328,7 +328,7 @@
       : z.priceFrom ? 'от <strong>' + (z.priceFrom / 1000000).toFixed(z.priceFrom % 1000000 ? 1 : 0).replace(".", ",") + "</strong> млн ₸"
       : (z.priceText ? "<strong>" + z.priceText + "</strong>" : "<strong>цена по запросу</strong>");
     return '<a class="pcard" href="' + rel("zk/" + z.slug + ".html") + '">' +
-      '<div class="pcard-photo">' + (photo ? '<img src="' + photo + '" alt="ЖК ' + z.name + '" loading="lazy" />' : "") +
+      '<div class="pcard-photo">' + (photo ? '<img src="' + photo + '" alt="' + z.name + '" loading="lazy" />' : "") +
         '<div class="pcard-badges"><span class="badge">' + z.segment + "</span>" + badge2 + "</div></div>" +
       '<div class="pcard-body"><div class="pcard-info"><h3 class="pcard-name">' + z.name + "</h3>" +
         '<span class="pcard-loc"><span class="dot">' + z.district + "</span></span></div>" +
@@ -349,7 +349,7 @@
     var cards = types.map(function (t) {
       var area = t.areaMin === t.areaMax ? t.areaMin + " м²" : t.areaMin + "–" + t.areaMax + " м²";
       return '<button type="button" class="plan-card" data-prooms-card="' + t.rooms + '" data-plans=\'' + JSON.stringify(t.plans.map(catAsset)) + '\' aria-label="Планировки ' + roomLabel(t.rooms) + '">' +
-        '<span class="plan-card-img"><img src="' + catAsset(t.plans[0]) + '" alt="Планировка ' + roomLabel(t.rooms) + (zname ? " — ЖК " + zname : "") + '" loading="lazy"><span class="plan-card-count">' + t.plans.length + " план.</span></span>" +
+        '<span class="plan-card-img"><img src="' + catAsset(t.plans[0]) + '" alt="Планировка ' + roomLabel(t.rooms) + (zname ? " — " + zname : "") + '" loading="lazy"><span class="plan-card-count">' + t.plans.length + " план.</span></span>" +
         '<span class="plan-card-body"><span class="plan-card-rooms">' + roomLabel(t.rooms) + '</span><span class="plan-card-area">' + area + '</span><span class="plan-card-price">от ' + money(t.priceFrom) + " ₸</span></span></button>";
     }).join("");
     return '<div class="plans-wrap">' + chips + '<div class="plans-grid">' + cards + "</div></div>";
@@ -364,7 +364,15 @@
     if (!types.length) return;
     var tableWrap = document.querySelector(".zk-layouts-wrap"); if (!tableWrap) return;
     var grid = document.createElement("div"); grid.innerHTML = plansGridHTML(types, "");
-    tableWrap.parentNode.replaceChild(grid.firstChild, tableWrap);
+    var gridNode = grid.firstChild;
+    tableWrap.parentNode.replaceChild(gridNode, tableWrap);
+    // #177: форма заявки сразу после планировок на страницах ЖК (клон foot-cta)
+    var footCta = document.querySelector(".foot-cta");
+    if (footCta && !document.querySelector(".foot-cta--inline")) {
+      var ctaClone = footCta.cloneNode(true);
+      ctaClone.className = "foot-cta foot-cta--inline";
+      gridNode.parentNode.insertBefore(ctaClone, gridNode.nextSibling);
+    }
     // обновляем вводный абзац ("изображения пришлёт менеджер" -> рабочий текст)
     var ps = document.querySelectorAll("p.zk-lead");
     for (var i = 0; i < ps.length; i++) {
@@ -373,6 +381,15 @@
         break;
       }
     }
+  }
+
+  /* #178/#179 — кнопки в мобильном drawer: «Заказать звонок» (форма) + «Написать на WhatsApp» */
+  function enhanceDrawer() {
+    var da = document.querySelector(".drawer-actions"); if (!da) return;
+    var brand = da.querySelector(".btn-brand");
+    if (brand) { brand.textContent = "Заказать звонок"; brand.setAttribute("data-open-lead", ""); brand.setAttribute("data-lead-source", "drawer"); brand.setAttribute("href", "#"); }
+    var outline = da.querySelector(".btn-outline");
+    if (outline) { outline.textContent = "Написать на WhatsApp"; }  // href уже wa.me
   }
 
   /* batch4 #160/#161/#162 — правки футера (на всех статических страницах) */
@@ -416,7 +433,7 @@
     var slug = host.getAttribute("data-slug");
     var z = window.ATAMURA_ZHK.filter(function (x) { return x.slug === slug; })[0];
     if (!z) { host.innerHTML = '<div class="wrap" style="padding:80px 0">Комплекс не найден. <a href="' + rel("index.html") + '#projects">Все ЖК</a></div>'; return; }
-    document.title = "ЖК " + z.name + " — ATAMURA GROUP";
+    document.title = "" + z.name + " — ATAMURA GROUP";
 
     var gal = []; if (z.hero_image) gal.push(z.hero_image); (z.gallery || []).forEach(function (g) { if (gal.indexOf(g) < 0) gal.push(g); });
     var heroImg = imgsrc(gal[0] || "");
@@ -437,11 +454,11 @@
       else other.push(h);
     });
     var near = z.nearby || [];
-    var mapQ = encodeURIComponent("ЖК " + z.name + " " + (z.address || z.district || "") + " Алматы");
+    var mapQ = encodeURIComponent("" + z.name + " " + (z.address || z.district || "") + " Алматы");
     var _c = ZK_COORDS[slug]; var mapSrc = _c ? "https://www.openstreetmap.org/export/embed.html?bbox=" + (_c[1] - 0.019) + "," + (_c[0] - 0.009) + "," + (_c[1] + 0.019) + "," + (_c[0] + 0.009) + "&layer=mapnik&marker=" + _c[0] + "," + _c[1] : "";
     var locBlock = block("Локация",
       (z.address ? '<p class="zk-lead" style="margin-bottom:var(--s-4)"><strong>Адрес:</strong> ' + z.address + (z.district && z.address.indexOf(z.district) < 0 ? " · " + z.district : "") + "</p>" : "") +
-      (mapSrc ? '<div class="zk-map"><iframe title="Карта — ЖК ' + z.name + '" src="' + mapSrc + '" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>' : "") +
+      (mapSrc ? '<div class="zk-map"><iframe title="Карта — ' + z.name + '" src="' + mapSrc + '" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>' : "") +
       '<div class="zk-maplinks"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 1.6c2.9 0 5.3 2.4 5.3 5.3 0 4-5.3 9.5-5.3 9.5S3.7 10.9 3.7 6.9C3.7 4 6.1 1.6 9 1.6z"/><circle cx="9" cy="6.9" r="2"/></svg><span class="zk-maplinks-label">Открыть на карте:</span><a href="https://2gis.kz/almaty/search/' + mapQ + '" target="_blank" rel="noopener">2GIS</a><a href="https://www.google.com/maps/search/?api=1&query=' + mapQ + '" target="_blank" rel="noopener">Google&nbsp;Maps</a><a href="https://yandex.ru/maps/?text=' + mapQ + '" target="_blank" rel="noopener">Яндекс</a></div>' +
       (near.length ? '<h3 class="zk-h3">Инфраструктура и дорога</h3><div class="feat-grid">' + featList(near) + "</div>" : ""));
     // #61/#27 — «Планировочные решения»: планировки из Profitbase, фильтр по комнатности, цена + площадь
@@ -452,7 +469,7 @@
     })();
     var catalogCard = '<div class="catalog-card">' +
       '<div class="catalog-card-text">' +
-        '<h3>Каталог по ЖК ' + z.name + ' и соседним</h3>' +
+        '<h3>Каталог по ' + z.name + ' и соседним</h3>' +
         '<p>Цены, площади, ипотечные программы и рассрочка 0% — на одном PDF. Менеджер ATAMŪRA свяжется в WhatsApp в течение 7 минут.</p>' +
       '</div>' +
       '<button type="button" class="btn btn-accent" data-open-catalog data-catalog-source="zk-' + z.slug + '">Забрать каталог</button>' +
@@ -491,9 +508,9 @@
     host.innerHTML =
       '<section class="pagehero" style="' + (heroImg ? "background-image:linear-gradient(180deg, oklch(0% 0 0 /.18) 0%, oklch(0% 0 0 /.62) 100%), url(" + heroImg + ")" : "background-color:var(--dark-cta)") + '">' +
         '<div class="wrap pagehero-inner">' +
-          '<nav class="crumbs"><a href="' + rel("index.html") + '">Главная</a><span>›</span><a href="' + rel("index.html") + '#projects">Жилые комплексы</a><span>›</span>ЖК ' + z.name + "</nav>" +
+          '<nav class="crumbs"><a href="' + rel("index.html") + '">Главная</a><span>›</span><a href="' + rel("index.html") + '#projects">Жилые комплексы</a><span>›</span>' + z.name + "</nav>" +
           '<div class="pagehero-badges">' + (z.segment ? '<span class="badge is-light">' + z.segment + "</span>" : "") + (z.status ? '<span class="badge is-accent">' + z.status + "</span>" : "") + "</div>" +
-          '<h1 class="pagehero-title">ЖК ' + z.name + "</h1>" +
+          '<h1 class="pagehero-title">' + z.name + "</h1>" +
           '<p class="pagehero-sub">' + (z.tagline || "") + " · " + z.district + "</p>" +
           '<div class="pagehero-cta"><a class="btn btn-accent" href="#zk-form">Узнать цены и планировки</a>' +
             (z.draft ? "" : '<a class="btn btn-light" href="' + z.site + '" target="_blank" rel="noopener">Текущий сайт ЖК</a>') + "</div>" +
@@ -502,7 +519,7 @@
         '<div class="zk-stats">' + stats + "</div>" +
         '<div class="zk-layout">' +
           '<div class="zk-main">' +
-            '<div class="zk-gallery">' + galTiles.map(function (u) { return u ? '<div class="zk-gtile"><img src="' + imgsrc(u) + '" alt="ЖК ' + z.name + '" loading="lazy"></div>' : '<div class="zk-gtile is-ph"></div>'; }).join("") + "</div>" +
+            '<div class="zk-gallery">' + galTiles.map(function (u) { return u ? '<div class="zk-gtile"><img src="' + imgsrc(u) + '" alt="' + z.name + '" loading="lazy"></div>' : '<div class="zk-gtile is-ph"></div>'; }).join("") + "</div>" +
             '<h2 class="zk-h2">О комплексе</h2><p class="zk-lead">' + (z.description || "") + "</p>" +
             '<div style="margin-top:var(--s-4)">' + roomChips + "</div>" +
             (z.draft ? '<div class="note">Фото комплекса — иллюстративные: финальные рендеры добавим позже. Описание и характеристики — по данным застройщика.</div>' : "") +
@@ -570,14 +587,14 @@
   function flatCard(f) {
     var rl = roomLabel(f.rooms);
     var area = f.areaMin === f.areaMax ? f.areaMin + " м²" : f.areaMin + "–" + f.areaMax + " м²";
-    var img = f.image ? '<img src="' + catAsset(f.image) + '" alt="' + rl + ' в ЖК ' + f.zkName + '" loading="lazy">' : "";
+    var img = f.image ? '<img src="' + catAsset(f.image) + '" alt="' + rl + ' в ' + f.zkName + '" loading="lazy">' : "";
     var srok = f.srok ? '<span class="flat-status">' + f.srok + "</span>" : "";
     var pN = (f.plans && f.plans.length) || 0;
     var pW = pN % 10 === 1 && pN % 100 !== 11 ? "планировка" : (pN % 10 >= 2 && pN % 10 <= 4 && (pN % 100 < 10 || pN % 100 >= 20) ? "планировки" : "планировок");
     var plansBtn = pN ? '<button class="flat-plans" type="button" data-plans=\'' + JSON.stringify(f.plans.map(catAsset)) + '\' aria-label="Смотреть планировки ' + rl + '">' +
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 9v12"/></svg>' +
       pN + " " + pW + "</button>" : "";
-    var waText = "Здравствуйте! Меня заинтересовала квартира в ЖК «" + f.zkName + "». Планировка: " + rl + ". Площадь: " + area + ". Стоимость: от " + money(f.priceFrom) + " ₸. Подскажите, пожалуйста, актуальна ли эта квартира и какие есть условия покупки?";
+    var waText = "Здравствуйте! Меня заинтересовала квартира в «" + f.zkName + "». Планировка: " + rl + ". Площадь: " + area + ". Стоимость: от " + money(f.priceFrom) + " ₸. Подскажите, пожалуйста, актуальна ли эта квартира и какие есть условия покупки?";
     var fid = flatId(f), isf = isFav(f);
     var heart = '<button class="flat-fav' + (isf ? ' is-on' : '') + '" type="button" data-fav="' + fid + '" aria-pressed="' + (isf ? 'true' : 'false') + '" aria-label="' + (isf ? 'Убрать из избранного' : 'В избранное') + '"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>';
     return '<article class="flat" data-zk="' + f.zk + '">' + heart +
@@ -585,7 +602,7 @@
       '<div class="flat-body">' +
         '<div class="flat-head"><span class="flat-rooms">' + rl + '</span><span class="flat-area">' + area + "</span></div>" +
         '<div class="flat-price"><strong>от ' + money(f.priceFrom) + ' ₸</strong><span>взнос 20% → от ' + money(f.payFrom) + " ₸/мес · 7-20-25</span></div>" +
-        '<div class="flat-meta"><span>ЖК ' + f.zkName + '</span><span>·</span><span>' + f.segment + "</span></div>" +
+        '<div class="flat-meta"><span>' + f.zkName + '</span><span>·</span><span>' + f.segment + "</span></div>" +
         '<div class="flat-actions">' +
           '<a class="btn btn-brand btn-sm" href="https://wa.me/' + WA_PHONE + "?text=" + encodeURIComponent(waText) + '" target="_blank" rel="noopener" data-wa="catalog-plan">Получить консультацию</a>' +
           '<a class="btn btn-outline btn-sm" href="' + rel("zk/" + f.zk + ".html") + '">Подробнее о ЖК</a>' +
@@ -629,7 +646,7 @@
           ROOM_OPTS.map(function (r) { return '<button class="cat-chip" type="button" data-room="' + r + '">' + r + "</button>"; }).join("") +
         "</div></div>" +
         '<div class="cat-field"><label>Жилой комплекс</label><select id="cat-zk"><option value="">Все ЖК</option>' +
-          ZK_OPTS.map(function (z) { return '<option value="' + z.slug + '">ЖК ' + z.name + "</option>"; }).join("") + "</select></div>" +
+          ZK_OPTS.map(function (z) { return '<option value="' + z.slug + '">' + z.name + "</option>"; }).join("") + "</select></div>" +
         '<div class="cat-field"><label>Способ покупки</label><select id="cat-deal"><option value="">Любой</option><option value="Ипотека">Ипотека</option><option value="Рассрочка">Рассрочка</option><option value="7-20-25">7-20-25</option></select></div>' +
         '<div class="cat-field"><label>Срок сдачи</label><select id="cat-srok"><option value="">Любой</option>' +
           SROK_OPTS.map(function (s) { return '<option value="' + s + '">' + s + "</option>"; }).join("") + "</select></div>" +
@@ -702,8 +719,8 @@
         if (elink) elink.hidden = true;
       } else if (list.length === 0 && upRoom) {
         var zs = UPCOMING[upRoom];
-        if (em) em.textContent = roomLabel(upRoom) + " — в новых ЖК " + zs.map(function (z) { return z.name; }).join(" и ") + ". Старт продаж скоро — оставьте заявку, сообщим первыми.";
-        if (elink) { elink.hidden = false; elink.textContent = "Смотреть ЖК " + zs[0].name; elink.setAttribute("href", rel("zk/" + zs[0].slug + ".html")); }
+        if (em) em.textContent = roomLabel(upRoom) + " — в новых " + zs.map(function (z) { return z.name; }).join(" и ") + ". Старт продаж скоро — оставьте заявку, сообщим первыми.";
+        if (elink) { elink.hidden = false; elink.textContent = "Смотреть " + zs[0].name; elink.setAttribute("href", rel("zk/" + zs[0].slug + ".html")); }
       } else {
         if (em) em.textContent = "";
         if (elink) elink.hidden = true;
@@ -1234,6 +1251,7 @@
     enhanceZhkLayouts();
     enhanceZhkExtras();
     enhanceFooter();
+    enhanceDrawer();
     renderCatalog();
     bindLightbox();
     bindPlansFilter();

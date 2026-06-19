@@ -1,16 +1,16 @@
 
   :root {
     /* Base palette — ATAMŪRA Brandbook 2024 */
-    --bg:        #F1F4F5;                  /* warm off-white, brandbook-tinted */
+    --bg:        #F7F5EE;                  /* warm off-white, brandbook-tinted */
     --card:      #FFFFFF;                  /* brandbook white */
-    --ink:       #081F3A;                  /* brandbook black (NOT pure black) */
-    --ink-soft:  #3C4C5C;
-    --ink-mute:  #6A7682;
+    --ink:       #1E1E1E;                  /* brandbook black (NOT pure black) */
+    --ink-soft:  #4A4A4A;
+    --ink-mute:  #6E6E6E;
     --line:      #D8DEE1;
     --line-soft: #E7ECEE;
-    --black:     #081F3A;
-    --navy:      #081F3A;                  /* brandbook dark navy — было НЕ определено → выбранные чипы становились невидимыми */
-    --teal:      #00BCC8;
+    --black:     #1E1E1E;
+    --navy:      #284157;                  /* brandbook dark navy — было НЕ определено → выбранные чипы становились невидимыми */
+    --teal:      #007484;
     --coral:     #FF2125;                  /* Сигнальный коралл — ТОЛЬКО промо/реклама */                  /* = brand teal — тоже было НЕ определено (цвет «Консультация» при скролле) */
     --grey:      #BCBCBC;                  /* brandbook grey */
     --green:     oklch(62% 0.16 145);
@@ -41,38 +41,38 @@
 
   /* ============ THEME A: Бирюза + Золото (Brandbook combination 2: teal-led) ============ */
   [data-theme="teal"] {
-    --brand:        #00BCC8;               /* brandbook dark teal */
-    --brand-deep:   #0094A0;
-    --brand-soft:   #D8F3F6;
+    --brand:        #007484;               /* brandbook dark teal */
+    --brand-deep:   #005763;
+    --brand-soft:   #E0EEF0;
     --brand-on:     #FBFBFB;
-    --accent:       #D0B473;               /* brandbook gold */
-    --accent-soft:  #F0E7D2;
-    --accent-deep:  #B0925A;
-    --accent-on:    #081F3A;
+    --accent:       #CFB372;               /* brandbook gold */
+    --accent-soft:  #EFE6CD;
+    --accent-deep:  #A88E48;
+    --accent-on:    #1E1E1E;
     --cta-orange:   #FF2125;               /* brandbook contrast orange (paired with teal) */
-    --dark-cta:     #081F3A;               /* Ночная степь */
+    --dark-cta:     #284157;               /* Ночная степь */
     --pop-eyebrow-bg: var(--accent-soft);
     --pop-eyebrow-fg: var(--accent-on);
-    --ai-grad-1:    #00BCC8;
-    --ai-grad-2:    #D0B473;
+    --ai-grad-1:    #007484;
+    --ai-grad-2:    #CFB372;
   }
 
   /* ============ THEME B: Навы + Золото (Brandbook combination 3: navy-led) ============ */
   [data-theme="blue"] {
-    --brand:        #081F3A;               /* brandbook dark navy */
-    --brand-deep:   #04101F;
+    --brand:        #284157;               /* brandbook dark navy */
+    --brand-deep:   #1A2B3A;
     --brand-soft:   #E5EAF0;
     --brand-on:     #FBFBFB;
-    --accent:       #D0B473;               /* brandbook gold (constant accent) */
-    --accent-soft:  #F0E7D2;
-    --accent-deep:  #B0925A;
-    --accent-on:    #081F3A;
+    --accent:       #CFB372;               /* brandbook gold (constant accent) */
+    --accent-soft:  #EFE6CD;
+    --accent-deep:  #A88E48;
+    --accent-on:    #1E1E1E;
     --cta-orange:   #866638;               /* brandbook brown-gold paired with navy */
     --dark-cta:     #1A2B3A;
     --pop-eyebrow-bg: var(--accent-soft);
     --pop-eyebrow-fg: var(--accent-on);
-    --ai-grad-1:    #081F3A;
-    --ai-grad-2:    #D0B473;
+    --ai-grad-1:    #284157;
+    --ai-grad-2:    #CFB372;
   }
 
   *, *::before, *::after { box-sizing: border-box; }
@@ -81,19 +81,17 @@
     margin: 0; padding-bottom: 80px;
     background: var(--bg);
     color: var(--ink);
-    font-family: 'Arimo', 'Jost', -apple-system, system-ui, sans-serif;
+    font-family: 'Jost', 'Montserrat', 'Futura PT', 'Futura', -apple-system, system-ui, sans-serif;
     font-size: var(--t-body); line-height: 1.45;
     -webkit-font-smoothing: antialiased;
     font-feature-settings: "ss03", "cv11";
     transition: background 200ms;
   }
-  /* markup #106: Geologica для всех заголовков и подзаголовков, Arimo для текста */
-  h1, h2, h3, h4, h5, h6 { font-family: 'Geologica', 'Jost', -apple-system, system-ui, sans-serif; }
   /* Казахский режим: единый шрифт Montserrat. Jost НЕ содержит ә ғ қ ң ө ұ ү һ і —
      эти буквы подменялись на fallback и «плясали» внутри слов. Montserrat покрывает казахский
      полностью и единообразно. Русский (Jost) и заголовки (Cormorant) не затрагиваются. */
   html[lang="kk"] body {
-    font-family: 'Arimo', 'Montserrat', -apple-system, system-ui, sans-serif;
+    font-family: 'Montserrat', 'Futura PT', 'Futura', -apple-system, system-ui, sans-serif;
     font-feature-settings: normal;
   }
   /* Montserrat заметно шире Jost — верхнее меню из 8 пунктов слегка ужимаем, чтобы оно помещалось в строку. */
@@ -149,8 +147,8 @@
     content: ''; width: 10px; height: 10px;
     border-radius: 50%;
   }
-  .theme-btn[data-theme="teal"]::before { background: #00BCC8; }
-  .theme-btn[data-theme="blue"]::before { background: #081F3A; }
+  .theme-btn[data-theme="teal"]::before { background: #007484; }
+  .theme-btn[data-theme="blue"]::before { background: #284157; }
   .theme-btn.is-on {
     background: oklch(98% 0 0); color: var(--ink);
   }
@@ -179,7 +177,7 @@
   /* ============ HEADER ============ */
   .head {
     background: var(--bg);
-    position: sticky; top: 0; z-index: 50;
+    position: static; z-index: 50;
     backdrop-filter: blur(12px);
   }
   .head-row {
@@ -577,7 +575,7 @@
   .pagehero-slide.is-on { opacity: 1; }
   .pagehero-scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, oklch(0% 0 0 /.34) 0%, oklch(0% 0 0 /.66) 100%); pointer-events: none; }
   .pagehero-multi .pagehero-inner { position: relative; z-index: 2; }
-  .features-strip h3 { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(24px, 2.8vw, 34px); font-weight: 600; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 var(--s-6); color: var(--ink); }
+  .features-strip h3 { font-family: 'Cormorant', Georgia, serif; font-size: clamp(24px, 2.8vw, 34px); font-weight: 600; line-height: 1.1; letter-spacing: -0.01em; margin: 0 0 var(--s-6); color: var(--ink); }
   .features-strip-row { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--s-5) var(--s-6); align-items: start; }
   .features-strip-item { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; flex: 0 0 calc(25% - var(--s-6)); max-width: 200px; min-width: 130px; }
   .features-strip-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--accent-soft); color: var(--brand); }
@@ -601,14 +599,14 @@
   .catalog-showcase-inner { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: clamp(28px, 4vw, 56px); position: relative; z-index: 1; }
   .catalog-showcase-content { color: #fff; max-width: 56ch; }
   .catalog-showcase .catalog-eyebrow { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin: 0 0 var(--s-2); }
-  .catalog-showcase-title { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(28px, 3.4vw, 42px); font-weight: 600; line-height: 1.05; letter-spacing: 0.005em; margin: 0 0 var(--s-3); color: #fff; }
+  .catalog-showcase-title { font-family: 'Cormorant', Georgia, serif; font-size: clamp(28px, 3.4vw, 42px); font-weight: 600; line-height: 1.05; letter-spacing: 0.005em; margin: 0 0 var(--s-3); color: #fff; }
   .catalog-showcase-sub { font-size: 14px; line-height: 1.55; color: rgba(255,255,255,0.72); margin: 0 0 var(--s-4); }
   .catalog-cover { display: block; width: clamp(160px, 18vw, 220px); aspect-ratio: 0.75 / 1; position: relative; border-radius: 6px; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.55), 0 12px 30px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(207,179,114,0.45); transform: perspective(1000px) rotateY(-8deg) rotateX(3deg) rotateZ(-1.2deg); transition: transform 500ms cubic-bezier(.2,.8,.25,1); flex-shrink: 0; }
   .catalog-cover:hover { transform: perspective(1000px) rotateY(0) rotateX(0) rotateZ(0); }
   .catalog-cover picture, .catalog-cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .catalog-cover-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: clamp(16px, 2.5vw, 24px) clamp(12px, 2vw, 20px); background: linear-gradient(180deg, rgba(15,26,38,0.86) 0%, rgba(15,26,38,0.4) 35%, rgba(15,26,38,0.5) 65%, rgba(15,26,38,0.92) 100%); color: #fff; text-align: center; pointer-events: none; }
   .catalog-cover-eyebrow { font-size: 8px; font-weight: 700; letter-spacing: 0.3em; color: var(--accent); text-transform: uppercase; }
-  .catalog-cover-brand { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; letter-spacing: 0.06em; line-height: 1; margin: auto 0; color: #fff; }
+  .catalog-cover-brand { font-family: 'Cormorant', Georgia, serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; letter-spacing: 0.06em; line-height: 1; margin: auto 0; color: #fff; }
   .catalog-cover-logo-frame { display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 100%; }
   .catalog-cover-logo { display: block; width: 62%; max-width: 130px; height: auto; object-fit: contain; opacity: 0.96; }
   .catalog-cover-tag { font-size: 8px; font-weight: 600; letter-spacing: 0.2em; color: rgba(255,255,255,0.78); text-transform: uppercase; }
@@ -626,7 +624,7 @@
   /* Компактный вариант для странички ЖК — карточка внутри потока */
   .catalog-card { background: var(--brand); color: var(--brand-on); border-radius: var(--r-lg); padding: var(--s-6) var(--s-7); margin: var(--s-7) 0; display: flex; align-items: center; justify-content: space-between; gap: var(--s-5); flex-wrap: wrap; }
   .catalog-card-text { flex: 1 1 280px; min-width: 0; }
-  .catalog-card h3 { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(20px, 2vw, 26px); font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--brand-on); }
+  .catalog-card h3 { font-family: 'Cormorant', Georgia, serif; font-size: clamp(20px, 2vw, 26px); font-weight: 600; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--brand-on); }
   .catalog-card p { font-size: 13px; color: oklch(90% 0.01 230); margin: 0; line-height: 1.5; }
   .catalog-card .btn { min-height: 48px; flex-shrink: 0; }
   @media (max-width: 768px) {
@@ -662,7 +660,7 @@
   .foot { background: var(--bg); border-top: 1px solid var(--line); padding-block: var(--sect-py); }
   .foot-cta { display: flex; align-items: center; justify-content: space-between; gap: var(--s-5); padding: var(--s-6) var(--s-7); margin-bottom: var(--s-8); background: var(--brand); color: var(--brand-on); border-radius: var(--r-lg); flex-wrap: wrap; }
   .foot-cta-text { flex: 1 1 320px; min-width: 0; }
-  .foot-cta h3 { font-family: 'Geologica', 'Cormorant', Georgia, serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em; line-height: 1.15; color: var(--brand-on); }
+  .foot-cta h3 { font-family: 'Cormorant', Georgia, serif; font-size: clamp(22px, 2.4vw, 30px); font-weight: 600; margin: 0 0 8px; letter-spacing: -0.01em; line-height: 1.15; color: var(--brand-on); }
   .foot-cta p { font-size: 14px; color: oklch(88% 0.01 230); margin: 0; max-width: 56ch; line-height: 1.5; }
   .foot-cta .foot-cta-btns { display: flex; gap: var(--s-2); flex-wrap: wrap; }
   .foot-cta .btn { min-height: 48px; padding: 14px 26px; font-size: 14px; flex-shrink: 0; }
@@ -730,8 +728,8 @@
     .floater, .sticky-bar { display: none !important; }
     .burger { display: none !important; }
     /* #38 markup-review: зафиксировать хэдэр на мобиле (был static — уезжал при скролле) */
-    .head:not(.over) { position: sticky !important; top: 0 !important; z-index: 50 !important; }
-    .head.over.is-stuck { position: absolute !important; top: 48px !important; background: transparent !important; border-bottom: 0 !important; box-shadow: none !important; backdrop-filter: none !important; }
+    .head:not(.over) { position: static !important; z-index: 50 !important; }
+    .head.over.is-stuck { position: absolute !important; top: 0 !important; background: transparent !important; border-bottom: 0 !important; box-shadow: none !important; backdrop-filter: none !important; }
     /* На мобайле бургера нет (внизу botnav) — но переключатель языка должен оставаться ВИДИМЫМ в шапке,
        иначе казахскую версию не найти (была жалоба). Лого слева, компактный Рус/Qaz справа; прочее из head-utils скрыто. */
     .head-row { display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 8px; }
@@ -760,7 +758,7 @@
     .content .content-grid > div > h2 { text-align: center; }
     .content .content-grid > div > p { text-align: justify; hyphens: auto; word-spacing: -0.02em; }
     .content .content-grid > div > .pagehero-cta { justify-content: center; }
-    .home .head.over { top: max(16px, env(safe-area-inset-top)) !important; }
+    .home .head.over { top: 0 !important; }
     /* Hero на мобайле — полноэкранный, но с местом под трастбар внизу.
        calc(100vh - 66px bottom-nav - 80px trustbar - safe-area) ≈ заполняет всё кроме нижнего таб-бара и трастбара.
        Контент (h1 + акция + кнопка) — внизу через flex/justify-end, чтобы фото было видно сверху. */
@@ -1089,8 +1087,8 @@
   .zk-map-legend { display: flex; flex-wrap: wrap; gap: 12px 16px; margin-top: 12px; padding: 12px 16px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r-md); font-size: 12px; color: var(--ink-soft); }
   .legend-item { display: inline-flex; align-items: center; gap: 6px; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-  .legend-dot.is-navy { background: #081F3A; }
-  .legend-dot.is-teal { background: #00BCC8; }
+  .legend-dot.is-navy { background: #284157; }
+  .legend-dot.is-teal { background: #007484; }
   .legend-dot.is-violet { background: #7c3aed; }
   .legend-dot.is-green { background: #16a34a; }
   .legend-dot.is-red { background: #dc2626; }
@@ -1338,7 +1336,7 @@
   .home .util.over { position: absolute; top: 0; left: 0; right: 0; z-index: 40; background: transparent; border-color: rgba(255,255,255,.10); }
   .home .util.over .util-tabs a, .home .util.over .city { color: rgba(255,255,255,.92); }
   .home .util.over .util-tabs a[data-soon] { color: rgba(255,255,255,.5); }
-  .home .head.over { position: absolute; top: 48px; left: 0; right: 0; z-index: 40; background: transparent; backdrop-filter: none; }
+  .home .head.over { position: absolute; top: 0; left: 0; right: 0; z-index: 40; background: transparent; backdrop-filter: none; }
   .home .head.over .nav-main a { color: #fff; }
   .home .head.over .nav-main a.nav-consult { color: #bfe9ef; }
   .home .head.over .phone-block strong a { color: #fff; }
@@ -1348,7 +1346,7 @@
   /* Логотип: белый над фото, тёмный при скролле */
   .head.over .logo-n { display: none; } .head.over .logo-w { display: block; }
   /* Липкая плотная шапка при скролле */
-  .head.over.is-stuck { position: fixed; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); box-shadow: 0 6px 24px rgba(40,65,87,.08); }
+  .head.over.is-stuck { position: static; top: 0; background: var(--bg); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); box-shadow: 0 6px 24px rgba(40,65,87,.08); }
   .head.over.is-stuck .logo-w { display: none; } .head.over.is-stuck .logo-n { display: block; }
   .head.over.is-stuck .nav-main a { color: var(--ink); }
   .head.over.is-stuck .nav-main a.nav-consult { color: var(--teal); }
@@ -1388,7 +1386,7 @@
   /* Засечные заголовки — Cormorant (премиум / «наследие»). Текст, интерфейс и числа остаются Jost. */
   .hh-title, .sect-title, .pagehero-title, .zk-h2,
   .content h2, .reviews h2, .news h2, .premium-row h2, .mortgage-info h2, .help-cta h3 {
-    font-family: 'Geologica', 'Cormorant', Georgia, serif;
+    font-family: 'Cormorant', Georgia, serif;
     letter-spacing: 0;
     font-weight: 600;
   }
@@ -1457,20 +1455,20 @@
 .zk-pagetitle { font-size: clamp(26px, 5vw, 38px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 var(--s-3); color: var(--ink); }
 
 /* ============ markup batch 2026-06-17 ============ */
-/* #108/#112: фон всех заявочных форм → Ночная степь #081F3A; #109: текст белый */
-.foot-cta { background: #081F3A; }
+/* #108/#112: фон всех заявочных форм → Ночная степь #284157; #109: текст белый */
+.foot-cta { background: #284157; }
 .foot-cta-consent { color: oklch(82% 0.02 230); }
-.zk-card, .lead-form-card { background: #081F3A; border-color: rgba(255,255,255,0.12); }
+.zk-card, .lead-form-card { background: #284157; border-color: rgba(255,255,255,0.12); }
 .zk-card .zk-card-title, .lead-form-card h3 { color: #fff; }
 .zk-card .zk-card-note, .lead-form-card p { color: oklch(90% 0.012 230); }
 .zk-card .popup-fineprint, .zk-card .popup-fineprint a,
 .lead-form-card .popup-fineprint, .lead-form-card .popup-fineprint a { color: oklch(80% 0.02 230); }
 .zk-card > div[style*="ink-soft"] { color: oklch(82% 0.02 230) !important; }
-/* #113/#114/#115/#117: фон кнопок-заявок → бирюза #00BCC8 */
-.btn-accent { background: #00BCC8; color: #052b33; }
+/* #113/#114/#115/#117: фон кнопок-заявок → бирюза #007484 */
+.btn-accent { background: #007484; color: #052b33; }
 .btn-accent:hover { background: #00a9b4; }
 /* #118: число «10%» в акции → бирюза */
-.pct-hl { color: #00BCC8; }
+.pct-hl { color: #007484; }
 /* #123: скруглить углы всех хиро-баннеров */
 .pagehero { border-radius: var(--r-lg); overflow: hidden; }
 .pagehero-zk { border-radius: var(--r-lg); overflow: hidden; }
@@ -1514,7 +1512,7 @@
 /* #145: мобильная шапка — белая полоса сверху, фото ЖК/героя ПОД ней (desktop не трогаем) */
 @media (max-width: 768px) {
   .head, .head.over, .head.over.is-stuck {
-    position: sticky !important; top: 0 !important; z-index: 60 !important;
+    position: static !important; z-index: 60 !important;
     background: #fff !important; backdrop-filter: none !important;
     border-bottom: 1px solid var(--line) !important; box-shadow: 0 1px 8px rgba(8,31,58,0.06) !important;
   }

@@ -49,6 +49,24 @@ def fetch_plans(tok):
             break
     return out
 
+def available_ids(tok):
+    # #176: id квартир, ДОСТУПНЫХ в продаже (status AVAILABLE, жильё/таунхаусы)
+    ids, off, LIMIT = set(), 0, 500
+    while True:
+        d = hj(f"{PB}/api/v4/json/property?access_token={tok}&fullness=1&limit={LIMIT}&offset={off}")
+        arr = d.get("data") or []
+        for it in arr:
+            if (it.get("status") == "AVAILABLE"
+                    and it.get("propertyType") in ("property", "townhouse")
+                    and it.get("typePurpose") == "residential"):
+                ids.add(str(it.get("id")))
+        if len(arr) < LIMIT:
+            break
+        off += LIMIT
+        if off > 50000:
+            break
+    return ids
+
 def room_key(slug, p):
     if slug == "aqsai":
         return "Таунхаус"  # Таунхаус
@@ -91,12 +109,19 @@ def main():
     print("auth OK")
     plans = fetch_plans(tok)
     print(f"presets: {len(plans)}")
+    avail = available_ids(tok)
+    print(f"available units: {len(avail)}")
 
     # slug -> roomKey -> ordered-unique urls
     grouped = defaultdict(lambda: defaultdict(OrderedDict))
+    skipped = 0
     for p in plans:
         slug = PROJ_MAP.get(p.get("projectName"))
         if not slug:
+            continue
+        # #176: пропускаем планировки без доступных в продаже квартир
+        if not (set(map(str, p.get("properties") or [])) & avail):
+            skipped += 1
             continue
         rk = room_key(slug, p)
         if not rk:
