@@ -1527,3 +1527,9 @@
   .head .lang-opt { color: var(--ink) !important; }
   .head .lang-opt[aria-pressed="true"] { color: #fff !important; }
 }
+
+/* #127 — plannings badge on catalog flat card (opens lightbox with Profitbase plans) */
+.flat-plans { position: absolute; right: 10px; bottom: 10px; z-index: 3; display: inline-flex; align-items: center; gap: 5px; border: 0; cursor: pointer; background: var(--brand); color: #fff; font: 700 11px/1 inherit; letter-spacing: .01em; padding: 7px 11px; border-radius: var(--r-pill); box-shadow: 0 2px 10px oklch(20% 0 0 / .25); transition: 160ms cubic-bezier(.2,.9,.25,1); }
+.flat-plans:hover { background: var(--ink); transform: translateY(-1px); }
+.flat-plans:active { transform: translateY(0); }
+.flat-plans svg { width: 14px; height: 14px; flex: none; }

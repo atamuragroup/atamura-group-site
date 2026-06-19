@@ -1,0 +1,95 @@
+{
+  "atmosfera_3": [
+    "assets/img/plans/atmosfera/3/01.jpg",
+    "assets/img/plans/atmosfera/3/02.jpg",
+    "assets/img/plans/atmosfera/3/03.jpg",
+    "assets/img/plans/atmosfera/3/04.jpg",
+    "assets/img/plans/atmosfera/3/05.jpg",
+    "assets/img/plans/atmosfera/3/06.jpg"
+  ],
+  "atmosfera_1": [
+    "assets/img/plans/atmosfera/1/01.jpg",
+    "assets/img/plans/atmosfera/1/02.jpg",
+    "assets/img/plans/atmosfera/1/03.jpg",
+    "assets/img/plans/atmosfera/1/04.jpg",
+    "assets/img/plans/atmosfera/1/05.jpg",
+    "assets/img/plans/atmosfera/1/06.jpg"
+  ],
+  "atmosfera_2": [
+    "assets/img/plans/atmosfera/2/01.jpg",
+    "assets/img/plans/atmosfera/2/02.jpg",
+    "assets/img/plans/atmosfera/2/03.jpg",
+    "assets/img/plans/atmosfera/2/04.jpg",
+    "assets/img/plans/atmosfera/2/05.jpg",
+    "assets/img/plans/atmosfera/2/06.jpg"
+  ],
+  "aura_2": [
+    "assets/img/plans/aura/2/01.jpg",
+    "assets/img/plans/aura/2/02.jpg",
+    "assets/img/plans/aura/2/03.jpg",
+    "assets/img/plans/aura/2/04.jpg",
+    "assets/img/plans/aura/2/05.jpg",
+    "assets/img/plans/aura/2/06.jpg"
+  ],
+  "aura_3": [
+    "assets/img/plans/aura/3/01.jpg",
+    "assets/img/plans/aura/3/02.jpg",
+    "assets/img/plans/aura/3/03.jpg",
+    "assets/img/plans/aura/3/04.jpg",
+    "assets/img/plans/aura/3/05.jpg",
+    "assets/img/plans/aura/3/06.jpg"
+  ],
+  "aura_1": [
+    "assets/img/plans/aura/1/01.jpg",
+    "assets/img/plans/aura/1/02.jpg",
+    "assets/img/plans/aura/1/03.jpg",
+    "assets/img/plans/aura/1/04.jpg",
+    "assets/img/plans/aura/1/05.jpg",
+    "assets/img/plans/aura/1/06.jpg"
+  ],
+  "keruen_1": [
+    "assets/img/plans/keruen/1/01.jpg",
+    "assets/img/plans/keruen/1/02.jpg",
+    "assets/img/plans/keruen/1/03.jpg",
+    "assets/img/plans/keruen/1/04.jpg",
+    "assets/img/plans/keruen/1/05.jpg",
+    "assets/img/plans/keruen/1/06.jpg"
+  ],
+  "keruen_2": [
+    "assets/img/plans/keruen/2/01.jpg",
+    "assets/img/plans/keruen/2/02.jpg",
+    "assets/img/plans/keruen/2/03.jpg",
+    "assets/img/plans/keruen/2/04.jpg",
+    "assets/img/plans/keruen/2/05.jpg",
+    "assets/img/plans/keruen/2/06.jpg"
+  ],
+  "keruen_3": [
+    "assets/img/plans/keruen/3/01.jpg",
+    "assets/img/plans/keruen/3/02.jpg",
+    "assets/img/plans/keruen/3/03.jpg",
+    "assets/img/plans/keruen/3/04.jpg",
+    "assets/img/plans/keruen/3/05.jpg",
+    "assets/img/plans/keruen/3/06.jpg"
+  ],
+  "aqsai_Таунхаус": [
+    "assets/img/plans/aqsai/th/01.jpg",
+    "assets/img/plans/aqsai/th/02.jpg",
+    "assets/img/plans/aqsai/th/03.jpg",
+    "assets/img/plans/aqsai/th/04.jpg",
+    "assets/img/plans/aqsai/th/05.jpg",
+    "assets/img/plans/aqsai/th/06.jpg"
+  ],
+  "bravo_3": [
+    "assets/img/plans/bravo/3/01.jpg",
+    "assets/img/plans/bravo/3/02.jpg"
+  ],
+  "bravo_2": [
+    "assets/img/plans/bravo/2/01.jpg"
+  ],
+  "bravo_1": [
+    "assets/img/plans/bravo/1/01.jpg",
+    "assets/img/plans/bravo/1/02.jpg",
+    "assets/img/plans/bravo/1/03.jpg",
+    "assets/img/plans/bravo/1/04.jpg"
+  ]
+}

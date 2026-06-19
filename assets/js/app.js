@@ -8,6 +8,13 @@
   var IN_ZK = /\/zk\//.test(location.pathname);
   function rel(p) { return (IN_ZK ? "../" : "") + p; }
   function imgsrc(p) { return p && !/^(https?:)?\/\//.test(p) && p.charAt(0) !== "/" ? rel(p) : p; }
+  // depth-aware resolver to site root (works on /, /kk/, /zk/, /kk/zk/) — fixes assets on language mirror
+  function catAsset(p) {
+    if (!p || /^(https?:)?\/\//.test(p) || p.charAt(0) === "/") return p;
+    var segs = location.pathname.split("/").filter(Boolean);
+    var depth = /\/$/.test(location.pathname) ? segs.length : Math.max(0, segs.length - 1);
+    return new Array(depth + 1).join("../") + p;
+  }
   function money(n) { return Math.round(n).toLocaleString("ru-RU").replace(/,/g, " "); }
   function byId(id) { return document.getElementById(id); }
   function priceLabel(z) {
@@ -481,13 +488,18 @@
   function flatCard(f) {
     var rl = roomLabel(f.rooms);
     var area = f.areaMin === f.areaMax ? f.areaMin + " м²" : f.areaMin + "–" + f.areaMax + " м²";
-    var img = f.image ? '<img src="' + f.image + '" alt="' + rl + ' в ЖК ' + f.zkName + '" loading="lazy">' : "";
+    var img = f.image ? '<img src="' + catAsset(f.image) + '" alt="' + rl + ' в ЖК ' + f.zkName + '" loading="lazy">' : "";
     var srok = f.srok ? '<span class="flat-status">' + f.srok + "</span>" : "";
+    var pN = (f.plans && f.plans.length) || 0;
+    var pW = pN % 10 === 1 && pN % 100 !== 11 ? "планировка" : (pN % 10 >= 2 && pN % 10 <= 4 && (pN % 100 < 10 || pN % 100 >= 20) ? "планировки" : "планировок");
+    var plansBtn = pN ? '<button class="flat-plans" type="button" data-plans=\'' + JSON.stringify(f.plans.map(catAsset)) + '\' aria-label="Смотреть планировки ' + rl + '">' +
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 9v12"/></svg>' +
+      pN + " " + pW + "</button>" : "";
     var waText = "Здравствуйте! Меня заинтересовала квартира в ЖК «" + f.zkName + "». Планировка: " + rl + ". Площадь: " + area + ". Стоимость: от " + money(f.priceFrom) + " ₸. Подскажите, пожалуйста, актуальна ли эта квартира и какие есть условия покупки?";
     var fid = flatId(f), isf = isFav(f);
     var heart = '<button class="flat-fav' + (isf ? ' is-on' : '') + '" type="button" data-fav="' + fid + '" aria-pressed="' + (isf ? 'true' : 'false') + '" aria-label="' + (isf ? 'Убрать из избранного' : 'В избранное') + '"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>';
     return '<article class="flat" data-zk="' + f.zk + '">' + heart +
-      '<a class="flat-photo" href="' + rel("zk/" + f.zk + ".html") + '">' + img + srok + "</a>" +
+      '<a class="flat-photo" href="' + rel("zk/" + f.zk + ".html") + '">' + img + srok + plansBtn + "</a>" +
       '<div class="flat-body">' +
         '<div class="flat-head"><span class="flat-rooms">' + rl + '</span><span class="flat-area">' + area + "</span></div>" +
         '<div class="flat-price"><strong>от ' + money(f.priceFrom) + ' ₸</strong><span>взнос 20% → от ' + money(f.payFrom) + " ₸/мес · 7-20-25</span></div>" +
@@ -1022,6 +1034,12 @@
     function open(list, i) { if (!box) build(); imgs = list; idx = i; show(); box.classList.add("is-on"); document.body.style.overflow = "hidden"; }
     function close() { if (box) box.classList.remove("is-on"); document.body.style.overflow = ""; }
     document.addEventListener("click", function (e) {
+      var pb = e.target.closest && e.target.closest(".flat-plans");
+      if (pb) {
+        e.preventDefault(); e.stopPropagation();
+        try { var list = JSON.parse(pb.getAttribute("data-plans")); if (list && list.length) open(list, 0); } catch (_) {}
+        return;
+      }
       var img = e.target.closest && e.target.closest(".zk-gallery img");
       if (!img) return;
       var gal = img.closest(".zk-gallery");
