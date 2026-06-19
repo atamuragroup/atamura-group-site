@@ -333,6 +333,40 @@
     aqsai: [43.166429, 76.786037], bravo: [43.429754, 77.025929], discovery: [43.392434, 77.025802],
     monarch: [43.259488, 76.940266], arlan: [43.29903, 77.04075]
   };
+  /* #61/#27 — общий билдер грида планировок (фильтр по комнатности + цена/площадь) */
+  function plansGridHTML(types, zname) {
+    var rooms = []; types.forEach(function (t) { if (rooms.indexOf(t.rooms) < 0) rooms.push(t.rooms); });
+    var chips = rooms.length > 1 ? '<div class="plans-filter"><button type="button" class="plans-chip is-on" data-prooms="*">Все</button>' +
+      rooms.map(function (r) { return '<button type="button" class="plans-chip" data-prooms="' + r + '">' + roomLabel(r) + "</button>"; }).join("") + "</div>" : "";
+    var cards = types.map(function (t) {
+      var area = t.areaMin === t.areaMax ? t.areaMin + " м²" : t.areaMin + "–" + t.areaMax + " м²";
+      return '<button type="button" class="plan-card" data-prooms-card="' + t.rooms + '" data-plans=\'' + JSON.stringify(t.plans.map(catAsset)) + '\' aria-label="Планировки ' + roomLabel(t.rooms) + '">' +
+        '<span class="plan-card-img"><img src="' + catAsset(t.plans[0]) + '" alt="Планировка ' + roomLabel(t.rooms) + (zname ? " — ЖК " + zname : "") + '" loading="lazy"><span class="plan-card-count">' + t.plans.length + " план.</span></span>" +
+        '<span class="plan-card-body"><span class="plan-card-rooms">' + roomLabel(t.rooms) + '</span><span class="plan-card-area">' + area + '</span><span class="plan-card-price">от ' + money(t.priceFrom) + " ₸</span></span></button>";
+    }).join("");
+    return '<div class="plans-wrap">' + chips + '<div class="plans-grid">' + cards + "</div></div>";
+  }
+
+  /* #61/#27 — на статических страницах ЖК заменяем таблицу цен на грид реальных планировок (Profitbase) */
+  function enhanceZhkLayouts() {
+    if (!/\/zk\//.test(location.pathname) || !window.ATAMURA_FLATS) return;
+    var m = location.pathname.match(/\/zk\/([a-z0-9-]+)\.html/i);
+    var slug = m ? m[1].toLowerCase() : null; if (!slug) return;
+    var types = window.ATAMURA_FLATS.filter(function (f) { return f.zk === slug && f.plans && f.plans.length; });
+    if (!types.length) return;
+    var tableWrap = document.querySelector(".zk-layouts-wrap"); if (!tableWrap) return;
+    var grid = document.createElement("div"); grid.innerHTML = plansGridHTML(types, "");
+    tableWrap.parentNode.replaceChild(grid.firstChild, tableWrap);
+    // обновляем вводный абзац ("изображения пришлёт менеджер" -> рабочий текст)
+    var ps = document.querySelectorAll("p.zk-lead");
+    for (var i = 0; i < ps.length; i++) {
+      if (/Изображения планировок|пришлёт менеджер/i.test(ps[i].textContent)) {
+        ps[i].textContent = "Планировки квартир под вашу комнатность — площади и цены «от» из системы продаж ATAMURA. Нажмите на планировку, чтобы рассмотреть детально.";
+        break;
+      }
+    }
+  }
+
   /* ---------- Страница ЖК (детальная, рендер из window.ATAMURA_ZHK) ---------- */
   function renderZhkDetail() {
     var host = byId("zhk-detail"); if (!host || !window.ATAMURA_ZHK) return;
@@ -367,7 +401,12 @@
       (mapSrc ? '<div class="zk-map"><iframe title="Карта — ЖК ' + z.name + '" src="' + mapSrc + '" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>' : "") +
       '<div class="zk-maplinks"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 1.6c2.9 0 5.3 2.4 5.3 5.3 0 4-5.3 9.5-5.3 9.5S3.7 10.9 3.7 6.9C3.7 4 6.1 1.6 9 1.6z"/><circle cx="9" cy="6.9" r="2"/></svg><span class="zk-maplinks-label">Открыть на карте:</span><a href="https://2gis.kz/almaty/search/' + mapQ + '" target="_blank" rel="noopener">2GIS</a><a href="https://www.google.com/maps/search/?api=1&query=' + mapQ + '" target="_blank" rel="noopener">Google&nbsp;Maps</a><a href="https://yandex.ru/maps/?text=' + mapQ + '" target="_blank" rel="noopener">Яндекс</a></div>' +
       (near.length ? '<h3 class="zk-h3">Инфраструктура и дорога</h3><div class="feat-grid">' + featList(near) + "</div>" : ""));
-    var planBlock = softBlock("Генплан и планировки", "Генплан территории и планировки квартир под вашу комнатность пришлём по запросу — нажмите «Получить подборку», менеджер вышлет PDF.");
+    // #61/#27 — «Планировочные решения»: планировки из Profitbase, фильтр по комнатности, цена + площадь
+    var planBlock = (function () {
+      var types = (window.ATAMURA_FLATS || []).filter(function (f) { return f.zk === slug && f.plans && f.plans.length; });
+      if (!types.length) return softBlock("Генплан и планировки", "Генплан территории и планировки квартир под вашу комнатность пришлём по запросу — нажмите «Получить подборку», менеджер вышлет PDF.");
+      return block("Планировочные решения", '<p class="zk-lead" style="margin-bottom:var(--s-4)">Планировки квартир под вашу комнатность — площади и цены «от». Нажмите, чтобы рассмотреть детально.</p>' + plansGridHTML(types, z.name));
+    })();
     var catalogCard = '<div class="catalog-card">' +
       '<div class="catalog-card-text">' +
         '<h3>Каталог по ЖК ' + z.name + ' и соседним</h3>' +
@@ -1034,7 +1073,7 @@
     function open(list, i) { if (!box) build(); imgs = list; idx = i; show(); box.classList.add("is-on"); document.body.style.overflow = "hidden"; }
     function close() { if (box) box.classList.remove("is-on"); document.body.style.overflow = ""; }
     document.addEventListener("click", function (e) {
-      var pb = e.target.closest && e.target.closest(".flat-plans");
+      var pb = e.target.closest && e.target.closest("[data-plans]");
       if (pb) {
         e.preventDefault(); e.stopPropagation();
         try { var list = JSON.parse(pb.getAttribute("data-plans")); if (list && list.length) open(list, 0); } catch (_) {}
@@ -1049,6 +1088,20 @@
     document.addEventListener("keydown", function (e) {
       if (!box || !box.classList.contains("is-on")) return;
       if (e.key === "Escape") close(); else if (e.key === "ArrowLeft") go(-1); else if (e.key === "ArrowRight") go(1);
+    });
+  }
+
+  /* #61/#27 — фильтр планировок ЖК по комнатности */
+  function bindPlansFilter() {
+    document.addEventListener("click", function (e) {
+      var chip = e.target.closest && e.target.closest(".plans-chip");
+      if (!chip) return;
+      var wrap = chip.closest(".plans-wrap"); if (!wrap) return;
+      var room = chip.getAttribute("data-prooms");
+      var chips = wrap.querySelectorAll(".plans-chip");
+      for (var i = 0; i < chips.length; i++) chips[i].classList.toggle("is-on", chips[i] === chip);
+      var cards = wrap.querySelectorAll("[data-prooms-card]");
+      for (var j = 0; j < cards.length; j++) cards[j].style.display = (room === "*" || cards[j].getAttribute("data-prooms-card") === room) ? "" : "none";
     });
   }
 
@@ -1082,14 +1135,15 @@
         '<h3>' + T.title + '</h3><p>' + T.text + '</p>' +
         '<a class="btn btn-light btn-block" href="' + LEAD_WA + '" target="_blank" rel="noopener" data-wa="lead-popup">' + T.wa + '</a>' +
         '<button type="button" class="btn btn-accent btn-block" data-lead-tocall style="margin-top:8px">' + T.call + '</button></div>' +
-        '<div class="popup-stage" data-lead-stage="form" hidden><span class="popup-eyebrow">' + T.eyebrow + '</span><h3>' + T.call + '</h3>' +
+        '<div class="popup-stage" data-lead-stage="form" hidden><span class="popup-eyebrow">' + T.eyebrow + '</span><h3 data-lead-formtitle>' + T.call + '</h3>' +
+        '<p data-lead-formsub hidden></p>' +
         '<form class="lead-pop-form" novalidate>' +
         '<input type="text" name="name" autocomplete="name" placeholder="' + T.name + '" />' +
         '<input type="tel" name="phone" required placeholder="+7 (7__) ___-__-__" />' +
         '<input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />' +
-        '<button type="submit" class="btn btn-accent btn-block">' + T.send + '</button>' +
+        '<button type="submit" class="btn btn-accent btn-block" data-lead-submit>' + T.send + '</button>' +
         '<p class="popup-fineprint">' + T.fine1 + '<a href="' + rel("privacy.html") + '">' + T.finePdn + '</a>' + T.fine2 + '</p></form></div>' +
-        '<div class="popup-stage" data-lead-stage="success" hidden><h3>' + T.okTitle + '</h3><p>' + T.okText + '</p>' +
+        '<div class="popup-stage" data-lead-stage="success" hidden><h3 data-lead-oktitle>' + T.okTitle + '</h3><p data-lead-oktext>' + T.okText + '</p>' +
         '<button type="button" class="btn btn-light btn-block" data-lead-close>' + T.close + '</button></div></div>';
       document.body.appendChild(box);
       var form = box.querySelector(".lead-pop-form");
@@ -1118,7 +1172,19 @@
       e.preventDefault();
       if (!box) build();
       src = btn.getAttribute("data-lead-source") || "zaivka";
-      stIntro.hidden = false; stForm.hidden = true; stOk.hidden = true;
+      var kk = document.documentElement.lang === "kk";
+      // optional per-trigger overrides (#155/#156 etc.): custom title/text/submit/success + direct-form mode
+      var cTitle = btn.getAttribute("data-lead-title"), cText = btn.getAttribute("data-lead-text");
+      var cSubmit = btn.getAttribute("data-lead-submit"), cOk = btn.getAttribute("data-lead-success");
+      var fTitle = box.querySelector("[data-lead-formtitle]"), fSub = box.querySelector("[data-lead-formsub]");
+      var fSubmit = box.querySelector("[data-lead-submit]"), okText = box.querySelector("[data-lead-oktext]");
+      fTitle.textContent = cTitle || (kk ? "Қоңырау тапсырыс беру" : "Заказать звонок");
+      if (cText) { fSub.textContent = cText; fSub.hidden = false; } else { fSub.hidden = true; }
+      fSubmit.textContent = cSubmit || (kk ? "Жіберу" : "Отправить");
+      okText.textContent = cOk || (kk ? "ATAMURA менеджері жұмыс уақытында сізбен хабарласады." : "Менеджер ATAMURA свяжется с вами в рабочее время.");
+      stForm.hidden = true; stOk.hidden = true;
+      if (btn.getAttribute("data-lead-mode") === "form") { stIntro.hidden = true; stForm.hidden = false; setTimeout(function () { nameI.focus(); }, 60); }
+      else { stIntro.hidden = false; }
       box.classList.add("is-on");
       track("lead_open", { source: src });
     });
@@ -1126,8 +1192,10 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     renderZhkDetail();
+    enhanceZhkLayouts();
     renderCatalog();
     bindLightbox();
+    bindPlansFilter();
     bindLeadPopup();
     bindHeroSearch();
     bindAiHelper();

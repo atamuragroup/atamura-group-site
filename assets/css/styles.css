@@ -1533,3 +1533,20 @@
 .flat-plans:hover { background: var(--ink); transform: translateY(-1px); }
 .flat-plans:active { transform: translateY(0); }
 .flat-plans svg { width: 14px; height: 14px; flex: none; }
+
+/* #61/#27 — ZHK page «Планировочные решения» grid (Profitbase plans, rooms filter) */
+.plans-wrap { margin-top: var(--s-3); }
+.plans-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: var(--s-4); }
+.plans-chip { height: 36px; padding: 0 16px; border: 1px solid var(--line); background: var(--bg); border-radius: var(--r-pill); font: 600 13px/1 inherit; color: var(--ink); cursor: pointer; transition: 140ms; }
+.plans-chip:hover { border-color: var(--brand); color: var(--brand); }
+.plans-chip.is-on { background: var(--brand); border-color: var(--brand); color: #fff; }
+.plans-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.plan-card { display: flex; flex-direction: column; text-align: left; padding: 0; border: 1px solid var(--line); background: #fff; border-radius: var(--r-md); overflow: hidden; cursor: pointer; transition: 160ms cubic-bezier(.2,.9,.25,1); }
+.plan-card:hover { border-color: var(--brand); box-shadow: 0 8px 24px oklch(20% 0 0 / .1); transform: translateY(-2px); }
+.plan-card-img { position: relative; aspect-ratio: 1/1; background: var(--brand-soft, #eef9fa); display: block; }
+.plan-card-img img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+.plan-card-count { position: absolute; right: 8px; bottom: 8px; background: oklch(20% 0 0 / .72); color: #fff; font: 600 11px/1 inherit; padding: 5px 8px; border-radius: var(--r-pill); }
+.plan-card-body { display: flex; flex-direction: column; gap: 3px; padding: 11px 13px 13px; }
+.plan-card-rooms { font-weight: 700; font-size: 14px; color: var(--ink); }
+.plan-card-area { font-size: 12.5px; color: var(--ink-soft); }
+.plan-card-price { margin-top: 2px; font-weight: 700; font-size: 14px; color: var(--brand); }
