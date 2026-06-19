@@ -1152,7 +1152,7 @@
      Любая кнопка [data-open-lead] открывает попап с выбором: WhatsApp или «Заказать звонок» (форма имя+тел → site-lead). */
   var LEAD_WA = "https://wa.me/77006410499?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%AF%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0%20Atamura.%20%D0%A5%D0%BE%D1%82%D0%B5%D0%BB%D0%BE%D1%81%D1%8C%20%D0%B1%D1%8B%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8E.&utm_source=site&utm_medium=whatsapp&utm_campaign=atamura";
   function bindLeadPopup() {
-    var box = null, nameI = null, phoneI = null, honey = null, stIntro = null, stForm = null, stOk = null, src = "zaivka";
+    var box = null, nameI = null, phoneI = null, honey = null, stForm = null, stOk = null, src = "zaivka";
     function build() {
       var kk = document.documentElement.lang === "kk";
       var T = kk ? {
@@ -1174,28 +1174,24 @@
       box.innerHTML =
         '<div class="popup"><button class="popup-close" type="button" aria-label="' + T.close + '">' +
         '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3l8 8M11 3L3 11"/></svg></button>' +
-        '<div class="popup-stage" data-lead-stage="intro"><span class="popup-eyebrow">' + T.eyebrow + '</span>' +
-        '<h3>' + T.title + '</h3><p>' + T.text + '</p>' +
-        '<a class="btn btn-light btn-block" href="' + LEAD_WA + '" target="_blank" rel="noopener" data-wa="lead-popup">' + T.wa + '</a>' +
-        '<button type="button" class="btn btn-accent btn-block" data-lead-tocall style="margin-top:8px">' + T.call + '</button></div>' +
-        '<div class="popup-stage" data-lead-stage="form" hidden><span class="popup-eyebrow">' + T.eyebrow + '</span><h3 data-lead-formtitle>' + T.call + '</h3>' +
-        '<p data-lead-formsub hidden></p>' +
+        '<div class="popup-stage" data-lead-stage="form"><span class="popup-eyebrow">' + T.eyebrow + '</span><h3 data-lead-formtitle>' + T.title + '</h3>' +
+        '<p data-lead-formsub>' + T.text + '</p>' +
         '<form class="lead-pop-form" novalidate>' +
         '<input type="text" name="name" autocomplete="name" placeholder="' + T.name + '" />' +
         '<input type="tel" name="phone" required placeholder="+7 (7__) ___-__-__" />' +
         '<input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />' +
         '<button type="submit" class="btn btn-accent btn-block" data-lead-submit>' + T.send + '</button>' +
+        '<a class="btn btn-light btn-block" href="' + LEAD_WA + '" target="_blank" rel="noopener" data-wa="lead-popup" style="margin-top:8px">' + T.wa + '</a>' +
         '<p class="popup-fineprint">' + T.fine1 + '<a href="' + rel("privacy.html") + '">' + T.finePdn + '</a>' + T.fine2 + '</p></form></div>' +
         '<div class="popup-stage" data-lead-stage="success" hidden><h3 data-lead-oktitle>' + T.okTitle + '</h3><p data-lead-oktext>' + T.okText + '</p>' +
         '<button type="button" class="btn btn-light btn-block" data-lead-close>' + T.close + '</button></div></div>';
       document.body.appendChild(box);
       var form = box.querySelector(".lead-pop-form");
       nameI = form.querySelector('input[name="name"]'); phoneI = form.querySelector('input[name="phone"]'); honey = form.querySelector('input[name="company"]');
-      stIntro = box.querySelector('[data-lead-stage="intro"]'); stForm = box.querySelector('[data-lead-stage="form"]'); stOk = box.querySelector('[data-lead-stage="success"]');
+      stForm = box.querySelector('[data-lead-stage="form"]'); stOk = box.querySelector('[data-lead-stage="success"]');
       bindPhones(form);
       box.querySelector(".popup-close").addEventListener("click", close);
       box.querySelector("[data-lead-close]").addEventListener("click", close);
-      box.querySelector("[data-lead-tocall]").addEventListener("click", function () { stIntro.hidden = true; stForm.hidden = false; setTimeout(function () { nameI.focus(); }, 60); });
       box.addEventListener("click", function (e) { if (e.target === box) close(); });
       form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -1221,13 +1217,13 @@
       var cSubmit = btn.getAttribute("data-lead-submit"), cOk = btn.getAttribute("data-lead-success");
       var fTitle = box.querySelector("[data-lead-formtitle]"), fSub = box.querySelector("[data-lead-formsub]");
       var fSubmit = box.querySelector("[data-lead-submit]"), okText = box.querySelector("[data-lead-oktext]");
-      fTitle.textContent = cTitle || (kk ? "Қоңырау тапсырыс беру" : "Заказать звонок");
-      if (cText) { fSub.textContent = cText; fSub.hidden = false; } else { fSub.hidden = true; }
+      fTitle.textContent = cTitle || (kk ? "Таңдауға көмектесеміз" : "Поможем с выбором");
+      fSub.textContent = cText || (kk ? "ATAMURA менеджері бюджетіңізге сай нұсқаларды таңдап, сатылым кеңсесінде кеңеске жазады." : "Менеджер ATAMURA подберёт варианты под ваш бюджет и запишет на консультацию.");
+      fSub.hidden = false;
       fSubmit.textContent = cSubmit || (kk ? "Жіберу" : "Отправить");
       okText.textContent = cOk || (kk ? "ATAMURA менеджері жұмыс уақытында сізбен хабарласады." : "Менеджер ATAMURA свяжется с вами в рабочее время.");
-      stForm.hidden = true; stOk.hidden = true;
-      if (btn.getAttribute("data-lead-mode") === "form") { stIntro.hidden = true; stForm.hidden = false; setTimeout(function () { nameI.focus(); }, 60); }
-      else { stIntro.hidden = false; }
+      stForm.hidden = false; stOk.hidden = true;   // сразу форма, без промежуточного экрана (видео-баг)
+      setTimeout(function () { nameI.focus(); }, 60);
       box.classList.add("is-on");
       track("lead_open", { source: src });
     });
