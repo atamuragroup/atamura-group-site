@@ -274,13 +274,21 @@
 
     document.addEventListener("click", function (e) {
       var card = e.target.closest && e.target.closest("a.pcard");
-      if (!card || !card.querySelector(".badge.is-status.is-light")) return;
+      // #157/#158/#159: футерные ссылки на «Скоро»-проекты (Discovery/AMAIA/DION) тоже открывают форму ожидания
+      var footLink = e.target.closest && e.target.closest(".foot-col-projects a");
+      var slug, nm;
+      if (card && card.querySelector(".badge.is-status.is-light")) {
+        var href = card.getAttribute("href") || "";
+        slug = (href.match(/zk\/([a-z-]+)\.html/) || [])[1] || "unknown";
+        var nmEl = card.querySelector(".pcard-name"); nm = nmEl ? nmEl.textContent : slug;
+      } else if (footLink && /скоро/i.test(footLink.textContent || "")) {
+        var fh = footLink.getAttribute("href") || "";
+        slug = (fh.match(/([a-z-]+)\.html/) || [])[1] || "soon";
+        nm = (footLink.textContent || "").replace(/скоро/i, "").trim();
+      } else return;
       e.preventDefault();
-      var href = card.getAttribute("href") || "";
-      var slug = (href.match(/zk\/([a-z-]+)\.html/) || [])[1] || "unknown";
       src = "soon-" + slug;
-      var nm = card.querySelector(".pcard-name");
-      if (titleEl && nm) { titleEl.textContent = nm.textContent; titleEl.hidden = false; }
+      if (titleEl && nm) { titleEl.textContent = " · " + nm; titleEl.hidden = false; }
       if (stageForm) stageForm.hidden = false;
       if (stageOk) stageOk.hidden = true;
       pop.classList.add("is-on");
@@ -363,6 +371,41 @@
       if (/Изображения планировок|пришлёт менеджер/i.test(ps[i].textContent)) {
         ps[i].textContent = "Планировки квартир под вашу комнатность — площади и цены «от» из системы продаж ATAMURA. Нажмите на планировку, чтобы рассмотреть детально.";
         break;
+      }
+    }
+  }
+
+  /* batch4 #160/#161/#162 — правки футера (на всех статических страницах) */
+  function enhanceFooter() {
+    var ul = document.querySelector(".foot-col-purchase ul"); if (!ul) return;
+    var links = ul.querySelectorAll("li > a");
+    for (var i = 0; i < links.length; i++) {
+      var a = links[i], t = (a.textContent || "").trim();
+      if (t === "Калькулятор ипотеки") a.textContent = "Ипотечный калькулятор";        // #161
+      else if (t === "Ипотека") { var li = a.closest("li"); if (li) li.remove(); }       // #160 (дубль #mortgage)
+      else if (t === "Запись на просмотр") { a.setAttribute("data-open-lead", ""); a.setAttribute("data-lead-source", "footer-zapis"); a.setAttribute("href", "#"); } // #162
+    }
+  }
+
+  /* batch4 #149/#150-154 — на страницах ЖК: новое фото хиро AURA + кнопка скачивания презентации */
+  function enhanceZhkExtras() {
+    if (!/\/zk\//.test(location.pathname)) return;
+    var m = location.pathname.match(/\/zk\/([a-z0-9-]+)\.html/i);
+    var slug = m ? m[1].toLowerCase() : null; if (!slug) return;
+    if (slug === "aura") {  // #149
+      var hero = document.querySelector(".pagehero, .pagehero-zk");
+      if (hero) hero.style.backgroundImage = "url(" + catAsset("assets/img/zhk/aura/hero149.jpg") + ")";
+    }
+    var PRES = { aura: 1, bravo: 1, atmosfera: 1, keruen: 1, aqsai: 1 };  // #150-154
+    if (PRES[slug]) {
+      var btn = document.querySelector(".catalog-card [data-open-catalog], .catalog-card .btn, .catalog-card button");
+      if (btn) {
+        var a = document.createElement("a");
+        a.className = btn.className; a.textContent = "Скачать презентацию";
+        a.setAttribute("href", catAsset("catalog/presentations/" + slug + ".pdf"));
+        a.setAttribute("download", ""); a.setAttribute("target", "_blank"); a.setAttribute("rel", "noopener");
+        a.setAttribute("data-wa", "zk-presentation");
+        btn.parentNode.replaceChild(a, btn);
       }
     }
   }
@@ -1193,6 +1236,8 @@
   document.addEventListener("DOMContentLoaded", function () {
     renderZhkDetail();
     enhanceZhkLayouts();
+    enhanceZhkExtras();
+    enhanceFooter();
     renderCatalog();
     bindLightbox();
     bindPlansFilter();

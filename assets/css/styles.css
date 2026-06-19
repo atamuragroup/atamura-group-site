@@ -1550,3 +1550,8 @@
 .plan-card-rooms { font-weight: 700; font-size: 14px; color: var(--ink); }
 .plan-card-area { font-size: 12.5px; color: var(--ink-soft); }
 .plan-card-price { margin-top: 2px; font-weight: 700; font-size: 14px; color: var(--brand); }
+
+/* #164 — меньше пустого пространства внизу каталога (под гридом перед футером) */
+.zk-section:has(#catalog) { padding-bottom: clamp(16px, 2vw, 28px); }
+#catalog .cat-more-wrap { margin-top: 16px; text-align: center; }
+#catalog .cat-more-wrap:has(> button[hidden]) { margin: 0; }
