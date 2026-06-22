@@ -43,7 +43,8 @@ def available_units(tok):
         arr = d.get("data") or []
         for it in arr:
             if (it.get("status") != "AVAILABLE" or it.get("typePurpose") != "residential"
-                    or it.get("propertyType") not in ("property", "townhouse")):
+                    or it.get("propertyType") not in ("property", "townhouse")
+                    or it.get("isHouseArchive")):  # архивные/дубли-очереди («копия», «архив») НЕ в продаже
                 continue
             slug = PROJ_MAP.get(it.get("projectName"))
             if not slug:
