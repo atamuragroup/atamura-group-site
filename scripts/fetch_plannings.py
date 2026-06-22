@@ -40,46 +40,32 @@ def auth():
     return t
 
 def available_units(tok):
-    """id квартиры -> {slug, price, area, rooms, studio}. В продаже = status AVAILABLE,
-    жильё/таунхаус, НЕ мусорный/нежилой дом (JUNK), и НЕ архивный ДУБЛЬ живого дома
-    (архивный дом исключаем только если есть живой дом с тем же именем в этом ЖК;
-    уникальные архив-продукты, напр. «Аура таунхаусы», остаются)."""
-    raw, off, LIMIT = [], 0, 500
+    """id квартиры -> {slug, price, area, rooms, studio}. В ПРОДАЖЕ = status AVAILABLE,
+    жильё/таунхаус, и дом НЕ архивный (isHouseArchive==false). Архивные дома застройщик
+    пометил как НЕ в продаже (включая дубли «копия», «архив», и снятые с продажи продукты)."""
+    out, off, LIMIT = {}, 0, 500
     while True:
         d = hj(f"{PB}/api/v4/json/property?access_token={tok}&fullness=1&limit={LIMIT}&offset={off}")
         arr = d.get("data") or []
         for it in arr:
             slug = PROJ_MAP.get(it.get("projectName"))
-            if (not slug or it.get("typePurpose") != "residential"
-                    or it.get("propertyType") not in ("property", "townhouse")):
+            if (not slug or it.get("status") != "AVAILABLE"
+                    or it.get("typePurpose") != "residential"
+                    or it.get("propertyType") not in ("property", "townhouse")
+                    or it.get("isHouseArchive")):
                 continue
-            it["_slug"] = slug
-            raw.append(it)
+            out[str(it.get("id"))] = {
+                "slug": slug,
+                "price": (it.get("price") or {}).get("value"),
+                "area": (it.get("area") or {}).get("area_total"),
+                "rooms": it.get("rooms_amount"),
+                "studio": bool(it.get("studio")),
+            }
         if len(arr) < LIMIT:
             break
         off += LIMIT
         if off > 50000:
             break
-    live = defaultdict(set)  # slug -> {houseName живых (не архивных) домов}
-    for it in raw:
-        if not it.get("isHouseArchive"):
-            live[it["_slug"]].add(it.get("houseName"))
-    out = {}
-    for it in raw:
-        if it.get("status") != "AVAILABLE":
-            continue
-        hn = it.get("houseName") or ""
-        if JUNK_HOUSE.search(hn):
-            continue
-        if it.get("isHouseArchive") and hn in live[it["_slug"]]:  # архивный дубль живого дома
-            continue
-        out[str(it.get("id"))] = {
-            "slug": it["_slug"],
-            "price": (it.get("price") or {}).get("value"),
-            "area": (it.get("area") or {}).get("area_total"),
-            "rooms": it.get("rooms_amount"),
-            "studio": bool(it.get("studio")),
-        }
     return out
 
 def fetch_plans(tok):
