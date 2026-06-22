@@ -1,31 +1,30 @@
 # -*- coding: utf-8 -*-
-"""#127 — планировки квартир из Profitbase на карточки каталога.
-Тянет пресеты планировок (/api/v4/json/plan), группирует по ЖК x комнатность,
-качает по N распознанных картинок на тип, оптимизирует (Pillow), кладёт в
-assets/img/plans/<slug>/<roomKey>/NN.jpg и вписывает "plans":[...] в flats-data.js.
-Запуск: python3 scripts/fetch_plannings.py
+"""Планировки + актуальные цены из Profitbase (по ТЗ Данияра 22.06):
+- карточки проектов: цена = самая дешёвая из ДОСТУПНЫХ к продаже квартир (patch zhk-data.js priceFrom)
+- планировки: каждая ОТДЕЛЬНО (не группируя по комнатности), только доступные;
+  у каждой свои комнатность/площадь/цена/картинка (window.ATAMURA_PLANS в flats-data.js)
+Ключ ТОЛЬКО из env: PROFITBASE_API_KEY (+ опц. PROFITBASE_BASE_URL).
+Запуск: PROFITBASE_API_KEY=... python3 scripts/fetch_plannings.py
 """
 import json, os, re, sys, urllib.request, hashlib
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict
 
-PB = "https://pb12230.profitbase.ru"
-KEY = os.environ.get("PROFITBASE_API_KEY", "app-67a9fc9aa2b23")
+PB = os.environ.get("PROFITBASE_BASE_URL", "https://pb12230.profitbase.ru").rstrip("/")
+KEY = os.environ.get("PROFITBASE_API_KEY")
+if not KEY:
+    sys.exit("ERROR: переменная окружения PROFITBASE_API_KEY обязательна")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-N_PER_TYPE = 6
 
-# projectName (Profitbase, UTF-8) -> slug каталога (только ЖК, что есть в flats-data.js)
+# projectName (Profitbase) -> slug каталога
 PROJ_MAP = {
-    "Атмосфера": "atmosfera",  # Атмосфера
-    "AURA": "aura",
-    "KERUEN": "keruen",
-    "AQSAI RESORT": "aqsai",
-    "Bravo": "bravo",
+    "Атмосфера": "atmosfera", "AURA": "aura", "KERUEN": "keruen",
+    "AQSAI RESORT": "aqsai", "Bravo": "bravo",
 }
 
 def hj(url, method="GET", body=None):
     req = urllib.request.Request(url, method=method, headers={"Content-Type": "application/json"},
                                  data=json.dumps(body).encode() if body else None)
-    with urllib.request.urlopen(req, timeout=60) as r:
+    with urllib.request.urlopen(req, timeout=90) as r:
         return json.loads(r.read())
 
 def auth():
@@ -35,6 +34,33 @@ def auth():
     if not t:
         raise RuntimeError(f"auth failed: {d}")
     return t
+
+def available_units(tok):
+    """id квартиры -> {slug, price, area, rooms, studio}, только AVAILABLE жильё/таунхаусы."""
+    out, off, LIMIT = {}, 0, 500
+    while True:
+        d = hj(f"{PB}/api/v4/json/property?access_token={tok}&fullness=1&limit={LIMIT}&offset={off}")
+        arr = d.get("data") or []
+        for it in arr:
+            if (it.get("status") != "AVAILABLE" or it.get("typePurpose") != "residential"
+                    or it.get("propertyType") not in ("property", "townhouse")):
+                continue
+            slug = PROJ_MAP.get(it.get("projectName"))
+            if not slug:
+                continue
+            out[str(it.get("id"))] = {
+                "slug": slug,
+                "price": (it.get("price") or {}).get("value"),
+                "area": (it.get("area") or {}).get("area_total"),
+                "rooms": it.get("rooms_amount"),
+                "studio": bool(it.get("studio")),
+            }
+        if len(arr) < LIMIT:
+            break
+        off += LIMIT
+        if off > 50000:
+            break
+    return out
 
 def fetch_plans(tok):
     out, off = [], 0
@@ -49,34 +75,6 @@ def fetch_plans(tok):
             break
     return out
 
-def available_ids(tok):
-    # #176: id квартир, ДОСТУПНЫХ в продаже (status AVAILABLE, жильё/таунхаусы)
-    ids, off, LIMIT = set(), 0, 500
-    while True:
-        d = hj(f"{PB}/api/v4/json/property?access_token={tok}&fullness=1&limit={LIMIT}&offset={off}")
-        arr = d.get("data") or []
-        for it in arr:
-            if (it.get("status") == "AVAILABLE"
-                    and it.get("propertyType") in ("property", "townhouse")
-                    and it.get("typePurpose") == "residential"):
-                ids.add(str(it.get("id")))
-        if len(arr) < LIMIT:
-            break
-        off += LIMIT
-        if off > 50000:
-            break
-    return ids
-
-def room_key(slug, p):
-    if slug == "aqsai":
-        return "Таунхаус"  # Таунхаус
-    if p.get("isStudio"):
-        return "Студия"  # Студия
-    ra = p.get("roomsAmount")
-    if ra in (1, 2, 3):
-        return str(ra)
-    return None  # 4+/0 -> в каталоге нет
-
 def img_url(p):
     im = p.get("image")
     if isinstance(im, dict):
@@ -89,96 +87,125 @@ def img_url(p):
         return (f.get("source") or f.get("big")) if isinstance(f, dict) else f
     return None
 
-def optimize(raw_path, out_jpg):
+def rooms_key(slug, p):
+    if slug == "aqsai":
+        return "Таунхаус"
+    if p.get("isStudio"):
+        return "Студия"
+    n = p.get("roomsAmount")
+    return str(n) if n else None
+
+def optimize(raw, out_jpg):
     from PIL import Image
-    im = Image.open(raw_path)
+    im = Image.open(raw)
     if im.mode in ("RGBA", "LA", "P"):
-        bg = Image.new("RGB", im.size, (255, 255, 255))
-        im = im.convert("RGBA")
-        bg.paste(im, mask=im.split()[-1])
-        im = bg
+        bg = Image.new("RGB", im.size, (255, 255, 255)); im = im.convert("RGBA")
+        bg.paste(im, mask=im.split()[-1]); im = bg
     else:
         im = im.convert("RGB")
     w, h = im.size
     if w > 1000:
         im = im.resize((1000, round(h * 1000 / w)), Image.LANCZOS)
-    im.save(out_jpg, "JPEG", quality=85, optimize=True)
+    im.save(out_jpg, "JPEG", quality=82, optimize=True)
+
+def download(url, slug, cache):
+    if url in cache:
+        return cache[url]
+    h = hashlib.md5(url.encode()).hexdigest()[:12]
+    rel = f"assets/img/plans/{slug}/{h}.jpg"
+    out = os.path.join(ROOT, rel)
+    os.makedirs(os.path.dirname(out), exist_ok=True)
+    raw = out + ".raw"
+    urllib.request.urlretrieve(url, raw)
+    optimize(raw, out)
+    os.remove(raw)
+    cache[url] = rel
+    return rel
+
+def patch_zhk_prices(minprice):
+    path = os.path.join(ROOT, "assets", "js", "zhk-data.js")
+    src = open(path, encoding="utf-8").read()
+    for slug, price in minprice.items():
+        pat = re.compile(r'("slug":\s*"' + re.escape(slug) + r'"[\s\S]*?"priceFrom":\s*)(\d+|null)')
+        src, n = pat.subn(lambda m: m.group(1) + str(price), src, count=1)
+        print(f"  zhk-data {slug}.priceFrom = {price} (заменено: {n})")
+    open(path, "w", encoding="utf-8").write(src)
+
+def write_plans(plans_by_slug):
+    """Удаляет старые plans[] из ATAMURA_FLATS и дописывает window.ATAMURA_PLANS."""
+    path = os.path.join(ROOT, "assets", "js", "flats-data.js")
+    src = open(path, encoding="utf-8").read()
+    m = re.search(r"window\.ATAMURA_FLATS\s*=\s*(\[.*?\]);", src, re.S)
+    arr = json.loads(m.group(1))
+    for f in arr:
+        f.pop("plans", None)
+    new_flats = "window.ATAMURA_FLATS = " + json.dumps(arr, ensure_ascii=False, separators=(",", ":")) + ";"
+    plans_js = "window.ATAMURA_PLANS = " + json.dumps(plans_by_slug, ensure_ascii=False, separators=(",", ":")) + ";"
+    # вырезаем старый ATAMURA_PLANS если был, заменяем блок ATAMURA_FLATS, дописываем ATAMURA_PLANS
+    head = src[:m.start()]
+    tail = src[m.end():]
+    tail = re.sub(r"\s*window\.ATAMURA_PLANS\s*=\s*\{.*?\};", "", tail, flags=re.S)
+    open(path, "w", encoding="utf-8").write(head + new_flats + tail.rstrip() + "\n" + plans_js + "\n")
 
 def main():
-    tok = auth()
-    print("auth OK")
-    plans = fetch_plans(tok)
-    print(f"presets: {len(plans)}")
-    avail = available_ids(tok)
-    print(f"available units: {len(avail)}")
+    tok = auth(); print("auth OK")
+    units = available_units(tok); print(f"доступных квартир: {len(units)}")
+    plans = fetch_plans(tok); print(f"пресетов всего: {len(plans)}")
 
-    # slug -> roomKey -> ordered-unique urls
-    grouped = defaultdict(lambda: defaultdict(OrderedDict))
-    skipped = 0
+    by_slug = {}      # slug -> OrderedDict(img_rel -> planning)
+    img_cache = {}
+    # чистим старые картинки
+    import shutil
+    pdir = os.path.join(ROOT, "assets", "img", "plans")
+    if os.path.isdir(pdir):
+        shutil.rmtree(pdir)
+
     for p in plans:
         slug = PROJ_MAP.get(p.get("projectName"))
         if not slug:
             continue
-        # #176: пропускаем планировки без доступных в продаже квартир
-        if not (set(map(str, p.get("properties") or [])) & avail):
-            skipped += 1
+        ids = [str(x) for x in (p.get("properties") or [])]
+        au = [units[i] for i in ids if i in units]
+        if not au:
             continue
-        rk = room_key(slug, p)
+        rk = rooms_key(slug, p)
         if not rk:
             continue
-        u = img_url(p)
-        if u:
-            grouped[slug][rk].setdefault(u, None)
-
-    mapping = {}  # fid -> [paths]
-    for slug in grouped:
-        for rk, urls in grouped[slug].items():
-            picked = list(urls.keys())[:N_PER_TYPE]
-            outdir = os.path.join(ROOT, "assets", "img", "plans", slug, _safe(rk))
-            os.makedirs(outdir, exist_ok=True)
-            paths = []
-            for i, u in enumerate(picked, 1):
-                raw = os.path.join(outdir, f"_raw{i}")
-                jpg = os.path.join(outdir, f"{i:02d}.jpg")
-                rel = f"assets/img/plans/{slug}/{_safe(rk)}/{i:02d}.jpg"
-                try:
-                    urllib.request.urlretrieve(u, raw)
-                    optimize(raw, jpg)
-                    os.remove(raw)
-                    paths.append(rel)
-                except Exception as e:
-                    print(f"  skip {slug}/{rk} #{i}: {e}")
-            if paths:
-                mapping[f"{slug}_{rk}"] = paths
-                kb = sum(os.path.getsize(os.path.join(ROOT, p)) for p in paths) // 1024
-                print(f"  {slug}/{rk}: {len(paths)} планировок ({kb} KB)")
-
-    json.dump(mapping, open(os.path.join(ROOT, "data", "plannings_map.json"), "w"),
-              ensure_ascii=False, indent=2)
-    patch_flats(mapping)
-
-def _safe(rk):
-    # roomKey -> safe dir segment (translit для кириллицы)
-    m = {"Студия": "studio", "Таунхаус": "th"}
-    return m.get(rk, rk)
-
-def patch_flats(mapping):
-    path = os.path.join(ROOT, "assets", "js", "flats-data.js")
-    src = open(path, encoding="utf-8").read()
-    m = re.search(r"window\.ATAMURA_FLATS\s*=\s*(\[.*\]);", src, re.S)
-    arr = json.loads(m.group(1))
-    hit = 0
-    for f in arr:
-        fid = f"{f['zk']}_{f['rooms']}"
-        if fid in mapping:
-            f["plans"] = mapping[fid]
-            hit += 1
+        prices = [u["price"] for u in au if u["price"]]
+        areas = [u["area"] for u in au if u["area"]]
+        if not prices:
+            continue
+        url = img_url(p)
+        if not url:
+            continue
+        try:
+            rel = download(url, slug, img_cache)
+        except Exception as e:
+            print(f"  skip img {slug}: {e}")
+            continue
+        entry = {"r": rk, "aMin": round(min(areas), 1) if areas else None,
+                 "aMax": round(max(areas), 1) if areas else None, "price": min(prices), "img": rel}
+        d = by_slug.setdefault(slug, OrderedDict())
+        if rel in d:  # дедуп по картинке: берём минимальную цену и общий диапазон площади
+            e0 = d[rel]
+            e0["price"] = min(e0["price"], entry["price"])
+            if entry["aMin"] is not None:
+                e0["aMin"] = min(e0["aMin"], entry["aMin"]) if e0["aMin"] is not None else entry["aMin"]
+                e0["aMax"] = max(e0["aMax"], entry["aMax"]) if e0["aMax"] is not None else entry["aMax"]
         else:
-            f.pop("plans", None)
-    new_arr = json.dumps(arr, ensure_ascii=False, separators=(",", ":"))
-    src2 = src[:m.start(1)] + new_arr + src[m.end(1):]
-    open(path, "w", encoding="utf-8").write(src2)
-    print(f"patched flats-data.js: {hit}/{len(arr)} карточек с планировками")
+            d[rel] = entry
+
+    plans_by_slug, minprice = {}, {}
+    for slug, d in by_slug.items():
+        lst = sorted(d.values(), key=lambda x: x["price"])
+        plans_by_slug[slug] = lst
+        minprice[slug] = min(x["price"] for x in lst)
+        kb = sum(os.path.getsize(os.path.join(ROOT, x["img"])) for x in lst) // 1024
+        print(f"  {slug}: {len(lst)} планировок, min {minprice[slug]/1e6:.2f} млн ({kb} KB)")
+
+    write_plans(plans_by_slug)
+    patch_zhk_prices(minprice)
+    print("flats-data.js (ATAMURA_PLANS) и zhk-data.js обновлены")
 
 if __name__ == "__main__":
     main()

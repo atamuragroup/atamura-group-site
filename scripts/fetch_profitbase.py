@@ -8,7 +8,9 @@ import json, os, re, sys, urllib.request, urllib.parse
 from collections import defaultdict
 
 PB_HOST = "https://pb12230.profitbase.ru"  # поддомен аккаунта pb12230 (ТОО ATAMURA GROUP)
-API_KEY = os.environ.get("PROFITBASE_API_KEY", "app-67a9fc9aa2b23")
+API_KEY = os.environ.get("PROFITBASE_API_KEY")
+if not API_KEY:
+    raise SystemExit("PROFITBASE_API_KEY env var required")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 PROJ_MAP = {

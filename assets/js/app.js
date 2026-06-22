@@ -341,29 +341,33 @@
     aqsai: [43.166429, 76.786037], bravo: [43.429754, 77.025929], discovery: [43.392434, 77.025802],
     monarch: [43.259488, 76.940266], arlan: [43.29903, 77.04075]
   };
-  /* #61/#27 — общий билдер грида планировок (фильтр по комнатности + цена/площадь) */
-  function plansGridHTML(types, zname) {
-    var rooms = []; types.forEach(function (t) { if (rooms.indexOf(t.rooms) < 0) rooms.push(t.rooms); });
+  /* ТЗ 22.06 — грид планировок: КАЖДАЯ планировка отдельно (не группируя по комнатности),
+     только доступные к продаже; у каждой свои комнатность/площадь/цена. Фильтр по комнатности — chips. */
+  var PLAN_ROOM_ORDER = ["Студия", "1", "2", "3", "4", "5", "Таунхаус"];
+  function plansGridHTML(plans, zname) {
+    var rooms = [];
+    plans.forEach(function (p) { if (rooms.indexOf(p.r) < 0) rooms.push(p.r); });
+    rooms.sort(function (a, b) { var ia = PLAN_ROOM_ORDER.indexOf(a), ib = PLAN_ROOM_ORDER.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
     var chips = rooms.length > 1 ? '<div class="plans-filter"><button type="button" class="plans-chip is-on" data-prooms="*">Все</button>' +
       rooms.map(function (r) { return '<button type="button" class="plans-chip" data-prooms="' + r + '">' + roomLabel(r) + "</button>"; }).join("") + "</div>" : "";
-    var cards = types.map(function (t) {
-      var area = t.areaMin === t.areaMax ? t.areaMin + " м²" : t.areaMin + "–" + t.areaMax + " м²";
-      return '<button type="button" class="plan-card" data-prooms-card="' + t.rooms + '" data-plans=\'' + JSON.stringify(t.plans.map(catAsset)) + '\' aria-label="Планировки ' + roomLabel(t.rooms) + '">' +
-        '<span class="plan-card-img"><img src="' + catAsset(t.plans[0]) + '" alt="Планировка ' + roomLabel(t.rooms) + (zname ? " — " + zname : "") + '" loading="lazy"><span class="plan-card-count">' + t.plans.length + " план.</span></span>" +
-        '<span class="plan-card-body"><span class="plan-card-rooms">' + roomLabel(t.rooms) + '</span><span class="plan-card-area">' + area + '</span><span class="plan-card-price">от ' + money(t.priceFrom) + " ₸</span></span></button>";
+    var cards = plans.map(function (p) {
+      var area = (p.aMin && p.aMax && p.aMin !== p.aMax) ? p.aMin + "–" + p.aMax + " м²" : ((p.aMin || p.aMax || "") + " м²");
+      return '<button type="button" class="plan-card" data-prooms-card="' + p.r + '" data-plans=\'' + JSON.stringify([catAsset(p.img)]) + '\' aria-label="Планировка ' + roomLabel(p.r) + '">' +
+        '<span class="plan-card-img"><img src="' + catAsset(p.img) + '" alt="Планировка ' + roomLabel(p.r) + (zname ? " — " + zname : "") + '" loading="lazy"></span>' +
+        '<span class="plan-card-body"><span class="plan-card-rooms">' + roomLabel(p.r) + '</span><span class="plan-card-area">' + area + '</span><span class="plan-card-price">от ' + money(p.price) + " ₸</span></span></button>";
     }).join("");
     return '<div class="plans-wrap">' + chips + '<div class="plans-grid">' + cards + "</div></div>";
   }
 
   /* #61/#27 — на статических страницах ЖК заменяем таблицу цен на грид реальных планировок (Profitbase) */
   function enhanceZhkLayouts() {
-    if (!/\/zk\//.test(location.pathname) || !window.ATAMURA_FLATS) return;
+    if (!/\/zk\//.test(location.pathname) || !window.ATAMURA_PLANS) return;
     var m = location.pathname.match(/\/zk\/([a-z0-9-]+)\.html/i);
     var slug = m ? m[1].toLowerCase() : null; if (!slug) return;
-    var types = window.ATAMURA_FLATS.filter(function (f) { return f.zk === slug && f.plans && f.plans.length; });
-    if (!types.length) return;
+    var plans = window.ATAMURA_PLANS[slug];
+    if (!plans || !plans.length) return;
     var tableWrap = document.querySelector(".zk-layouts-wrap"); if (!tableWrap) return;
-    var grid = document.createElement("div"); grid.innerHTML = plansGridHTML(types, "");
+    var grid = document.createElement("div"); grid.innerHTML = plansGridHTML(plans, "");
     var gridNode = grid.firstChild;
     tableWrap.parentNode.replaceChild(gridNode, tableWrap);
     // #177: форма заявки сразу после планировок на страницах ЖК (клон foot-cta)
@@ -380,6 +384,20 @@
         ps[i].textContent = "Планировки квартир под вашу комнатность — площади и цены «от» из системы продаж ATAMURA. Нажмите на планировку, чтобы рассмотреть детально.";
         break;
       }
+    }
+  }
+
+  /* ТЗ 22.06 — актуальная цена на статических карточках проектов = z.priceFrom (мин. доступная, из Profitbase) */
+  function enhanceProjectPrices() {
+    if (!window.ATAMURA_ZHK) return;
+    var by = {}; window.ATAMURA_ZHK.forEach(function (z) { by[z.slug] = z; });
+    var cards = document.querySelectorAll("a.pcard");
+    for (var i = 0; i < cards.length; i++) {
+      var hm = (cards[i].getAttribute("href") || "").match(/zk\/([a-z0-9-]+)\.html/);
+      if (!hm) continue;
+      var z = by[hm[1]]; if (!z || !z.priceFrom) continue;  // только продающиеся ЖК; «Скоро»/«Сдан» не трогаем
+      var el = cards[i].querySelector(".pcard-price"); if (!el) continue;
+      el.innerHTML = "от <strong>" + (z.priceFrom / 1000000).toFixed(z.priceFrom % 1000000 ? 1 : 0).replace(".", ",") + "</strong> млн ₸";
     }
   }
 
@@ -463,9 +481,9 @@
       (near.length ? '<h3 class="zk-h3">Инфраструктура и дорога</h3><div class="feat-grid">' + featList(near) + "</div>" : ""));
     // #61/#27 — «Планировочные решения»: планировки из Profitbase, фильтр по комнатности, цена + площадь
     var planBlock = (function () {
-      var types = (window.ATAMURA_FLATS || []).filter(function (f) { return f.zk === slug && f.plans && f.plans.length; });
-      if (!types.length) return softBlock("Генплан и планировки", "Генплан территории и планировки квартир под вашу комнатность пришлём по запросу — нажмите «Получить подборку», менеджер вышлет PDF.");
-      return block("Планировочные решения", '<p class="zk-lead" style="margin-bottom:var(--s-4)">Планировки квартир под вашу комнатность — площади и цены «от». Нажмите, чтобы рассмотреть детально.</p>' + plansGridHTML(types, z.name));
+      var plans = (window.ATAMURA_PLANS || {})[slug];
+      if (!plans || !plans.length) return softBlock("Генплан и планировки", "Генплан территории и планировки квартир под вашу комнатность пришлём по запросу — нажмите «Получить подборку», менеджер вышлет PDF.");
+      return block("Планировочные решения", '<p class="zk-lead" style="margin-bottom:var(--s-4)">Доступные к продаже планировки — у каждой своя площадь и цена «от». Нажмите, чтобы рассмотреть детально.</p>' + plansGridHTML(plans, z.name));
     })();
     var catalogCard = '<div class="catalog-card">' +
       '<div class="catalog-card-text">' +
@@ -589,9 +607,10 @@
     var area = f.areaMin === f.areaMax ? f.areaMin + " м²" : f.areaMin + "–" + f.areaMax + " м²";
     var img = f.image ? '<img src="' + catAsset(f.image) + '" alt="' + rl + ' в ' + f.zkName + '" loading="lazy">' : "";
     var srok = f.srok ? '<span class="flat-status">' + f.srok + "</span>" : "";
-    var pN = (f.plans && f.plans.length) || 0;
+    var fplans = ((window.ATAMURA_PLANS || {})[f.zk] || []).filter(function (p) { return p.r === f.rooms; }).map(function (p) { return catAsset(p.img); });
+    var pN = fplans.length;
     var pW = pN % 10 === 1 && pN % 100 !== 11 ? "планировка" : (pN % 10 >= 2 && pN % 10 <= 4 && (pN % 100 < 10 || pN % 100 >= 20) ? "планировки" : "планировок");
-    var plansBtn = pN ? '<button class="flat-plans" type="button" data-plans=\'' + JSON.stringify(f.plans.map(catAsset)) + '\' aria-label="Смотреть планировки ' + rl + '">' +
+    var plansBtn = pN ? '<button class="flat-plans" type="button" data-plans=\'' + JSON.stringify(fplans) + '\' aria-label="Смотреть планировки ' + rl + '">' +
       '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 9v12"/></svg>' +
       pN + " " + pW + "</button>" : "";
     var waText = "Здравствуйте! Меня заинтересовала квартира в «" + f.zkName + "». Планировка: " + rl + ". Площадь: " + area + ". Стоимость: от " + money(f.priceFrom) + " ₸. Подскажите, пожалуйста, актуальна ли эта квартира и какие есть условия покупки?";
@@ -1252,6 +1271,7 @@
     enhanceZhkExtras();
     enhanceFooter();
     enhanceDrawer();
+    enhanceProjectPrices();
     renderCatalog();
     bindLightbox();
     bindPlansFilter();
