@@ -356,7 +356,8 @@
         '<span class="plan-card-img"><img src="' + catAsset(p.img) + '" alt="Планировка ' + roomLabel(p.r) + (zname ? " — " + zname : "") + '" loading="lazy"></span>' +
         '<span class="plan-card-body"><span class="plan-card-rooms">' + roomLabel(p.r) + '</span><span class="plan-card-area">' + area + '</span><span class="plan-card-price">от ' + money(p.price) + " ₸</span></span></button>";
     }).join("");
-    return '<div class="plans-wrap">' + chips + '<div class="plans-grid">' + cards + "</div></div>";
+    return '<div class="plans-wrap">' + chips + '<div class="plans-grid">' + cards + "</div>" +
+      '<div class="plans-more-wrap"><button type="button" class="btn btn-outline plans-more" hidden>Показать ещё</button></div></div>';
   }
 
   /* #61/#27 — на статических страницах ЖК заменяем таблицу цен на грид реальных планировок (Profitbase) */
@@ -1170,18 +1171,43 @@
     });
   }
 
-  /* #61/#27 — фильтр планировок ЖК по комнатности */
-  function bindPlansFilter() {
+  /* Планировки ЖК: фильтр по комнатности + пагинация «Показать ещё» по 6 (длинное полотно) */
+  var PLANS_STEP = 6;
+  function bindPlans() {
+    function apply(wrap) {
+      var room = wrap.getAttribute("data-room") || "*";
+      var shown = +(wrap.getAttribute("data-shown") || PLANS_STEP);
+      var cards = wrap.querySelectorAll("[data-prooms-card]"), matched = 0;
+      for (var i = 0; i < cards.length; i++) {
+        var ok = room === "*" || cards[i].getAttribute("data-prooms-card") === room;
+        if (ok) { matched++; cards[i].style.display = matched <= shown ? "" : "none"; }
+        else cards[i].style.display = "none";
+      }
+      var more = wrap.querySelector(".plans-more");
+      if (more) more.hidden = matched <= shown;
+    }
     document.addEventListener("click", function (e) {
       var chip = e.target.closest && e.target.closest(".plans-chip");
-      if (!chip) return;
-      var wrap = chip.closest(".plans-wrap"); if (!wrap) return;
-      var room = chip.getAttribute("data-prooms");
-      var chips = wrap.querySelectorAll(".plans-chip");
-      for (var i = 0; i < chips.length; i++) chips[i].classList.toggle("is-on", chips[i] === chip);
-      var cards = wrap.querySelectorAll("[data-prooms-card]");
-      for (var j = 0; j < cards.length; j++) cards[j].style.display = (room === "*" || cards[j].getAttribute("data-prooms-card") === room) ? "" : "none";
+      if (chip) {
+        var w = chip.closest(".plans-wrap"); if (!w) return;
+        w.setAttribute("data-room", chip.getAttribute("data-prooms"));
+        w.setAttribute("data-shown", String(PLANS_STEP));
+        var chips = w.querySelectorAll(".plans-chip");
+        for (var i = 0; i < chips.length; i++) chips[i].classList.toggle("is-on", chips[i] === chip);
+        apply(w); return;
+      }
+      var more = e.target.closest && e.target.closest(".plans-more");
+      if (more) {
+        var wm = more.closest(".plans-wrap"); if (!wm) return;
+        wm.setAttribute("data-shown", String(+(wm.getAttribute("data-shown") || PLANS_STEP) + PLANS_STEP));
+        apply(wm);
+      }
     });
+    var wraps = document.querySelectorAll(".plans-wrap");
+    for (var k = 0; k < wraps.length; k++) {
+      wraps[k].setAttribute("data-room", "*"); wraps[k].setAttribute("data-shown", String(PLANS_STEP));
+      apply(wraps[k]);
+    }
   }
 
   /* #144/#146: ЕДИНАЯ универсальная форма «Поможем с выбором» (динамический DOM).
@@ -1274,7 +1300,7 @@
     enhanceProjectPrices();
     renderCatalog();
     bindLightbox();
-    bindPlansFilter();
+    bindPlans();
     bindLeadPopup();
     bindHeroSearch();
     bindAiHelper();

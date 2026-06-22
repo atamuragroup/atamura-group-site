@@ -1553,3 +1553,7 @@
 .zk-section:has(#catalog) { padding-bottom: clamp(16px, 2vw, 28px); }
 #catalog .cat-more-wrap { margin-top: 16px; text-align: center; }
 #catalog .cat-more-wrap:has(> button[hidden]) { margin: 0; }
+
+/* Планировки ЖК — пагинация «Показать ещё» по 6 */
+.plans-more-wrap { text-align: center; margin-top: 18px; }
+.plans-more[hidden] { display: none; }
