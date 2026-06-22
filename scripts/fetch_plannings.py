@@ -7,7 +7,7 @@
 Запуск: PROFITBASE_API_KEY=... python3 scripts/fetch_plannings.py
 """
 import json, os, re, sys, urllib.request, hashlib
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 PB = os.environ.get("PROFITBASE_BASE_URL", "https://pb12230.profitbase.ru").rstrip("/")
 KEY = os.environ.get("PROFITBASE_API_KEY")
@@ -20,6 +20,10 @@ PROJ_MAP = {
     "Атмосфера": "atmosfera", "AURA": "aura", "KERUEN": "keruen",
     "AQSAI RESORT": "aqsai", "Bravo": "bravo",
 }
+# мусорные/нежилые/дубль-дома (не в продаже): «копия», «архив», кладовые, паркинги, тест.
+# NB: фильтруем по ИМЕНИ дома, НЕ по isHouseArchive — иначе теряются легитимные
+# архив-помеченные продукты (напр. «Аура таунхаусы» — террасные таунхаусы в продаже).
+JUNK_HOUSE = re.compile(r"копи|архив|тест|дубл|кладов|парков|паркинг|машином", re.I)
 
 def hj(url, method="GET", body=None):
     req = urllib.request.Request(url, method=method, headers={"Content-Type": "application/json"},
@@ -36,31 +40,46 @@ def auth():
     return t
 
 def available_units(tok):
-    """id квартиры -> {slug, price, area, rooms, studio}, только AVAILABLE жильё/таунхаусы."""
-    out, off, LIMIT = {}, 0, 500
+    """id квартиры -> {slug, price, area, rooms, studio}. В продаже = status AVAILABLE,
+    жильё/таунхаус, НЕ мусорный/нежилой дом (JUNK), и НЕ архивный ДУБЛЬ живого дома
+    (архивный дом исключаем только если есть живой дом с тем же именем в этом ЖК;
+    уникальные архив-продукты, напр. «Аура таунхаусы», остаются)."""
+    raw, off, LIMIT = [], 0, 500
     while True:
         d = hj(f"{PB}/api/v4/json/property?access_token={tok}&fullness=1&limit={LIMIT}&offset={off}")
         arr = d.get("data") or []
         for it in arr:
-            if (it.get("status") != "AVAILABLE" or it.get("typePurpose") != "residential"
-                    or it.get("propertyType") not in ("property", "townhouse")
-                    or it.get("isHouseArchive")):  # архивные/дубли-очереди («копия», «архив») НЕ в продаже
-                continue
             slug = PROJ_MAP.get(it.get("projectName"))
-            if not slug:
+            if (not slug or it.get("typePurpose") != "residential"
+                    or it.get("propertyType") not in ("property", "townhouse")):
                 continue
-            out[str(it.get("id"))] = {
-                "slug": slug,
-                "price": (it.get("price") or {}).get("value"),
-                "area": (it.get("area") or {}).get("area_total"),
-                "rooms": it.get("rooms_amount"),
-                "studio": bool(it.get("studio")),
-            }
+            it["_slug"] = slug
+            raw.append(it)
         if len(arr) < LIMIT:
             break
         off += LIMIT
         if off > 50000:
             break
+    live = defaultdict(set)  # slug -> {houseName живых (не архивных) домов}
+    for it in raw:
+        if not it.get("isHouseArchive"):
+            live[it["_slug"]].add(it.get("houseName"))
+    out = {}
+    for it in raw:
+        if it.get("status") != "AVAILABLE":
+            continue
+        hn = it.get("houseName") or ""
+        if JUNK_HOUSE.search(hn):
+            continue
+        if it.get("isHouseArchive") and hn in live[it["_slug"]]:  # архивный дубль живого дома
+            continue
+        out[str(it.get("id"))] = {
+            "slug": it["_slug"],
+            "price": (it.get("price") or {}).get("value"),
+            "area": (it.get("area") or {}).get("area_total"),
+            "rooms": it.get("rooms_amount"),
+            "studio": bool(it.get("studio")),
+        }
     return out
 
 def fetch_plans(tok):
