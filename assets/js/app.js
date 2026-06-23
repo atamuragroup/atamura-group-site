@@ -403,9 +403,10 @@
     var by = {}; window.ATAMURA_ZHK.forEach(function (z) { by[z.slug] = z; });
     var cards = document.querySelectorAll("a.pcard");
     for (var i = 0; i < cards.length; i++) {
-      var hm = (cards[i].getAttribute("href") || "").match(/zk\/([a-z0-9-]+)\.html/);
+      // матчим последний слаг в href: и «zk/keruen.html» (главная), и «keruen.html» (кросс-линк на самой zk-странице)
+      var hm = (cards[i].getAttribute("href") || "").match(/([a-z0-9-]+)\.html(?:[?#]|$)/i);
       if (!hm) continue;
-      var z = by[hm[1]]; if (!z || !z.priceFrom) continue;  // только продающиеся ЖК; «Скоро»/«Сдан» не трогаем
+      var z = by[hm[1].toLowerCase()]; if (!z || !z.priceFrom) continue;  // только продающиеся ЖК; «Скоро»/«Сдан» не трогаем
       var el = cards[i].querySelector(".pcard-price"); if (!el) continue;
       el.innerHTML = "от <strong>" + (z.priceFrom / 1000000).toFixed(z.priceFrom % 1000000 ? 1 : 0).replace(".", ",") + "</strong> млн ₸";
     }
@@ -437,6 +438,15 @@
     if (!/\/zk\//.test(location.pathname)) return;
     var m = location.pathname.match(/\/zk\/([a-z0-9-]+)\.html/i);
     var slug = m ? m[1].toLowerCase() : null; if (!slug) return;
+    // Единая «Стартовая цена» = priceFrom из zhk-data.js (источник правды: каталог + карточки).
+    // Первый .zk-stat — цена; правим только если в нём ₸ и у ЖК есть цена («Скоро»/0 не трогаем).
+    if (window.ATAMURA_ZHK) {
+      var zkPrice = window.ATAMURA_ZHK.filter(function (x) { return x.slug === slug; })[0];
+      if (zkPrice && zkPrice.priceFrom) {
+        var pst = document.querySelector(".zk-stats .zk-stat strong");
+        if (pst && /₸/.test(pst.textContent)) pst.textContent = "от " + money(zkPrice.priceFrom) + " ₸";
+      }
+    }
     if (slug === "aura") {  // #149
       var hero = document.querySelector(".pagehero, .pagehero-zk");
       if (hero) hero.style.backgroundImage = "url(" + catAsset("assets/img/zhk/aura/hero149.jpg") + ")";
