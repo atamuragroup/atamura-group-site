@@ -274,7 +274,7 @@
       linear-gradient(155deg,
         color-mix(in oklch, var(--brand-deep) 65%, transparent) 0%,
         color-mix(in oklch, var(--accent-deep) 50%, transparent) 100%),
-      url('https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1600&q=80');
+      url('../img/hero/atmosfera.webp');
     background-size: cover; background-position: center;
     color: oklch(98% 0 0);
     display: flex; flex-direction: column; justify-content: space-between;
@@ -329,10 +329,10 @@
   .teaser-arrow { width: 38px; height: 38px; border-radius: 50%; background: oklch(98% 0 0); color: var(--ink); display: grid; place-items: center; flex-shrink: 0; transition: 200ms; }
   .teaser:hover .teaser-arrow { background: var(--brand); color: oklch(98% 0 0); }
 
-  .teaser.is-1 .teaser-bg { background-image: url('https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?auto=format&fit=crop&w=1200&q=80'); }
-  .teaser.is-2 .teaser-bg { background-image: url('https://images.unsplash.com/photo-1531835551805-16d864c8d311?auto=format&fit=crop&w=1200&q=80'); }
-  .teaser.is-3 .teaser-bg { background-image: url('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1200&q=80'); }
-  .teaser.is-4 .teaser-bg { background-image: url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1200&q=80'); }
+  .teaser.is-1 .teaser-bg { background-image: url('../img/hero/keruen.webp'); }
+  .teaser.is-2 .teaser-bg { background-image: url('../img/hero/bravo.webp'); }
+  .teaser.is-3 .teaser-bg { background-image: url('../img/hero/arlan.webp'); }
+  .teaser.is-4 .teaser-bg { background-image: url('../img/hero/monarch.webp'); }
 
   /* ============ BUTTONS ============ */
   .btn {
@@ -476,12 +476,12 @@
   .premium-card::before { content: ''; position: absolute; inset: 0; z-index: 0; background-size: cover; background-position: center; }
   .premium-card::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, oklch(0% 0 0 / 0.1) 0%, oklch(0% 0 0 / 0.55) 100%); }
   .premium-card > * { position: relative; z-index: 2; }
-  .premium-card.is-prem::before { background-image: url('https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1400&q=80'); }
-  .premium-card.is-last::before { background-image: url('https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=1400&q=80'); }
+  .premium-card.is-prem::before { background-image: url('../img/zhk/atmosfera.jpg'); }
+  .premium-card.is-last::before { background-image: url('../img/zhk/bravo.jpg'); }
   .premium-card.is-discount { background: linear-gradient(160deg, var(--brand-deep) 0%, var(--brand) 100%); }
   .premium-card.is-discount::before, .premium-card.is-discount::after { display: none; }
-  .premium-card.is-finish::before { background-image: url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=1400&q=80'); }
-  .premium-card.is-master::before { background-image: url('assets/img/zhk/keruen-02.jpg'); }
+  .premium-card.is-finish::before { background-image: url('../img/zhk/aura.jpg'); }
+  .premium-card.is-master::before { background-image: url('../img/zhk/keruen-02.jpg'); }
   .premium-eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; opacity: 0.95; }
   .premium-sub { font-size: 13px; line-height: 1.45; color: oklch(98% 0 0 / 0.86); margin: 12px 0 0; max-width: 30ch; }
   .premium-body { display: flex; flex-direction: column; }
@@ -490,7 +490,7 @@
 
   /* ============ MORTGAGE ============ */
   .mortgage { padding-block: var(--sect-py); }
-  .mortgage-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(32px, 5vw, 72px); align-items: center; }
+  .mortgage-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(32px, 5vw, 72px); align-items: start; }
   .mortgage-info h2 { font-size: var(--t-h2); font-weight: 600; letter-spacing: -0.025em; line-height: 1.1; margin: 0 0 var(--s-4); }
   .mortgage-info p { font-size: 16px; color: var(--ink-soft); max-width: 42ch; margin: 0 0 var(--s-5); }
   .mort-bullets { display: grid; gap: var(--s-3); margin-bottom: var(--s-6); }
@@ -1179,8 +1179,8 @@
   .flat-status { position: absolute; left: 10px; bottom: 10px; background: oklch(20% 0 0 / 0.78); color: oklch(98% 0 0); font: 600 11px/1 inherit; padding: 6px 10px; border-radius: var(--r-pill); backdrop-filter: blur(6px); }
   .flat-body { padding: var(--s-4) var(--s-5) var(--s-5); display: flex; flex-direction: column; gap: 8px; flex: 1; }
   .flat-head { display: flex; align-items: baseline; justify-content: space-between; }
-  .flat-rooms { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
-  .flat-area { font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .flat-rooms { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+  .flat-area { font-size: 14px; color: var(--ink-soft); font-variant-numeric: tabular-nums; white-space: nowrap; flex-shrink: 0; }
   .flat-price strong { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
   .flat-price span { font-size: 12px; color: var(--ink-mute); margin-left: 8px; }
   .flat-meta { font-size: 12px; color: var(--ink-mute); display: flex; gap: 6px; flex-wrap: wrap; }
@@ -1569,4 +1569,21 @@
    правый блок шапки за край. */
 @media (min-width: 769px) {
   .head .logo-img { height: 25px; width: auto; max-width: none; }
+}
+
+/* T2 — шапка 1361–1570px: меню ещё показано (бургер включается ≤1360), но контент шапки (~1410px)
+   шире контейнера 1320px; пока vw < ~1564 излишек выходит за вьюпорт и «Подобрать квартиру»
+   обрезалась справа. Прячем дублирующую иконку «избранное», слегка ужимаем gap меню и паддинг
+   CTA — кнопка влезает целиком. Выше 1570px излишек помещается в боковые поля (скролла нет). */
+@media (min-width: 1361px) and (max-width: 1570px) {
+  .head-utils .icon-btn { display: none; }
+  .nav-main { gap: clamp(7px, 0.6vw, 12px); }
+  .head-cta { padding: 0 14px; }
+}
+
+/* T3 — каталог на узких экранах: две кнопки в карточке планировки («Получить консультацию» +
+   «Подробнее о ЖК») шире контейнера и 2-я обрезалась. Складываем в столбик на всю ширину. */
+@media (max-width: 480px) {
+  .flat-actions { grid-template-columns: 1fr; gap: 8px; }
+  .flat-actions > a, .flat-actions > button { width: 100%; white-space: normal; min-width: 0; }
 }

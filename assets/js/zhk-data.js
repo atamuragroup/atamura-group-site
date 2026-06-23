@@ -227,13 +227,14 @@ window.ATAMURA_ZHK = [
     "statusDetail": "",
     "hero_image": "assets/img/zhk/bravo.jpg",
     "gallery": [
-      "https://images.unsplash.com/photo-1480074568708-e7b720bb3f09?auto=format&fit=crop&w=1400&q=80",
-      "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1400&q=80",
-      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1400&q=80",
-      "https://images.unsplash.com/photo-1460317442991-0ec209397118?auto=format&fit=crop&w=1400&q=80",
-      "https://images.unsplash.com/photo-1448630360428-65456885c650?auto=format&fit=crop&w=1400&q=80"
+      "assets/img/zhk/bravo/01.jpg",
+      "assets/img/zhk/bravo/02.jpg",
+      "assets/img/zhk/bravo/03.jpg",
+      "assets/img/zhk/bravo/04.jpg",
+      "assets/img/zhk/bravo/05.jpg",
+      "assets/img/zhk/bravo/06.jpg"
     ],
-    "realPhotos": 0,
+    "realPhotos": 6,
     "site": "https://bravo.atamuragroup.kz",
     "draft": false
   },

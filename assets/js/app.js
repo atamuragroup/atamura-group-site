@@ -825,9 +825,16 @@
     var dots = [].slice.call(document.querySelectorAll(".hh-dots button"));
     var i = 0, timer = null;
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function loadBg(s) {
+      if (!s) return;
+      var bg = s.getAttribute("data-bg");
+      if (bg) { s.style.backgroundImage = "url('" + bg + "')"; s.removeAttribute("data-bg"); }
+    }
     function show(n) {
       slides[i].classList.remove("is-on"); if (dots[i]) dots[i].classList.remove("on");
       i = (n + slides.length) % slides.length;
+      loadBg(slides[i]);                         // фон текущего слайда — по требованию
+      loadBg(slides[(i + 1) % slides.length]);   // предзагрузка следующего для плавного кроссфейда
       slides[i].classList.add("is-on"); if (dots[i]) dots[i].classList.add("on");
       if (nameEl) nameEl.textContent = slides[i].getAttribute("data-name") || "";
     }
@@ -835,6 +842,9 @@
     function stop() { if (timer) { clearInterval(timer); timer = null; } }
     dots.forEach(function (d) { d.addEventListener("click", function () { show(+d.getAttribute("data-i")); start(); }); });
     box.addEventListener("mouseenter", stop); box.addEventListener("mouseleave", start);
+    // первый слайд уже загружен (inline webp). Следующий — лениво после первого кадра, чтобы не утяжелять старт.
+    var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1200); };
+    idle(function () { loadBg(slides[1]); });
     start();
   }
 
