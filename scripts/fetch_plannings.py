@@ -120,12 +120,14 @@ def download(url, slug, cache):
     h = hashlib.md5(url.encode()).hexdigest()[:12]
     rel = f"assets/img/plans/{slug}/{h}.jpg"
     out = os.path.join(ROOT, rel)
+    cache[url] = rel
+    if os.path.exists(out):           # уже скачано (детерминированное имя по URL) — не качаем повторно
+        return rel
     os.makedirs(os.path.dirname(out), exist_ok=True)
     raw = out + ".raw"
     urllib.request.urlretrieve(url, raw)
     optimize(raw, out)
     os.remove(raw)
-    cache[url] = rel
     return rel
 
 def patch_zhk_prices(minprice):
@@ -160,12 +162,6 @@ def main():
 
     by_slug = {}      # slug -> OrderedDict(img_rel -> planning)
     img_cache = {}
-    # чистим старые картинки
-    import shutil
-    pdir = os.path.join(ROOT, "assets", "img", "plans")
-    if os.path.isdir(pdir):
-        shutil.rmtree(pdir)
-
     for p in plans:
         slug = PROJ_MAP.get(p.get("projectName"))
         if not slug:
@@ -211,7 +207,14 @@ def main():
 
     write_plans(plans_by_slug)
     patch_zhk_prices(minprice)
-    print("flats-data.js (ATAMURA_PLANS) и zhk-data.js обновлены")
+    # удаляем осиротевшие картинки (планировки, которых больше нет в продаже)
+    import glob
+    used = set(os.path.join(ROOT, x["img"]) for lst in plans_by_slug.values() for x in lst)
+    removed = 0
+    for fp in glob.glob(os.path.join(ROOT, "assets", "img", "plans", "*", "*.jpg")):
+        if os.path.abspath(fp) not in set(os.path.abspath(u) for u in used):
+            os.remove(fp); removed += 1
+    print(f"flats-data.js (ATAMURA_PLANS) и zhk-data.js обновлены; осиротевших картинок удалено: {removed}")
 
 if __name__ == "__main__":
     main()

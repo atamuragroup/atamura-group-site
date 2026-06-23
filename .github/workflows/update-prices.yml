@@ -1,0 +1,50 @@
+name: Daily price update from ProfitBase
+
+# 20:00 Алматы (UTC+5) = 15:00 UTC. Можно запустить вручную (workflow_dispatch).
+on:
+  schedule:
+    - cron: "0 15 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: price-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pillow
+        run: pip install --quiet Pillow
+
+      - name: Fetch prices & plannings from ProfitBase
+        env:
+          PROFITBASE_API_KEY: ${{ secrets.PROFITBASE_API_KEY }}
+        run: python3 scripts/fetch_plannings.py
+
+      - name: Cache-bust changed assets
+        run: python3 scripts/cache_bust.py
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "atamura-price-bot"
+          git config user.email "price-bot@atamuragroup.kz"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Изменений нет — цены актуальны."
+          else
+            git commit -m "chore(prices): авто-обновление цен/планировок из ProfitBase ($(date -u +%Y-%m-%d))"
+            git push
+            echo "Цены обновлены и запушены."
+          fi
