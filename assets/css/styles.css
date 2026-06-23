@@ -1563,3 +1563,9 @@
 .flat-photo-plan img { object-fit: contain; padding: 10px; background: #fff; }
 .plan-flat .flat-meta { color: var(--ink-soft); }
 .plan-flat .flat-price span { font-size: 12px; color: var(--ink-soft); }
+
+/* Логотип в шапке крупнее на десктопе. Wordmark широкий (7.9:1), поэтому 90px (×3)
+   выдавливал верхнее меню; 48px — максимум, при котором меню целиком влезает. */
+@media (min-width: 769px) {
+  .head .logo-img { height: 48px; width: auto; max-width: none; }
+}
