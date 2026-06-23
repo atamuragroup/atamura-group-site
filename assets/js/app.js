@@ -344,6 +344,15 @@
   /* ТЗ 22.06 — грид планировок: КАЖДАЯ планировка отдельно (не группируя по комнатности),
      только доступные к продаже; у каждой свои комнатность/площадь/цена. Фильтр по комнатности — chips. */
   var PLAN_ROOM_ORDER = ["Студия", "1", "2", "3", "4", "5", "Таунхаус"];
+  // дедуп планировок одного типа: один тип = (комнатность + площадь + цена); чертежей-дублей не показываем
+  function dedupPlans(list) {
+    var seen = {}, out = [];
+    (list || []).forEach(function (p) {
+      var k = p.r + "|" + p.aMin + "|" + p.aMax + "|" + p.price;
+      if (seen[k]) return; seen[k] = 1; out.push(p);
+    });
+    return out;
+  }
   function plansGridHTML(plans, zname) {
     var rooms = [];
     plans.forEach(function (p) { if (rooms.indexOf(p.r) < 0) rooms.push(p.r); });
@@ -365,7 +374,7 @@
     if (!/\/zk\//.test(location.pathname) || !window.ATAMURA_PLANS) return;
     var m = location.pathname.match(/\/zk\/([a-z0-9-]+)\.html/i);
     var slug = m ? m[1].toLowerCase() : null; if (!slug) return;
-    var plans = window.ATAMURA_PLANS[slug];
+    var plans = dedupPlans(window.ATAMURA_PLANS[slug]);
     if (!plans || !plans.length) return;
     var tableWrap = document.querySelector(".zk-layouts-wrap"); if (!tableWrap) return;
     var grid = document.createElement("div"); grid.innerHTML = plansGridHTML(plans, "");
@@ -482,7 +491,7 @@
       (near.length ? '<h3 class="zk-h3">Инфраструктура и дорога</h3><div class="feat-grid">' + featList(near) + "</div>" : ""));
     // #61/#27 — «Планировочные решения»: планировки из Profitbase, фильтр по комнатности, цена + площадь
     var planBlock = (function () {
-      var plans = (window.ATAMURA_PLANS || {})[slug];
+      var plans = dedupPlans((window.ATAMURA_PLANS || {})[slug]);
       if (!plans || !plans.length) return softBlock("Генплан и планировки", "Генплан территории и планировки квартир под вашу комнатность пришлём по запросу — нажмите «Получить подборку», менеджер вышлет PDF.");
       return block("Планировочные решения", '<p class="zk-lead" style="margin-bottom:var(--s-4)">Доступные к продаже планировки — у каждой своя площадь и цена «от». Нажмите, чтобы рассмотреть детально.</p>' + plansGridHTML(plans, z.name));
     })();
@@ -630,123 +639,107 @@
       "</div></article>";
   }
 
+  /* ТЗ 23.06 — каталог flats.html: ИНДИВИДУАЛЬНЫЕ планировки из Profitbase (status AVAILABLE,
+     не группируя). У каждой: чертёж, комнатность, м², цена за 100% оплату. Фильтр комнатность/ЖК/бюджет/сортировка. */
+  function catPlanCard(p) {
+    var rl = roomLabel(p.rooms);
+    var area = (p.areaMin && p.areaMax && p.areaMin !== p.areaMax) ? (p.areaMin + "–" + p.areaMax + " м²") : ((p.areaMin || p.areaMax || "") + " м²");
+    var waText = "Здравствуйте! Заинтересовала планировка в «" + p.zkName + "»: " + rl + ", " + area + ", от " + money(p.price) + " ₸ при 100% оплате. Актуальна ли эта квартира и какие условия?";
+    return '<article class="flat plan-flat" data-zk="' + p.zk + '">' +
+      '<button type="button" class="flat-photo flat-photo-plan" data-plans=\'' + JSON.stringify([catAsset(p.img)]) + '\' aria-label="Планировка ' + rl + ' — ' + p.zkName + '">' +
+        '<img src="' + catAsset(p.img) + '" alt="Планировка ' + rl + " — " + p.zkName + '" loading="lazy"></button>' +
+      '<div class="flat-body">' +
+        '<div class="flat-head"><span class="flat-rooms">' + rl + '</span><span class="flat-area">' + area + "</span></div>" +
+        '<div class="flat-price"><strong>от ' + money(p.price) + ' ₸</strong><span>при 100% оплате</span></div>' +
+        '<div class="flat-meta"><span>' + p.zkName + "</span></div>" +
+        '<div class="flat-actions">' +
+          '<a class="btn btn-brand btn-sm" href="https://wa.me/' + WA_PHONE + "?text=" + encodeURIComponent(waText) + '" target="_blank" rel="noopener" data-wa="catalog-plan">Получить консультацию</a>' +
+          '<a class="btn btn-outline btn-sm" href="' + rel("zk/" + p.zk + ".html") + '">Подробнее о ЖК</a>' +
+        "</div>" +
+      "</div></article>";
+  }
+
   function renderCatalog() {
-    var root = byId("catalog"); if (!root || !window.ATAMURA_FLATS) return;
-    var ALL = window.ATAMURA_FLATS.slice();
-    /* Типы из строящихся ЖК без цены (Amaia/Dion → «Дуплекс»): показываем как опцию, но без выдуманных квартир.
-       UPCOMING[room] = [{slug,name}] — нужные ЖК для честного экрана «скоро». */
-    var UPCOMING = {};
-    (window.ATAMURA_ZHK || []).forEach(function (z) {
-      if (z.status === "Скоро" && !ALL.some(function (f) { return f.zk === z.slug; })) (z.rooms || []).forEach(function (r) {
-        if (!ALL.some(function (f) { return f.rooms === r; })) { (UPCOMING[r] = UPCOMING[r] || []).push({ slug: z.slug, name: z.name }); }
+    var root = byId("catalog"); if (!root || !window.ATAMURA_PLANS) return;
+    var ZK = {}; (window.ATAMURA_ZHK || []).forEach(function (z) { ZK[z.slug] = z; });
+    // плоский список индивидуальных планировок по всем ЖК (только доступные к продаже)
+    var ALL = [];
+    Object.keys(window.ATAMURA_PLANS).forEach(function (slug) {
+      var zn = (ZK[slug] && ZK[slug].name) || slug.toUpperCase();
+      dedupPlans(window.ATAMURA_PLANS[slug]).forEach(function (p) {
+        ALL.push({ zk: slug, zkName: zn, rooms: p.r, areaMin: p.aMin, areaMax: p.aMax, price: p.price, img: p.img });
       });
     });
-    var prices = ALL.map(function (f) { return f.priceFrom; });
+    if (!ALL.length) return;
+    var prices = ALL.map(function (f) { return f.price; });
     var PMIN = Math.min.apply(null, prices), PMAX = Math.max.apply(null, prices);
-    var FINISH_ZK = ["aura", "aqsai"]; // #13: ЖК с чистовой отделкой «под ключ» (по премиум-карточке «Опция в Aura и Aqsai Resort»)
-    var state = { rooms: [], zk: "", pmax: PMAX, deal: "", srok: "", sort: "price-asc", fav: false, finish: false };
+    var state = { rooms: [], zk: "", pmax: PMAX, sort: "price-asc" };
 
     var q = new URLSearchParams(location.search);
     if (q.get("rooms")) state.rooms = q.get("rooms").split(",").filter(Boolean);
     if (q.get("zk")) state.zk = q.get("zk");
     if (q.get("pmax")) state.pmax = +q.get("pmax") || PMAX;
-    if (q.get("deal")) state.deal = q.get("deal");
-    if (q.get("srok")) state.srok = q.get("srok");
     if (q.get("sort")) state.sort = q.get("sort");
-    if (q.get("fav")) state.fav = true;
-    if (q.get("finish")) state.finish = true;
 
-    var ROOM_OPTS = ROOM_ORDER.filter(function (r) { return ALL.some(function (f) { return f.rooms === r; }) || UPCOMING[r]; });
+    var ROOM_OPTS = ROOM_ORDER.filter(function (r) { return ALL.some(function (f) { return f.rooms === r; }); });
     var ZK_OPTS = []; ALL.forEach(function (f) { if (!ZK_OPTS.some(function (z) { return z.slug === f.zk; })) ZK_OPTS.push({ slug: f.zk, name: f.zkName }); });
-    var SROK_OPTS = []; ALL.forEach(function (f) { if (f.srok && SROK_OPTS.indexOf(f.srok) < 0) SROK_OPTS.push(f.srok); });
 
     root.innerHTML =
       '<div class="cat-bar">' +
         '<div class="cat-field cat-field-rooms"><label>Комнатность</label><div class="cat-chips" id="cat-rooms">' +
-          ROOM_OPTS.map(function (r) { return '<button class="cat-chip" type="button" data-room="' + r + '">' + r + "</button>"; }).join("") +
+          ROOM_OPTS.map(function (r) { return '<button class="cat-chip" type="button" data-room="' + r + '">' + roomLabel(r) + "</button>"; }).join("") +
         "</div></div>" +
-        '<div class="cat-field"><label>Жилой комплекс</label><select id="cat-zk"><option value="">Все ЖК</option>' +
+        '<div class="cat-field"><label>Жилой комплекс</label><select id="cat-zk"><option value="">Все</option>' +
           ZK_OPTS.map(function (z) { return '<option value="' + z.slug + '">' + z.name + "</option>"; }).join("") + "</select></div>" +
-        '<div class="cat-field"><label>Способ покупки</label><select id="cat-deal"><option value="">Любой</option><option value="Ипотека">Ипотека</option><option value="Рассрочка">Рассрочка</option><option value="7-20-25">7-20-25</option></select></div>' +
-        '<div class="cat-field"><label>Срок сдачи</label><select id="cat-srok"><option value="">Любой</option>' +
-          SROK_OPTS.map(function (s) { return '<option value="' + s + '">' + s + "</option>"; }).join("") + "</select></div>" +
         '<div class="cat-field cat-field-wide"><label>Бюджет до <output id="cat-pmax-v"></output></label><input type="range" id="cat-pmax" min="' + PMIN + '" max="' + PMAX + '" step="500000" value="' + state.pmax + '"></div>' +
-        '<div class="cat-field cat-field-finish"><label>Отделка</label><button class="cat-chip" type="button" id="cat-finish" aria-pressed="false">Чистовая под ключ</button></div>' +
         '<div class="cat-field"><label>Сортировка</label><select id="cat-sort"><option value="price-asc">Сначала дешевле</option><option value="price-desc">Сначала дороже</option><option value="area-desc">Больше площадь</option></select></div>' +
         '<button class="cat-reset" type="button" id="cat-reset">Сбросить</button>' +
       "</div>" +
       '<div class="cat-head"><div class="cat-head-l"><h2 class="cat-count" id="cat-count" aria-live="polite"></h2>' +
-        '<p class="cat-note">Цена — «от». Точную стоимость и подходящие квартиры подберёт менеджер.</p></div>' +
-        '<button class="cat-fav-toggle" type="button" id="cat-fav" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>Избранное<span class="cat-fav-n" id="cat-fav-n"></span></button></div>' +
+        '<p class="cat-note">Планировки доступных к продаже квартир. Цена указана при 100% оплате (от — минимум по этой планировке).</p></div></div>' +
       '<div class="cat-grid" id="cat-grid"></div>' +
-      '<div class="cat-empty" id="cat-empty" hidden><span id="cat-empty-msg">Под эти параметры вариантов нет.</span> <a class="btn btn-outline btn-sm" id="cat-empty-link" hidden></a></div>' +
+      '<div class="cat-empty" id="cat-empty" hidden><span id="cat-empty-msg">Под эти параметры планировок нет.</span></div>' +
       '<div class="cat-more-wrap"><button class="btn btn-outline cat-more" type="button" id="cat-more" hidden>Показать ещё</button></div>';
 
     var grid = byId("cat-grid"), count = byId("cat-count"), empty = byId("cat-empty"), moreBtn = byId("cat-more");
-    /* #129: пагинация каталога — по 8 карточек, «Показать ещё» открывает следующие 8 */
-    var SHOW_STEP = 8, shown = SHOW_STEP, lastList = [];
+    var SHOW_STEP = 9, shown = SHOW_STEP, lastList = [];
     function paintGrid() {
-      grid.innerHTML = lastList.slice(0, shown).map(flatCard).join("");
+      grid.innerHTML = lastList.slice(0, shown).map(catPlanCard).join("");
       if (moreBtn) moreBtn.hidden = lastList.length <= shown;
     }
     if (moreBtn) moreBtn.addEventListener("click", function () { shown += SHOW_STEP; paintGrid(); });
-    var pmaxR = byId("cat-pmax"), pmaxV = byId("cat-pmax-v"), zkS = byId("cat-zk"), dealS = byId("cat-deal"), srokS = byId("cat-srok"), sortS = byId("cat-sort");
+    var pmaxR = byId("cat-pmax"), pmaxV = byId("cat-pmax-v"), zkS = byId("cat-zk"), sortS = byId("cat-sort");
 
     function syncControls() {
-      zkS.value = state.zk; dealS.value = state.deal; srokS.value = state.srok; sortS.value = state.sort; pmaxR.value = state.pmax;
+      zkS.value = state.zk; sortS.value = state.sort; pmaxR.value = state.pmax;
       pmaxV.textContent = money(state.pmax) + " ₸";
       byId("cat-rooms").querySelectorAll(".cat-chip").forEach(function (b) { b.classList.toggle("is-on", state.rooms.indexOf(b.getAttribute("data-room")) >= 0); });
-      var cf = byId("cat-finish"); if (cf) { cf.classList.toggle("is-on", state.finish); cf.setAttribute("aria-pressed", state.finish ? "true" : "false"); }
-      var ft = byId("cat-fav"); if (ft) { ft.classList.toggle("is-on", state.fav); ft.setAttribute("aria-pressed", state.fav ? "true" : "false"); }
     }
     function writeURL() {
       var p = new URLSearchParams();
       if (state.rooms.length) p.set("rooms", state.rooms.join(","));
       if (state.zk) p.set("zk", state.zk);
-      if (state.deal) p.set("deal", state.deal);
-      if (state.srok) p.set("srok", state.srok);
       if (state.pmax < PMAX) p.set("pmax", state.pmax);
       if (state.sort !== "price-asc") p.set("sort", state.sort);
-      if (state.fav) p.set("fav", "1");
-      if (state.finish) p.set("finish", "1");
       history.replaceState(null, "", location.pathname + (p.toString() ? "?" + p.toString() : ""));
     }
     function apply() {
-      var favs = getFav();
       var list = ALL.filter(function (f) {
-        if (state.fav && favs.indexOf(flatId(f)) < 0) return false;
         if (state.rooms.length && state.rooms.indexOf(f.rooms) < 0) return false;
         if (state.zk && f.zk !== state.zk) return false;
-        if (state.deal && (f.deal || []).indexOf(state.deal) < 0) return false;
-        if (state.srok && f.srok !== state.srok) return false;
-        if (f.priceFrom > state.pmax) return false;
-        if (state.finish && FINISH_ZK.indexOf(f.zk) < 0) return false;
+        if (f.price > state.pmax) return false;
         return true;
       });
       list.sort(function (a, b) {
-        if (state.sort === "price-desc") return b.priceFrom - a.priceFrom;
-        if (state.sort === "area-desc") return b.areaMax - a.areaMax;
-        return a.priceFrom - b.priceFrom;
+        if (state.sort === "price-desc") return b.price - a.price;
+        if (state.sort === "area-desc") return (b.areaMax || 0) - (a.areaMax || 0);
+        return a.price - b.price;
       });
-      count.textContent = list.length + " " + plural(list.length, "вариант", "варианта", "вариантов");
+      count.textContent = list.length + " " + plural(list.length, "планировка", "планировки", "планировок");
       shown = SHOW_STEP; lastList = list; paintGrid();
       empty.hidden = list.length > 0;
       grid.hidden = list.length === 0;
-      var em = byId("cat-empty-msg"), elink = byId("cat-empty-link");
-      var upRoom = state.rooms.filter(function (r) { return UPCOMING[r]; })[0];
-      if (state.fav && favs.length === 0) {
-        if (em) em.textContent = "В избранном пока пусто — нажимайте ♥ на карточках квартир, чтобы сохранить.";
-        if (elink) elink.hidden = true;
-      } else if (list.length === 0 && upRoom) {
-        var zs = UPCOMING[upRoom];
-        if (em) em.textContent = roomLabel(upRoom) + " — в новых " + zs.map(function (z) { return z.name; }).join(" и ") + ". Старт продаж скоро — оставьте заявку, сообщим первыми.";
-        if (elink) { elink.hidden = false; elink.textContent = "Смотреть " + zs[0].name; elink.setAttribute("href", rel("zk/" + zs[0].slug + ".html")); }
-      } else {
-        if (em) em.textContent = "";
-        if (elink) elink.hidden = true;
-      }
       writeURL();
-      paintFavCount();
     }
 
     byId("cat-rooms").addEventListener("click", function (e) {
@@ -757,32 +750,8 @@
     });
     pmaxR.addEventListener("input", function () { state.pmax = +pmaxR.value; pmaxV.textContent = money(state.pmax) + " ₸"; apply(); });
     zkS.addEventListener("change", function () { state.zk = zkS.value; apply(); });
-    dealS.addEventListener("change", function () { state.deal = dealS.value; apply(); });
-    srokS.addEventListener("change", function () { state.srok = srokS.value; apply(); });
     sortS.addEventListener("change", function () { state.sort = sortS.value; apply(); });
-    var finBtn = byId("cat-finish"); if (finBtn) finBtn.addEventListener("click", function () { state.finish = !state.finish; finBtn.classList.toggle("is-on", state.finish); finBtn.setAttribute("aria-pressed", state.finish ? "true" : "false"); apply(); });
-    byId("cat-reset").addEventListener("click", function () { state = { rooms: [], zk: "", pmax: PMAX, deal: "", srok: "", sort: "price-asc", fav: false, finish: false }; syncControls(); apply(); });
-    var catEmptyReset = byId("cat-empty-reset"); if (catEmptyReset) catEmptyReset.addEventListener("click", function () { byId("cat-reset").click(); });
-    grid.addEventListener("click", function (e) {
-      var favBtn = e.target.closest(".flat-fav");
-      if (favBtn) {
-        var on = toggleFav(favBtn.getAttribute("data-fav"));
-        favBtn.classList.toggle("is-on", on);
-        favBtn.setAttribute("aria-pressed", on ? "true" : "false");
-        favBtn.setAttribute("aria-label", on ? "Убрать из избранного" : "В избранное");
-        track("fav_toggle", { on: on ? 1 : 0 });
-        paintFavCount();
-        if (state.fav && !on) apply();   // в режиме «избранное» убрать снятую карточку из списка
-        return;
-      }
-      if (e.target.closest("[data-wa]")) track("whatsapp_click", { source: "catalog" });
-    });
-    byId("cat-fav").addEventListener("click", function () {
-      state.fav = !state.fav;
-      this.classList.toggle("is-on", state.fav);
-      this.setAttribute("aria-pressed", state.fav ? "true" : "false");
-      apply();
-    });
+    byId("cat-reset").addEventListener("click", function () { state = { rooms: [], zk: "", pmax: PMAX, sort: "price-asc" }; syncControls(); apply(); });
 
     syncControls(); apply();
   }

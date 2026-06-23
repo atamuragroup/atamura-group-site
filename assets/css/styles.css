@@ -1557,3 +1557,9 @@
 /* Планировки ЖК — пагинация «Показать ещё» по 6 */
 .plans-more-wrap { text-align: center; margin-top: 18px; }
 .plans-more[hidden] { display: none; }
+
+/* ТЗ 23.06 — каталог flats.html: карточка индивидуальной планировки (чертёж целиком на белом) */
+.flat-photo-plan { display: block; width: 100%; border: 0; padding: 0; cursor: pointer; background: #fff; }
+.flat-photo-plan img { object-fit: contain; padding: 10px; background: #fff; }
+.plan-flat .flat-meta { color: var(--ink-soft); }
+.plan-flat .flat-price span { font-size: 12px; color: var(--ink-soft); }
