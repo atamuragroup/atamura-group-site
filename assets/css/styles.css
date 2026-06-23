@@ -1473,9 +1473,11 @@
 .zk-card .popup-fineprint, .zk-card .popup-fineprint a,
 .lead-form-card .popup-fineprint, .lead-form-card .popup-fineprint a { color: oklch(80% 0.02 230); }
 .zk-card > div[style*="ink-soft"] { color: oklch(82% 0.02 230) !important; }
-/* #113/#114/#115/#117: фон кнопок-заявок → бирюза #007484 */
-.btn-accent { background: #007484; color: #052b33; }
-.btn-accent:hover { background: #00a9b4; }
+/* #113/#114/#115/#117: фон кнопок-заявок → бирюза #007484. Текст белый — тёмный #052b33
+   на бирюзе не читался (контраст ~2.7). Покрывает все .btn-accent (hero «Показать квартиры»,
+   «Написать в WhatsApp», «Скачать каталог», заявки на страницах ЖК и т.д.). */
+.btn-accent { background: #007484; color: #fff; }
+.btn-accent:hover { background: #00a9b4; color: #fff; }
 /* #118: число «10%» в акции → бирюза */
 .pct-hl { color: #007484; }
 /* #123: скруглить углы всех хиро-баннеров */
