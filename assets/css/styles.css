@@ -1564,9 +1564,9 @@
 .plan-flat .flat-meta { color: var(--ink-soft); }
 .plan-flat .flat-price span { font-size: 12px; color: var(--ink-soft); }
 
-/* Логотип в шапке на десктопе — соразмерно пунктам меню (чуть выше текста меню).
-   Wordmark широкий (7.9:1), поэтому крупнее 40px начинает доминировать и выдавливать
+/* Логотип в шапке на десктопе — вровень с пунктами меню.
+   Wordmark широкий (7.9:1), поэтому крупнее быстро доминирует и выдавливает
    правый блок шапки за край. */
 @media (min-width: 769px) {
-  .head .logo-img { height: 34px; width: auto; max-width: none; }
+  .head .logo-img { height: 28px; width: auto; max-width: none; }
 }
