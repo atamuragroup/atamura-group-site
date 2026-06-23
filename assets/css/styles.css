@@ -1568,5 +1568,5 @@
    Wordmark широкий (7.9:1), поэтому крупнее быстро доминирует и выдавливает
    правый блок шапки за край. */
 @media (min-width: 769px) {
-  .head .logo-img { height: 28px; width: auto; max-width: none; }
+  .head .logo-img { height: 25px; width: auto; max-width: none; }
 }
