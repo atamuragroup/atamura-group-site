@@ -723,6 +723,8 @@
   /* ===== Мобильная нижняя навигация (level.ru-style) ===== */
   .botnav { display: none; }
   .hh-cta-m { display: none; }
+  /* Блок под хиро (промо + кнопка) — виден только на мобайле, см. @media (max-width: 768px) */
+  .hh-below { display: none; }
   /* Промо-плашка в герое (на десктопе + мобиле): белая пилюля с золотым tag */
   .hh-promo { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 7px 16px 7px 7px; background: oklch(100% 0 0 / 0.94); color: var(--ink); border-radius: 999px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px oklch(0% 0 0 / 0.22); }
   .hh-promo b { color: var(--brand-deep); font-weight: 800; }
@@ -756,7 +758,17 @@
     .home-hero .hh-sliderui { display: none; }
     .trust { display: none; }
     .hh-promo { font-size: 13px; padding: 6px 14px 6px 6px; }
-    .hh-cta-m { display: inline-flex; justify-content: center; width: 100%; max-width: 340px; padding: 15px 24px; font-size: 15px; margin-top: 20px; }
+    /* Промо + кнопка вынесены ПОД хиро (.hh-below) в один горизонтальный ряд: слева карточка акции
+       с иконкой-подарком, справа кнопка. Промо внутри хиро прячем, заголовок хиро — по левому краю. */
+    .home-hero .hh-promo { display: none; }
+    .home .home-hero-inner { text-align: left; }
+    .hh-below { display: flex; flex-direction: row; align-items: stretch; gap: 8px; padding: 12px 14px 12px; }
+    .hh-deal { flex: 1 1 auto; display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line-soft); border-radius: 16px; padding: 8px 10px; box-shadow: 0 6px 18px oklch(0% 0 0 / 0.07); }
+    .hh-deal-ico { flex: 0 0 auto; width: 36px; height: 36px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent-deep); }
+    .hh-deal-txt { font-size: 11.5px; line-height: 1.28; font-weight: 600; color: var(--ink); }
+    .hh-deal-txt .pct-hl { color: var(--brand); font-weight: 800; }
+    /* Кнопка «Выбрать квартиру»: тонкий шрифт, скруглённый прямоугольник, по высоте вровень с карточкой */
+    .hh-cta-m { display: inline-flex; justify-content: center; align-items: center; flex: 0 0 auto; white-space: nowrap; width: auto; max-width: none; min-height: 0; padding: 10px 14px; font-size: 13px; font-weight: 400; margin-top: 0; border-radius: 16px; }
     /* Промо — горизонтальная карусель */
     .premium-grid { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
     .premium-card { flex: 0 0 80%; scroll-snap-align: start; }
@@ -771,11 +783,11 @@
     .content .content-grid > div > p { text-align: justify; hyphens: auto; word-spacing: -0.02em; }
     .content .content-grid > div > .pagehero-cta { justify-content: center; }
     .home .head.over { top: 0 !important; }
-    /* Hero на мобайле — полноэкранный, но с местом под трастбар внизу.
-       calc(100vh - 66px bottom-nav - 80px trustbar - safe-area) ≈ заполняет всё кроме нижнего таб-бара и трастбара.
-       Контент (h1 + акция + кнопка) — внизу через flex/justify-end, чтобы фото было видно сверху. */
-    .home .home-hero { min-height: 0 !important; }
-    .home .home-hero-inner { min-height: calc(100vh - 180px); display: flex; flex-direction: column; justify-content: flex-end; padding-block: var(--s-5) var(--s-5); gap: var(--s-3); }
+    /* Hero на мобайле — квадратный баннер (1:1 от ширины экрана), не полноэкранный.
+       Высота = ширине вьюпорта; контент (h1 + акция + кнопка) — внизу через flex/justify-end,
+       чтобы фото было видно сверху, а под баннером сразу шёл трастбар и карточки ЖК. */
+    .home .home-hero { min-height: 0 !important; aspect-ratio: 1 / 1; }
+    .home .home-hero-inner { min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; padding-block: var(--s-5) var(--s-5); gap: var(--s-3); }
     /* === Жилые комплексы — горизонтальная snap-карусель (level.ru-style) === */
     .sect-projects .grid-3 { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; gap: 12px; padding-bottom: 8px; scroll-padding-left: 4px; }
     .sect-projects .grid-3 > * { flex: 0 0 86%; scroll-snap-align: start; }
