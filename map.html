@@ -39,7 +39,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:site_name" content="ATAMURA GROUP" />
 <meta property="og:locale" content="ru_KZ" />
 <meta name="twitter:card" content="summary_large_image" />
-<link rel="stylesheet" href="assets/css/styles.css?v=9cc5d800" />
+<link rel="stylesheet" href="assets/css/styles.css?v=482ecd38" />
 <!-- GA4: вставьте Measurement ID в build_site.mjs (GA4_ID), затем node build_site.mjs. События уже копятся в window.dataLayer. -->
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"ATAMURA GROUP","alternateName":"Atamura Group","url":"https://atamuragroup.kz","logo":"https://atamuragroup.kz/assets/img/logo-navy.png","description":"Застройщик Алматы с 2016 года. 8 жилых комплексов — от доступного жилья до таунхаусов бизнес-класса.","foundingDate":"2016","areaServed":{"@type":"City","name":"Алматы"},"address":{"@type":"PostalAddress","addressCountry":"KZ","addressLocality":"Алматы","streetAddress":"ул. Толе би, 12"},"telephone":"+7 700 700 11 11","sameAs":["https://instagram.com/atamura.group","https://t.me/atamuragroup"]}</script>
 </head>
@@ -172,6 +172,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     markers[p.slug]=m; bounds.extend([p.lat,p.lng]);
   });
   map.fitBounds(bounds.pad(0.18));
+  // M1: после применения квадратной высоты (aspect-ratio на мобиле) и при ресайзе — пересчитать
+  // размер контейнера и перерисовать тайлы, иначе остаются серые поля.
+  function fixSize(){ map.invalidateSize(); map.fitBounds(bounds.pad(0.18)); }
+  setTimeout(fixSize, 200);
+  window.addEventListener('resize', fixSize);
   document.querySelectorAll('.map-card').forEach(function(a){
     a.addEventListener('mouseenter',function(){var s=a.getAttribute('href').match(/zk\/([a-z]+)/)[1];if(markers[s]){map.setView(markers[s].getLatLng(),13);markers[s].openPopup();}});
   });
