@@ -17,6 +17,28 @@
   }
   function money(n) { return Math.round(n).toLocaleString("ru-RU").replace(/,/g, " "); }
   function byId(id) { return document.getElementById(id); }
+
+  /* Акция ЖК Aura: скидка 10% на все способы приобретения. Базовая (профитбейс) цена —
+     зачёркнута красным, рядом цена со скидкой. Только Aura; остальные ЖК без изменений. */
+  var SALE_SLUG = "aura", SALE_OFF = 0.10;
+  function saleN(n) { return Math.round(n * (1 - SALE_OFF)); }
+  function mln(v) { return (v / 1e6).toFixed(v % 1e6 ? 1 : 0).replace(".", ","); }
+  /* «от N ₸» — база зачёркнута + цена со скидкой (формат полной суммы) */
+  function saleFull(base) {
+    return '<s class="price-old">от ' + money(base) + ' ₸</s> <strong class="price-new">от ' + money(saleN(base)) + ' ₸</strong>';
+  }
+  /* формат «млн ₸» (карточки .pcard) */
+  function saleMln(base) {
+    return '<s class="price-old">от ' + mln(base) + ' млн ₸</s> <strong class="price-new">от ' + mln(saleN(base)) + ' млн ₸</strong>';
+  }
+  function addSaleSticker(card) {
+    var host = card.querySelector(".pcard-photo") || card;
+    if (host.querySelector(".sale-sticker")) return;
+    var s = document.createElement("div");
+    s.className = "sale-sticker";
+    s.innerHTML = '<b>СКИДКА</b><span>на все способы приобретения</span>';
+    host.appendChild(s);
+  }
   function priceLabel(z) {
     if (z.priceFrom) return "от " + money(z.priceFrom) + " ₸";
     if (z.priceText) return z.priceText;
@@ -353,7 +375,8 @@
     });
     return out;
   }
-  function plansGridHTML(plans, zname) {
+  function plansGridHTML(plans, zname, slug) {
+    var sale = slug === SALE_SLUG;
     var rooms = [];
     plans.forEach(function (p) { if (rooms.indexOf(p.r) < 0) rooms.push(p.r); });
     rooms.sort(function (a, b) { var ia = PLAN_ROOM_ORDER.indexOf(a), ib = PLAN_ROOM_ORDER.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
@@ -363,7 +386,7 @@
       var area = (p.aMin && p.aMax && p.aMin !== p.aMax) ? p.aMin + "–" + p.aMax + " м²" : ((p.aMin || p.aMax || "") + " м²");
       return '<button type="button" class="plan-card" data-prooms-card="' + p.r + '" data-plans=\'' + JSON.stringify([catAsset(p.img)]) + '\' aria-label="Планировка ' + roomLabel(p.r) + '">' +
         '<span class="plan-card-img"><img src="' + catAsset(p.img) + '" alt="Планировка ' + roomLabel(p.r) + (zname ? " — " + zname : "") + '" loading="lazy"></span>' +
-        '<span class="plan-card-body"><span class="plan-card-rooms">' + roomLabel(p.r) + '</span><span class="plan-card-area">' + area + '</span><span class="plan-card-price">от ' + money(p.price) + " ₸</span></span></button>";
+        '<span class="plan-card-body"><span class="plan-card-rooms">' + roomLabel(p.r) + '</span><span class="plan-card-area">' + area + '</span><span class="plan-card-price">' + (sale ? saleFull(p.price) : "от " + money(p.price) + " ₸") + "</span></span></button>";
     }).join("");
     return '<div class="plans-wrap">' + chips + '<div class="plans-grid">' + cards + "</div>" +
       '<div class="plans-more-wrap"><button type="button" class="btn btn-outline plans-more" hidden>Показать ещё</button></div></div>';
@@ -377,7 +400,7 @@
     var plans = dedupPlans(window.ATAMURA_PLANS[slug]);
     if (!plans || !plans.length) return;
     var tableWrap = document.querySelector(".zk-layouts-wrap"); if (!tableWrap) return;
-    var grid = document.createElement("div"); grid.innerHTML = plansGridHTML(plans, "");
+    var grid = document.createElement("div"); grid.innerHTML = plansGridHTML(plans, "", slug);
     var gridNode = grid.firstChild;
     tableWrap.parentNode.replaceChild(gridNode, tableWrap);
     // #177: форма заявки сразу после планировок на страницах ЖК (клон foot-cta)
@@ -408,7 +431,8 @@
       if (!hm) continue;
       var z = by[hm[1].toLowerCase()]; if (!z || !z.priceFrom) continue;  // только продающиеся ЖК; «Скоро»/«Сдан» не трогаем
       var el = cards[i].querySelector(".pcard-price"); if (!el) continue;
-      el.innerHTML = "от <strong>" + (z.priceFrom / 1000000).toFixed(z.priceFrom % 1000000 ? 1 : 0).replace(".", ",") + "</strong> млн ₸";
+      if (z.slug === SALE_SLUG) { el.innerHTML = saleMln(z.priceFrom); addSaleSticker(cards[i]); }
+      else el.innerHTML = "от <strong>" + mln(z.priceFrom) + "</strong> млн ₸";
     }
   }
 
@@ -444,7 +468,10 @@
       var zkPrice = window.ATAMURA_ZHK.filter(function (x) { return x.slug === slug; })[0];
       if (zkPrice && zkPrice.priceFrom) {
         var pst = document.querySelector(".zk-stats .zk-stat strong");
-        if (pst && /₸/.test(pst.textContent)) pst.textContent = "от " + money(zkPrice.priceFrom) + " ₸";
+        if (pst && /₸/.test(pst.textContent)) {
+          if (slug === SALE_SLUG) pst.innerHTML = saleFull(zkPrice.priceFrom);
+          else pst.textContent = "от " + money(zkPrice.priceFrom) + " ₸";
+        }
       }
     }
     if (slug === "aura") {  // #149
@@ -503,7 +530,7 @@
     var planBlock = (function () {
       var plans = dedupPlans((window.ATAMURA_PLANS || {})[slug]);
       if (!plans || !plans.length) return softBlock("Генплан и планировки", "Генплан территории и планировки квартир под вашу комнатность пришлём по запросу — нажмите «Получить подборку», менеджер вышлет PDF.");
-      return block("Планировочные решения", '<p class="zk-lead" style="margin-bottom:var(--s-4)">Доступные к продаже планировки — у каждой своя площадь и цена «от». Нажмите, чтобы рассмотреть детально.</p>' + plansGridHTML(plans, z.name));
+      return block("Планировочные решения", '<p class="zk-lead" style="margin-bottom:var(--s-4)">Доступные к продаже планировки — у каждой своя площадь и цена «от». Нажмите, чтобы рассмотреть детально.</p>' + plansGridHTML(plans, z.name, z.slug));
     })();
     var catalogCard = '<div class="catalog-card">' +
       '<div class="catalog-card-text">' +
@@ -660,7 +687,7 @@
         '<img src="' + catAsset(p.img) + '" alt="Планировка ' + rl + " — " + p.zkName + '" loading="lazy"></button>' +
       '<div class="flat-body">' +
         '<div class="flat-head"><span class="flat-rooms">' + rl + '</span><span class="flat-area">' + area + "</span></div>" +
-        '<div class="flat-price"><strong>от ' + money(p.price) + ' ₸</strong><span>при 100% оплате</span></div>' +
+        '<div class="flat-price">' + (p.zk === SALE_SLUG ? saleFull(p.price) : '<strong>от ' + money(p.price) + ' ₸</strong>') + '<span>при 100% оплате</span></div>' +
         '<div class="flat-meta"><span>' + p.zkName + "</span></div>" +
         '<div class="flat-actions">' +
           '<a class="btn btn-brand btn-sm" href="https://wa.me/' + WA_PHONE + "?text=" + encodeURIComponent(waText) + '" target="_blank" rel="noopener" data-wa="catalog-plan">Получить консультацию</a>' +

@@ -1603,3 +1603,18 @@
   .flat-actions { grid-template-columns: 1fr; gap: 8px; }
   .flat-actions > a, .flat-actions > button { width: 100%; white-space: normal; min-width: 0; }
 }
+
+/* ===== Акция ЖК Aura: скидка 10% ===== */
+/* Базовая (профитбейс) цена — зачёркнута красным; рядом/ниже цена со скидкой. */
+.price-old { color: #d12b2b; text-decoration: line-through; font-weight: 400; opacity: .9; margin-right: 6px; white-space: nowrap; }
+.price-new { white-space: nowrap; }
+.pcard-price .price-old, .flat-price .price-old { font-size: 13px; }
+.flat-price .price-new { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; }
+/* в маленькой плашке «Стартовая цена» — две цены в столбик */
+.zk-stat .price-old { display: block; font-size: 13px; margin: 0; }
+.zk-stat .price-new { display: block; }
+/* Круглый красный стикер «СКИДКА» в углу карточки ЖК Aura */
+.sale-sticker { position: absolute; top: 12px; right: 12px; z-index: 4; width: 92px; height: 92px; border-radius: 50%; background: #d12b2b; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 8px; box-sizing: border-box; box-shadow: 0 4px 14px rgba(0,0,0,.28); transform: rotate(-8deg); pointer-events: none; }
+.sale-sticker b { font-size: 17px; font-weight: 800; letter-spacing: .04em; line-height: 1; }
+.sale-sticker span { font-size: 8px; line-height: 1.2; margin-top: 5px; font-weight: 500; }
+@media (max-width: 600px) { .sale-sticker { width: 78px; height: 78px; } .sale-sticker b { font-size: 14px; } .sale-sticker span { font-size: 7.5px; } }
