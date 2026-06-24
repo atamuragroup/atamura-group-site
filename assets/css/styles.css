@@ -1614,7 +1614,10 @@
 .zk-stat .price-old { display: block; font-size: 13px; margin: 0; }
 .zk-stat .price-new { display: block; }
 /* Круглый красный стикер «СКИДКА» в углу карточки ЖК Aura */
-.sale-sticker { position: absolute; top: 12px; right: 12px; z-index: 4; width: 92px; height: 92px; border-radius: 50%; background: #d12b2b; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 8px; box-sizing: border-box; box-shadow: 0 4px 14px rgba(0,0,0,.28); transform: rotate(45deg); pointer-events: none; }
-.sale-sticker b { font-size: 17px; font-weight: 800; letter-spacing: .04em; line-height: 1; }
-.sale-sticker span { font-size: 8px; line-height: 1.2; margin-top: 5px; font-weight: 500; }
-@media (max-width: 600px) { .sale-sticker { width: 78px; height: 78px; } .sale-sticker b { font-size: 14px; } .sale-sticker span { font-size: 7.5px; } }
+/* «Наклейка»: звёздообразный бурст (зубчатые края), текст горизонтальный */
+.sale-sticker { position: absolute; top: 10px; right: 10px; z-index: 4; width: 106px; height: 106px; background: #d12b2b; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 16px; box-sizing: border-box;
+  clip-path: polygon(100% 50%, 87.1% 62%, 90.5% 79.4%, 72.9% 81.6%, 65.5% 97.6%, 50% 89%, 34.5% 97.6%, 27.1% 81.6%, 9.5% 79.4%, 12.9% 62%, 0% 50%, 12.9% 38%, 9.5% 20.6%, 27.1% 18.4%, 34.5% 2.4%, 50% 11%, 65.5% 2.4%, 72.9% 18.4%, 90.5% 20.6%, 87.1% 38%);
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,.3)); pointer-events: none; }
+.sale-sticker b { font-size: 15px; font-weight: 800; letter-spacing: .03em; line-height: 1; }
+.sale-sticker span { font-size: 7.5px; line-height: 1.18; margin-top: 4px; font-weight: 500; }
+@media (max-width: 600px) { .sale-sticker { width: 88px; height: 88px; padding: 12px; } .sale-sticker b { font-size: 13px; } .sale-sticker span { font-size: 6.5px; } }
