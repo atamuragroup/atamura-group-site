@@ -159,7 +159,9 @@
   }
 
   /* ============ TOP UTILITY STRIP ============ */
-  .util { background: var(--bg); border-bottom: 1px solid var(--line); }
+  /* Segment-nav (.util) скрыт на всех ширинах — был пустым (вкладки удалены), оставлял светлую
+     полосу над меню. PM: убрать segment-nav на ВСЕХ страницах. Разметку не трогаем. */
+  .util { display: none; background: var(--bg); border-bottom: 1px solid var(--line); }
   .util-row {
     max-width: var(--container); margin: 0 auto;
     padding: 14px clamp(16px, 2vw, 32px);
