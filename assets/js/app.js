@@ -431,8 +431,10 @@
       if (!hm) continue;
       var z = by[hm[1].toLowerCase()]; if (!z || !z.priceFrom) continue;  // только продающиеся ЖК; «Скоро»/«Сдан» не трогаем
       var el = cards[i].querySelector(".pcard-price"); if (!el) continue;
-      if (z.slug === SALE_SLUG) { el.innerHTML = saleMln(z.priceFrom); addSaleSticker(cards[i]); }
-      else el.innerHTML = "от <strong>" + mln(z.priceFrom) + "</strong> млн ₸";
+      // Акция Aura (красная плашка «СКИДКА» + зачёркнутая/сниженная цена) отключена по запросу —
+      // все ЖК, включая Aura, показывают обычную цену «от priceFrom». Чтобы вернуть акцию:
+      //   if (z.slug === SALE_SLUG) { el.innerHTML = saleMln(z.priceFrom); addSaleSticker(cards[i]); } else
+      el.innerHTML = "от <strong>" + mln(z.priceFrom) + "</strong> млн ₸";
     }
   }
 
