@@ -18,9 +18,10 @@
   function money(n) { return Math.round(n).toLocaleString("ru-RU").replace(/,/g, " "); }
   function byId(id) { return document.getElementById(id); }
 
-  /* Акция ЖК Aura: скидка 10% на все способы приобретения. Базовая (профитбейс) цена —
-     зачёркнута красным, рядом цена со скидкой. Только Aura; остальные ЖК без изменений. */
-  var SALE_SLUG = "aura", SALE_OFF = 0.10;
+  /* Акция ЖК Aura (зачёркнутая база + цена со скидкой + стикер «СКИДКА») ОТКЛЮЧЕНА по запросу:
+     Aura показывает обычную цену, как остальные ЖК — ВЕЗДЕ (главная, страница ЖК, каталог).
+     Единый переключатель: все места ниже проверяют === SALE_SLUG. Чтобы вернуть акцию: SALE_SLUG = "aura". */
+  var SALE_SLUG = null, SALE_OFF = 0.10;
   function saleN(n) { return Math.round(n * (1 - SALE_OFF)); }
   function mln(v) { return (v / 1e6).toFixed(v % 1e6 ? 1 : 0).replace(".", ","); }
   /* «от N ₸» — база зачёркнута + цена со скидкой (формат полной суммы) */
@@ -431,10 +432,8 @@
       if (!hm) continue;
       var z = by[hm[1].toLowerCase()]; if (!z || !z.priceFrom) continue;  // только продающиеся ЖК; «Скоро»/«Сдан» не трогаем
       var el = cards[i].querySelector(".pcard-price"); if (!el) continue;
-      // Акция Aura (красная плашка «СКИДКА» + зачёркнутая/сниженная цена) отключена по запросу —
-      // все ЖК, включая Aura, показывают обычную цену «от priceFrom». Чтобы вернуть акцию:
-      //   if (z.slug === SALE_SLUG) { el.innerHTML = saleMln(z.priceFrom); addSaleSticker(cards[i]); } else
-      el.innerHTML = "от <strong>" + mln(z.priceFrom) + "</strong> млн ₸";
+      if (z.slug === SALE_SLUG) { el.innerHTML = saleMln(z.priceFrom); addSaleSticker(cards[i]); }
+      else el.innerHTML = "от <strong>" + mln(z.priceFrom) + "</strong> млн ₸";
     }
   }
 
