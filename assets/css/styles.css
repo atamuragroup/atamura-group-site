@@ -978,6 +978,17 @@
     .head-utils .icon-btn { display: none; }
     .head-utils .lang-switch { display: none; }
     .phone-block { display: none; }
+    /* Планшет: меню-бургер вправо (а не в середину после лого из-за grid auto-placement скрытого .nav-main).
+       padding-right: 20px = внутренний отступ панели подбора (.herosearch), чтобы правый край кнопки «Меню»
+       точно совпал с правым краем кнопки «Показать квартиры» (а не с гаттером шапки, который на ~2px шире). */
+    .head-row { display: flex; align-items: center; justify-content: space-between; padding-right: 20px; }
+  }
+
+  /* Планшет (портрет): контент хиро во всю ширину + левый отступ = гаттеру шапки,
+     чтобы левый край текста/панели совпал с левым краем логотипа. Правый край не трогаем
+     (форма подбора и кнопка остаются у правого края — бургер уже выровнен по кнопке). */
+  @media (min-width: 769px) and (max-width: 980px) {
+    .home .home-hero-inner { width: 100%; max-width: none; margin-inline: 0; padding-left: clamp(16px, 2vw, 32px); }
   }
 
   /* ============ MOBILE ============ */
