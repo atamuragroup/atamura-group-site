@@ -1369,6 +1369,9 @@
   .home-hero-bg { position: absolute; inset: 0; z-index: 0; background: var(--navy); }
   .hh-slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1000ms ease; }
   .hh-slide.is-on { opacity: 1; }
+  /* LCP-слайд героя: фон через CSS (не inline), чтобы на мобиле отдавать лёгкий вариант */
+  .hh-slide--lcp { background-image: url('../img/hero/atmosfera.webp'); }
+  @media (max-width: 760px) { .hh-slide--lcp { background-image: url('../img/hero/atmosfera-960.webp'); } }
   .hh-scrim { position: absolute; inset: 0; z-index: 1; background: linear-gradient(102deg, rgba(18,30,42,.92) 0%, rgba(18,30,42,.55) 48%, rgba(18,30,42,.28) 100%); }
   .hh-sliderui { position: absolute; right: 30px; bottom: 24px; z-index: 3; display: flex; align-items: center; gap: 14px; }
   .hh-name { font-size: 13px; color: rgba(255,255,255,.85); font-weight: 500; }
