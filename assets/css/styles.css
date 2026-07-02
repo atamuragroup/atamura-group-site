@@ -1669,3 +1669,20 @@
 .sale-sticker b { font-size: 15px; font-weight: 800; letter-spacing: .03em; line-height: 1; }
 .sale-sticker span { font-size: 7.5px; line-height: 1.18; margin-top: 4px; font-weight: 500; }
 @media (max-width: 600px) { .sale-sticker { width: 88px; height: 88px; padding: 12px; } .sale-sticker b { font-size: 13px; } .sale-sticker span { font-size: 6.5px; } }
+
+/* ===== Landing-страницы /kupit/ (FAQ, сноски) + фикс контраста site-wide ===== */
+.faqlist { margin-top: var(--s-4); }
+.faqitem { padding: 16px 0; border-top: 1px solid rgba(0,0,0,.09); }
+.faqitem:first-child { border-top: 0; padding-top: 0; }
+.faqitem h3 { margin: 0 0 6px; font-size: 17px; font-weight: 600; }
+.faqitem p { margin: 0; color: var(--ink-soft); }
+.ast { color: #007484; font-weight: 700; }
+/* контраст: тёмная карточка формы — текст и ссылки светлые (чинит и существующие страницы) */
+.lead-form-card p { color: rgba(255,255,255,.78) !important; }
+.lead-form-card p a { color: #fff; }
+/* ghost-кнопка на фото page-hero — светлая (был тёмный текст на светлом фото) */
+.pagehero .btn-outline { color: #fff; border-color: rgba(255,255,255,.55); }
+.pagehero .btn-outline:hover { background: rgba(255,255,255,.12); }
+
+.related-links a { color: #007484; text-decoration: none; border-bottom: 1px solid rgba(0,116,132,.35); }
+.related-links a:hover { border-bottom-color: #007484; }
