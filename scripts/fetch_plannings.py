@@ -11,7 +11,8 @@ from collections import OrderedDict, defaultdict
 
 PB = os.environ.get("PROFITBASE_BASE_URL", "https://pb12230.profitbase.ru").rstrip("/")
 KEY = os.environ.get("PROFITBASE_API_KEY")
-if not KEY:
+STATICS_ONLY = "--statics-only" in sys.argv   # синхронизировать статику из уже обновлённого zhk-data.js, без API
+if not KEY and not STATICS_ONLY:
     sys.exit("ERROR: переменная окружения PROFITBASE_API_KEY обязательна")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -139,6 +140,63 @@ def patch_zhk_prices(minprice):
         print(f"  zhk-data {slug}.priceFrom = {price} (заменено: {n})")
     open(path, "w", encoding="utf-8").write(src)
 
+def fmt_mln(price):
+    return f"{price/1_000_000:.1f}".replace(".", ",")
+
+def patch_statics(minprice):
+    """Зашитые цены в статике (их видят SEO и посетители без JS): карточки и hero главной,
+    карточки+точки карты, таблица сравнения — ru и kk. Без этого статика разъезжается
+    с runtime-ценами из zhk-data.js (баг: hero «от 13,7», карточка ниже «от 11,7»)."""
+    def sub1(pat, repl, src, label):
+        out, n = re.subn(pat, repl, src, flags=re.S)
+        if n == 1:
+            print(f"  statics {label}: 1")
+        else:
+            # ::warning:: виден в GitHub Actions UI — иначе рассинхрон разметки и цен пройдёт незамеченным
+            print(f"::warning::patch_statics {label}: {n} замен вместо 1 — разметка изменилась, цена в статике НЕ обновлена")
+        return out
+
+    hero_min = fmt_mln(min(minprice.values()))
+    for f in ("index.html", "kk/index.html"):
+        p = os.path.join(ROOT, f); src = open(p, encoding="utf-8").read()
+        for slug, price in minprice.items():
+            src = sub1(r'(<a class="pcard" href="zk/' + slug + r'\.html">.*?<span class="pcard-price">от <strong>)[\d,]+(</strong>)',
+                       lambda m, pr=price: m.group(1) + fmt_mln(pr) + m.group(2), src, f"{f} pcard {slug}")
+        src = sub1(r'(<h1 class="hh-title">Квартиры в Алматы<br/>от )[\d,]+( млн ₸</h1>)',
+                   lambda m: m.group(1) + hero_min + m.group(2), src, f"{f} hero")
+        open(p, "w", encoding="utf-8").write(src)
+
+    def patch_inline_json(fname, var):
+        p = os.path.join(ROOT, fname); src = open(p, encoding="utf-8").read()
+        m = re.search(r"var " + var + r"=(\[.*?\]);", src)
+        if not m:
+            print(f"::warning::patch_statics {fname}: var {var} не найдена — цены карты/сравнения НЕ обновлены"); return
+        arr = json.loads(m.group(1)); n = 0
+        for o in arr:
+            if o.get("slug") in minprice:
+                o["price"] = "от " + fmt_mln(minprice[o["slug"]]) + " млн ₸"; n += 1
+        out = json.dumps(arr, ensure_ascii=False, separators=(",", ":"))
+        src = src[:m.start(1)] + out + src[m.end(1):]
+        print(f"  statics {fname} {var}: {n} цен")
+        open(p, "w", encoding="utf-8").write(src)
+
+    for f in ("map.html", "kk/map.html"):
+        p = os.path.join(ROOT, f); src = open(p, encoding="utf-8").read()
+        for slug, price in minprice.items():
+            src = sub1(r'(<a class="map-card" href="zk/' + slug + r'\.html"[^>]*>.*?<div class="map-card-price">от )[\d,]+( млн ₸</div>)',
+                       lambda m, pr=price: m.group(1) + fmt_mln(pr) + m.group(2), src, f"{f} card {slug}")
+        open(p, "w", encoding="utf-8").write(src)
+        patch_inline_json(f, "pts")
+
+    for f in ("compare.html", "kk/compare.html"):
+        patch_inline_json(f, "rows")
+
+def minprice_from_zhkdata():
+    src = open(os.path.join(ROOT, "assets", "js", "zhk-data.js"), encoding="utf-8").read()
+    arr = json.loads(src[src.index("["):src.rindex("]") + 1])
+    slugs = set(PROJ_MAP.values())
+    return {z["slug"]: z["priceFrom"] for z in arr if z["slug"] in slugs and z.get("priceFrom")}
+
 def write_plans(plans_by_slug):
     """Удаляет старые plans[] из ATAMURA_FLATS и дописывает window.ATAMURA_PLANS."""
     path = os.path.join(ROOT, "assets", "js", "flats-data.js")
@@ -207,6 +265,7 @@ def main():
 
     write_plans(plans_by_slug)
     patch_zhk_prices(minprice)
+    patch_statics(minprice)
     # удаляем осиротевшие картинки (планировки, которых больше нет в продаже)
     import glob
     used = set(os.path.join(ROOT, x["img"]) for lst in plans_by_slug.values() for x in lst)
@@ -217,4 +276,7 @@ def main():
     print(f"flats-data.js (ATAMURA_PLANS) и zhk-data.js обновлены; осиротевших картинок удалено: {removed}")
 
 if __name__ == "__main__":
-    main()
+    if STATICS_ONLY:
+        patch_statics(minprice_from_zhkdata())
+    else:
+        main()

@@ -29,13 +29,18 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Pillow
-        run: pip install --quiet Pillow
+      - name: Install Pillow & reportlab
+        run: pip install --quiet Pillow reportlab
 
       - name: Fetch prices & plannings from ProfitBase
         env:
           PROFITBASE_API_KEY: ${{ secrets.PROFITBASE_API_KEY }}
         run: python3 scripts/fetch_plannings.py
+
+      # PDF-каталог берёт цены из zhk-data.js — пересобираем сразу после обновления цен,
+      # чтобы каталог не разъезжался с сайтом. Сбой генерации НЕ блокирует обновление цен.
+      - name: Rebuild catalog PDF (non-blocking)
+        run: python3 scripts/gen_catalog_pdf.py || echo "::warning::PDF generation failed — цены обновятся, каталог останется прежним"
 
       - name: Cache-bust changed assets
         run: python3 scripts/cache_bust.py
