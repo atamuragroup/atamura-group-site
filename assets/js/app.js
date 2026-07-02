@@ -880,7 +880,7 @@
     function stop() { if (timer) { clearInterval(timer); timer = null; } }
     dots.forEach(function (d) { d.addEventListener("click", function () { show(+d.getAttribute("data-i")); start(); }); });
     box.addEventListener("mouseenter", stop); box.addEventListener("mouseleave", start);
-    // первый слайд уже загружен (inline webp). Следующий — лениво после первого кадра, чтобы не утяжелять старт.
+    // первый слайд (LCP) грузится через CSS-фон .hh-slide--lcp + <link rel="preload">. Следующий — лениво после первого кадра, чтобы не утяжелять старт.
     var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1200); };
     idle(function () { loadBg(slides[1]); });
     start();
