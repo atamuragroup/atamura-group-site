@@ -304,10 +304,10 @@
         var href = card.getAttribute("href") || "";
         slug = (href.match(/zk\/([a-z-]+)\.html/) || [])[1] || "unknown";
         var nmEl = card.querySelector(".pcard-name"); nm = nmEl ? nmEl.textContent : slug;
-      } else if (footLink && /скоро/i.test(footLink.textContent || "")) {
+      } else if (footLink && /скоро|жақында/i.test(footLink.textContent || "")) {
         var fh = footLink.getAttribute("href") || "";
         slug = (fh.match(/([a-z-]+)\.html/) || [])[1] || "soon";
-        nm = (footLink.textContent || "").replace(/скоро/i, "").trim();
+        nm = (footLink.textContent || "").replace(/скоро|жақында/i, "").trim();
       } else return;
       e.preventDefault();
       src = "soon-" + slug;

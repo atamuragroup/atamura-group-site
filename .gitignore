@@ -1,3 +1,6 @@
 .DS_Store
 *.log
 .netlify/
+
+# локальная конфигурация Claude Code
+.claude/

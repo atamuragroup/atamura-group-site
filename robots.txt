@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://atamura.group/sitemap.xml
+Sitemap: https://atamuragroup.kz/sitemap.xml

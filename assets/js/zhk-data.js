@@ -1,4 +1,4 @@
-/* Данные по 8 ЖК ATAMURA. Описания/цены/преимущества — реальные (харвест с действующих сайтов ЖК).
+/* Данные по ЖК ATAMURA. Описания/цены/преимущества — реальные (харвест с действующих сайтов ЖК).
    Изображения: реальные фото ЖК где есть и годны (>=15KB, не лого/планировка); остальное — премиум-фоллбэки,
    уникальные на каждый ЖК (заменить реальными фото от заказчика). draft:true — сайт ЖК не опубликован. */
 window.ATAMURA_ZHK = [
@@ -188,11 +188,11 @@ window.ATAMURA_ZHK = [
     "statusDetail": "строится очередями: 1 оч. — II кв. 2026, 2 оч. — IV кв. 2026, 3 оч. — II кв. 2027, 4 оч. — IV кв. 2027",
     "hero_image": "assets/img/zhk/aqsai.jpg",
     "gallery": [
-      "https://static.tildacdn.pro/tild3562-3664-4165-b134-303837633162/photo_2025-12-25_102.jpeg",
-      "https://static.tildacdn.pro/tild3663-3039-4533-b065-366161653737/photo_2025-12-25_102.jpeg",
-      "https://static.tildacdn.pro/tild6666-6431-4536-b139-653961613361/photo_2025-12-25_102.jpeg",
-      "https://static.tildacdn.pro/tild6439-3364-4266-a636-363435653733/photo_2025-12-25_102.jpeg",
-      "https://static.tildacdn.pro/tild3636-3530-4538-b763-343434653165/fon1-1.jpg"
+      "assets/img/zhk/aqsai/gallery-01.jpg",
+      "assets/img/zhk/aqsai/gallery-02.jpg",
+      "assets/img/zhk/aqsai/gallery-04.jpg",
+      "assets/img/zhk/aqsai/gallery-03.jpg",
+      "assets/img/zhk/aqsai/gallery-05.jpg"
     ],
     "realPhotos": 12,
     "site": "https://aqsai.atamuragroup.kz",
