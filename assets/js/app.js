@@ -148,7 +148,7 @@
     if (exitPop) {
       var eshown = sessionStorage.getItem("atamura_exitPop") === "1";
       document.addEventListener("mouseleave", function (e) {
-        if (eshown) return;
+        if (eshown || sessionStorage.getItem("atamura_scrollPop") === "1") return;
         if (e.clientY < 10 && performance.now() > 15000) { exitPop.classList.add("is-on"); eshown = true; sessionStorage.setItem("atamura_exitPop", "1"); track("popup_shown", { popup: "exit" }); }
       });
     }
