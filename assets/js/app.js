@@ -238,6 +238,7 @@
     return r;
   }
   function phoneValid(v) { return v.replace(/\D/g, "").length >= 11; }
+  function nameValid(v) { return (v || "").trim().length >= 2; }
   function bindPhones(scope) {
     (scope || document).querySelectorAll('input[type="tel"]').forEach(function (i) {
       if (i.dataset.tel) return; i.dataset.tel = "1";
@@ -263,7 +264,9 @@
       if (f.dataset.bound) return; f.dataset.bound = "1";
       f.addEventListener("submit", function (e) {
         e.preventDefault();
-        var tel = f.querySelector('input[type="tel"]');
+        var nm = f.querySelector('[name="name"]');
+        if (nm && !nameValid(nm.value)) { showFieldError(nm, "Введите имя (минимум 2 буквы)"); nm.focus(); return; }
+        var tel = f.querySelector('input[type="tel"]') || f.querySelector('[name="phone"]');
         if (tel && !phoneValid(tel.value)) { showFieldError(tel, "Введите номер: +7 7XX XXX-XX-XX"); tel.focus(); return; }
         var data = {}; new FormData(f).forEach(function (v, k) { data[k] = v; });
         data.source = f.getAttribute("data-form") || "form"; data.page = location.pathname;
@@ -323,6 +326,7 @@
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       if (honeyInput && honeyInput.value) return;
+      if (nameInput && !nameValid(nameInput.value)) { showFieldError(nameInput, "Введите имя (минимум 2 буквы)"); nameInput.focus(); return; }
       if (phoneInput && !phoneValid(phoneInput.value)) { showFieldError(phoneInput, "Введите номер: +7 7XX XXX-XX-XX"); phoneInput.focus(); return; }
       var data = {};
       new FormData(form).forEach(function (v, k) { if (k !== "company") data[k] = v; });
@@ -607,7 +611,7 @@
             payHTML +
             '<div class="zk-card-note">Менеджер пришлёт подборку планировок и точный расчёт под ваш бюджет.</div>' +
             '<form class="lead-form" data-form="zk-' + z.slug + '">' +
-              '<input class="input-pill" name="name" aria-label="Ваше имя" placeholder="Ваше имя" />' +
+              '<input class="input-pill" name="name" required aria-label="Ваше имя" placeholder="Ваше имя" />' +
               '<input class="input-pill" name="phone" type="tel" required aria-label="Номер телефона" placeholder="+7 (___) ___-__-__" />' +
               '<button class="btn btn-brand" type="submit">Получить подборку →</button>' +
               '<p class="popup-fineprint">Нажимая кнопку, вы соглашаетесь с обработкой данных.</p>' +
@@ -1256,7 +1260,7 @@
         '<div class="popup-stage" data-lead-stage="form"><span class="popup-eyebrow">' + T.eyebrow + '</span><h3 data-lead-formtitle>' + T.title + '</h3>' +
         '<p data-lead-formsub>' + T.text + '</p>' +
         '<form class="lead-pop-form" novalidate>' +
-        '<input type="text" name="name" autocomplete="name" placeholder="' + T.name + '" />' +
+        '<input type="text" name="name" autocomplete="name" required placeholder="' + T.name + '" />' +
         '<input type="tel" name="phone" required placeholder="+7 (7__) ___-__-__" />' +
         '<input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />' +
         '<button type="submit" class="btn btn-accent btn-block" data-lead-submit>' + T.send + '</button>' +
@@ -1275,6 +1279,7 @@
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (honey && honey.value) return;
+        if (!nameValid(nameI.value)) { showFieldError(nameI, "Введите имя (минимум 2 буквы)"); nameI.focus(); return; }
         if (!phoneValid(phoneI.value)) { showFieldError(phoneI, "Введите номер: +7 7XX XXX-XX-XX"); phoneI.focus(); return; }
         var data = { name: (nameI.value || "").trim(), phone: phoneI.value, source: src, page: location.pathname, ref: document.referrer || "прямой заход", utm: location.search || "", ts: new Date().toISOString() };
         try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
