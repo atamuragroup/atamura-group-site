@@ -39,7 +39,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:site_name" content="ATAMURA GROUP" />
 <meta property="og:locale" content="ru_KZ" />
 <meta name="twitter:card" content="summary_large_image" />
-<link rel="stylesheet" href="assets/css/styles.css?v=942be473" />
+<link rel="stylesheet" href="assets/css/styles.css?v=afcb0f43" />
 <link rel="preload" as="image" href="assets/img/hero/atmosfera-mobile.webp" media="(max-width: 760px)" fetchpriority="high" />
 <link rel="preload" as="image" href="assets/img/hero/atmosfera.webp" media="(min-width: 760.02px)" fetchpriority="high" />
 <!-- GA4: вставьте Measurement ID в build_site.mjs (GA4_ID), затем node build_site.mjs. События уже копятся в window.dataLayer. -->
@@ -190,7 +190,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <span class="tb-item"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7M5 10v10h14V10M9 20v-6h6v6"/></svg><b>2000+ семей</b> уже живут</span>
   <span class="tb-item"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12l5 5L20 6"/></svg><b>200 000+ м²</b> сдано</span>
 </div></section>
-<!-- #2 markup-review: каталог-band скрыт — каталога пока нет (вернуть при готовности) -->
+<!-- ============ Каталог-band (лид-магнит: кнопка → форма имя+тел → скачивание PDF) ============ -->
+<section class="catalog-section"><div class="wrap">
+  <div class="catalog-showcase" id="catalog-band"><div class="catalog-showcase-inner">
+    <figure class="catalog-cover">
+      <picture>
+        <source srcset="assets/img/catalog-cover/monarch-portal.webp" type="image/webp">
+        <img src="assets/img/catalog-cover/monarch-portal.jpg" alt="Обложка каталога ATAMŪRA" width="220" height="293" loading="lazy" />
+      </picture>
+      <figcaption class="catalog-cover-overlay">
+        <span class="catalog-cover-eyebrow">Каталог · 2026</span>
+        <span class="catalog-cover-logo-frame"><img class="catalog-cover-logo" src="assets/img/logo-white.png" alt="ATAMURA GROUP" /></span>
+        <span class="catalog-cover-tag">9 ЖК · Алматы</span>
+      </figcaption>
+    </figure>
+    <div class="catalog-showcase-content">
+      <p class="catalog-eyebrow">PDF-каталог · бесплатно</p>
+      <h2 class="catalog-showcase-title">Каталог 9 ЖК ATAMŪRA</h2>
+      <p class="catalog-showcase-sub">Цены, площади, ипотечные программы и рассрочка 0% — на одном PDF. Менеджер свяжется в WhatsApp в течение 7 минут, подберёт ЖК под бюджет.</p>
+      <button type="button" class="catalog-band-cta" data-open-catalog data-catalog-source="home-showcase">
+        Скачать каталог
+        <svg aria-hidden="true" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v11M4 9l5 5 5-5M3 17h12"/></svg>
+      </button>
+    </div>
+  </div></div>
+</div></section>
 
 
 <section class="trust"><div class="wrap"><div class="trust-grid">
@@ -545,10 +569,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="popup-stage" data-catalog-stage="form">
       <span class="popup-eyebrow">PDF · бесплатно</span>
       <h3>Каталог 9 ЖК ATAMŪRA</h3>
-      <p>Цены, площади, ипотечные программы, рассрочка 0% — на одном PDF. Скачайте каталог прямо сейчас и напишите в WhatsApp — менеджер подскажет подходящий ЖК под бюджет.</p>
-      <a class="btn btn-accent btn-block" href="catalog/atamura-catalog.pdf" download aria-label="Скачать каталог в формате PDF" data-catalog-download>Скачать каталог (PDF)</a>
+      <p>Цены, площади, ипотечные программы, рассрочка 0% — на одном PDF. Оставьте имя и телефон — каталог скачается сразу, менеджер подберёт ЖК под бюджет.</p>
+      <form class="catalog-form" novalidate>
+        <input type="hidden" name="catalog_source" value="" />
+        <input type="text" name="name" autocomplete="name" required placeholder="Ваше имя" />
+        <input type="tel" name="phone" required placeholder="+7 (7__) ___-__-__" />
+        <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+        <button type="submit" class="btn btn-accent btn-block">Скачать каталог (PDF)</button>
+        <p class="popup-fineprint" style="margin:8px 0 0">Нажимая «Скачать», вы соглашаетесь с <a href="privacy.html">обработкой ПДн</a>.</p>
+      </form>
       <a class="btn btn-light btn-block" href="https://wa.me/77006410499?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%AF%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0%20Atamura.%20%D0%A5%D0%BE%D1%82%D0%B5%D0%BB%D0%BE%D1%81%D1%8C%20%D0%B1%D1%8B%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8E.&amp;utm_source=site&amp;utm_medium=whatsapp&amp;utm_campaign=atamura" target="_blank" rel="noopener" aria-label="Написать в WhatsApp (откроется в новой вкладке)" data-wa="catalog-popup" style="margin-top:8px">Написать в WhatsApp</a>
-      <p class="popup-fineprint" style="margin-top:8px">PDF откроется в новой вкладке. Чтобы менеджер ответил — напишите в WhatsApp с вопросом. Нажимая «Написать в WhatsApp», вы соглашаетесь с <a href="privacy.html">обработкой ПДн</a>.</p>
+      <p class="popup-fineprint" style="margin-top:8px">Или сразу напишите в WhatsApp — менеджер подскажет цены и подберёт ЖК под бюджет.</p>
     </div>
     <div class="popup-stage" data-catalog-stage="success" hidden>
       <div class="catalog-success-icon">
@@ -558,7 +589,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <h3>Каталог скачивается</h3>
       <p>PDF загружается прямо сейчас. Чтобы менеджер ATAMŪRA ответил — напишите в WhatsApp: подскажем цены, наличие квартир и подберём ЖК под бюджет.</p>
       <div class="catalog-success-actions">
-        <a class="btn btn-accent" href="catalog/atamura-catalog.pdf" download data-catalog-redownload>Скачать ещё раз</a>
+        <a class="btn btn-accent" href="catalog/atamura-catalog-2026.pdf" download data-catalog-redownload>Скачать ещё раз</a>
         <a class="btn btn-light" href="https://wa.me/77006410499?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%AF%20%D1%81%20%D1%81%D0%B0%D0%B9%D1%82%D0%B0%20Atamura.%20%D0%A5%D0%BE%D1%82%D0%B5%D0%BB%D0%BE%D1%81%D1%8C%20%D0%B1%D1%8B%20%D0%BF%D0%BE%D0%BB%D1%83%D1%87%D0%B8%D1%82%D1%8C%20%D0%BA%D0%BE%D0%BD%D1%81%D1%83%D0%BB%D1%8C%D1%82%D0%B0%D1%86%D0%B8%D1%8E.&amp;utm_source=site&amp;utm_medium=whatsapp&amp;utm_campaign=atamura" target="_blank" rel="noopener" data-wa="catalog-success">Открыть WhatsApp</a>
       </div>
     </div>
@@ -573,6 +604,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script src="assets/js/zhk-data.js?v=da22ab1a"></script>
 <script src="assets/js/flats-data.js?v=542c78cf"></script>
 <script src="assets/js/i18n_kk.js?v=953fdf4d"></script>
-<script src="assets/js/app.js?v=5f1bdc2a"></script>
+<script src="assets/js/app.js?v=81da453f"></script>
 </body>
 </html>

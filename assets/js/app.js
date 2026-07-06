@@ -171,7 +171,7 @@
     var honeyInput = form ? form.querySelector('input[name="company"]') : null;
     var redownload = stageOk ? stageOk.querySelector('[data-catalog-redownload]') : null;
     if (form) bindPhones(form);
-    var catalogHref = rel("catalog/atamura-catalog.pdf");
+    var catalogHref = rel("catalog/atamura-catalog-2026.pdf"); /* дизайнерский PDF заказчика; бот пересобирает atamura-catalog.pdf отдельно */
     if (redownload) redownload.setAttribute("href", catalogHref);
 
     /* Open: делегируем клик по [data-open-catalog] (для динамической карточки на /zk/<slug>) */
@@ -215,7 +215,7 @@
       stageOk.hidden = false;
       var dl = document.createElement("a");
       dl.href = catalogHref;
-      dl.download = "atamura-catalog.pdf";
+      dl.download = "ATAMURA-catalog-2026.pdf";
       dl.rel = "noopener";
       document.body.appendChild(dl);
       dl.click();
