@@ -210,6 +210,12 @@
       } catch (e2) {}
       track("catalog_submit", { source: data.source, page: data.page });
 
+      /* Отправка заявки в CRM (site-lead → Bitrix24) — как у остальных форм.
+         Fire-and-forget: не блокируем скачивание; при ошибке лид остаётся в localStorage. */
+      if (LEAD_WEBHOOK) {
+        fetch(LEAD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true }).catch(function () {});
+      }
+
       /* Переключаем стадию + автоскачивание PDF */
       stageForm.hidden = true;
       stageOk.hidden = false;
