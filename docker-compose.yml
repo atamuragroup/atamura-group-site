@@ -1,0 +1,8 @@
+services:
+  site:
+    build: .
+    image: atamura-group-site
+    container_name: atamura-group-site
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

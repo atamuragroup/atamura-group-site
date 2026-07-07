@@ -1,0 +1,11 @@
+.git
+.github
+.claude
+.netlify
+.DS_Store
+*.log
+Dockerfile
+.dockerignore
+docker-compose.yml
+scripts
+node_modules
