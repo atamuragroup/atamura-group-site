@@ -352,35 +352,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <h3>Ипотечный калькулятор</h3>
       <!-- #5 markup-review: интегрирован TM_Calculator (calculator.atamuragroup.kz) — 16 программ: ипотека, рассрочка 0%, «Наурыз», 7-20-25 -->
       <iframe id="atamura-calc" src="https://calculator.atamuragroup.kz/embed" title="Ипотечный калькулятор ATAMURA GROUP" loading="lazy" scrolling="no" style="width:100%;border:0;display:block;min-height:520px;border-radius:14px;overflow:hidden"></iframe>
-      <!-- Фолбэк: если внешний сервер калькулятора не отвечает — показываем сообщение + кнопку заявки -->
-      <div class="mort-calc-fallback" id="calc-fallback" hidden style="text-align:center;padding:48px 20px;min-height:520px;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-        <svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--ink-mute)" stroke-width="1.6" style="margin-bottom:14px"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h2M8 14h2M14 10h2M14 14h2M8 18h8"/></svg>
-        <p style="font-size:18px;font-weight:600;color:var(--ink);margin:0 0 8px;">Калькулятор временно недоступен</p>
-        <p style="font-size:14px;color:var(--ink-soft);max-width:42ch;margin:0 auto 20px;">Уже занимаемся. Оставьте контакты — менеджер рассчитает ипотеку, рассрочку и подберёт ЖК под ваш бюджет.</p>
-        <button type="button" class="btn btn-brand" data-open-lead data-lead-source="calc-fallback" data-lead-title="Рассчитать ипотеку" data-lead-text="Оставьте имя и телефон — менеджер ATAMURA рассчитает платёж и подберёт программу.">Заказать расчёт →</button>
-      </div>
       <script>
       (function () {
         var O = "https://calculator.atamuragroup.kz";
         var iframe = document.getElementById("atamura-calc");
-        var fallback = document.getElementById("calc-fallback");
-        var loaded = false, timer = null;
         window.addEventListener("message", function (e) {
           if (e.origin !== O) return;
-          loaded = true; if (timer) { clearTimeout(timer); timer = null; }
-          if (fallback && !fallback.hidden) { fallback.hidden = true; if (iframe) iframe.style.display = ""; }
           if (e.data && e.data.type === "atamura-calc:height" && iframe) iframe.style.height = e.data.height + "px";
         });
-        function arm() {
-          if (loaded || timer || !iframe || !fallback) return;
-          timer = setTimeout(function () { if (!loaded) { iframe.style.display = "none"; fallback.hidden = false; } }, 7000);
-        }
-        if ("IntersectionObserver" in window && iframe) {
-          var io = new IntersectionObserver(function (ents) {
-            ents.forEach(function (en) { if (en.isIntersecting) { arm(); io.disconnect(); } });
-          }, { rootMargin: "200px" });
-          io.observe(iframe);
-        } else { arm(); }
       })();
       </script>
     </div>
