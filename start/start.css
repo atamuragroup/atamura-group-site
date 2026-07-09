@@ -274,6 +274,24 @@ body.theme-dion  .dion-only{display:block;}
   display:grid; place-items:center; margin:0 auto 16px;}
 .thanks h3{font-size:24px;} .thanks p{color:var(--ink-soft); margin:8px 0 22px;}
 
+/* ============ Тени зелени (декор, как в презентации AMAIA) ============
+   Размытые силуэты веток на светлых секциях. Инлайн-SVG с blur внутри,
+   вес нулевой; на контент не влияют (pointer-events:none, контент выше). */
+.find,.about,.program,.why,.faq{position:relative; overflow:hidden;}
+.find>.wrap,.about>.wrap,.program>.wrap,.why>.wrap,.faq>.wrap{position:relative; z-index:1;}
+.find::before,.about::before,.program::before,.why::before,.faq::before{
+  content:''; position:absolute; width:min(560px,88vw); aspect-ratio:1;
+  background:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 600'><defs><filter id='b' x='-25%25' y='-25%25' width='150%25' height='150%25'><feGaussianBlur stdDeviation='7'/></filter></defs><g filter='url(%23b)' fill='%233F362C'><path d='M90 570 Q180 360 330 90' stroke='%233F362C' stroke-width='4' fill='none'/><path d='M480 580 Q470 430 400 300' stroke='%233F362C' stroke-width='3.5' fill='none'/><path d='M520 180 Q540 140 572 100' stroke='%233F362C' stroke-width='2.5' fill='none'/><ellipse cx='95' cy='522' rx='9' ry='27' transform='rotate(-18 95 522)'/><ellipse cx='140' cy='495' rx='9' ry='26' transform='rotate(62 140 495)'/><ellipse cx='120' cy='455' rx='10' ry='28' transform='rotate(-20 120 455)'/><ellipse cx='168' cy='420' rx='9' ry='26' transform='rotate(66 168 420)'/><ellipse cx='146' cy='382' rx='9' ry='27' transform='rotate(-15 146 382)'/><ellipse cx='196' cy='345' rx='9' ry='25' transform='rotate(60 196 345)'/><ellipse cx='176' cy='305' rx='10' ry='28' transform='rotate(-22 176 305)'/><ellipse cx='226' cy='268' rx='9' ry='25' transform='rotate(64 226 268)'/><ellipse cx='208' cy='230' rx='9' ry='27' transform='rotate(-12 208 230)'/><ellipse cx='258' cy='196' rx='8' ry='24' transform='rotate(58 258 196)'/><ellipse cx='242' cy='158' rx='9' ry='26' transform='rotate(-18 242 158)'/><ellipse cx='290' cy='128' rx='8' ry='23' transform='rotate(62 290 128)'/><ellipse cx='322' cy='96' rx='8' ry='24' transform='rotate(20 322 96)'/><ellipse cx='461' cy='498' rx='9' ry='26' transform='rotate(-55 461 498)'/><ellipse cx='490' cy='470' rx='8' ry='24' transform='rotate(25 490 470)'/><ellipse cx='442' cy='430' rx='9' ry='27' transform='rotate(-60 442 430)'/><ellipse cx='472' cy='400' rx='8' ry='24' transform='rotate(20 472 400)'/><ellipse cx='417' cy='360' rx='9' ry='26' transform='rotate(-55 417 360)'/><ellipse cx='447' cy='330' rx='8' ry='23' transform='rotate(18 447 330)'/><ellipse cx='398' cy='302' rx='8' ry='24' transform='rotate(-15 398 302)'/><ellipse cx='528' cy='162' rx='7' ry='20' transform='rotate(-40 528 162)'/><ellipse cx='550' cy='150' rx='6' ry='18' transform='rotate(35 550 150)'/><ellipse cx='543' cy='120' rx='7' ry='19' transform='rotate(-35 543 120)'/><ellipse cx='567' cy='104' rx='6' ry='17' transform='rotate(25 567 104)'/></g></svg>") center/contain no-repeat;
+  opacity:.12; pointer-events:none;}
+.find::before{top:-70px; right:-110px; transform:rotate(14deg);}
+.about::before{top:-50px; left:-130px; transform:scaleX(-1) rotate(9deg); opacity:.15;}
+.program::before{bottom:-60px; right:-120px; transform:rotate(-12deg);}
+.why::before{top:16%; left:-140px; transform:scaleX(-1) rotate(-8deg);}
+.faq::before{top:-60px; right:-100px; transform:rotate(22deg);}
+@media (max-width:640px){
+  .find::before,.about::before,.program::before,.why::before,.faq::before{width:120vw; opacity:.1;}
+}
+
 /* декоративный переключатель темы — плавность фонов секций */
 .about,.timer,.price,.dev{transition:background-color .4s var(--ease), color .4s var(--ease);}
 
