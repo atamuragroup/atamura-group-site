@@ -4,3 +4,9 @@
 
 # локальная конфигурация Claude Code
 .claude/
+
+# бэкенд заявок (leads-api): секреты, данные, артефакты сборки
+leads-api/.env
+leads-api/data/
+leads-api/node_modules/
+leads-api/dist-server/

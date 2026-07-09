@@ -261,9 +261,9 @@
   }
 
   /* ---------- Лид-формы (валидация → доставка → localStorage → /спасибо) ---------- */
-  /* Endpoint доставки заявок: TM_Calculator Hono-сервер (VDS) → файл + Bitrix24 crm.lead.add.
-     Пусто → fallback только в localStorage. */
-  var LEAD_WEBHOOK = "https://calculator.atamuragroup.kz/api/site-lead";
+  /* Endpoint доставки заявок: свой leads-api на том же origin (nginx проксирует /api/)
+     → файл + Bitrix24 crm.lead.add + Telegram. Пусто → fallback только в localStorage. */
+  var LEAD_WEBHOOK = "/api/site-lead";
   function bindForms(scope) {
     bindPhones(scope);
     (scope || document).querySelectorAll("form.lead-form").forEach(function (f) {
