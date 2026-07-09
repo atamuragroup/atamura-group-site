@@ -126,27 +126,29 @@
 
     pixelTrack("Lead", { content_name: "start_amaia", complex: COMPLEX });
 
-    buildIcs();
     formStep.style.display = "none"; thanksStep.style.display = "";
   });
 
-  /* ---------- .ics для «Добавить в календарь» ---------- */
-  function buildIcs() {
-    var btn = document.getElementById("icsBtn"); if (!btn) return;
-    var ics = [
-      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ATAMURA//start-amaia//RU", "CALSCALE:GREGORIAN",
-      "BEGIN:VEVENT",
-      "UID:start-amaia-2026@atamuragroup.kz",
-      "DTSTART;TZID=Asia/Almaty:20260718T100000",
-      "DTEND;TZID=Asia/Almaty:20260718T190000",
-      "SUMMARY:Старт продаж AMAIA — ATAMURA Group",
-      "LOCATION:Алматы\\, ул. Толе би\\, 12\\, 1 этаж",
-      "DESCRIPTION:Центральный офис продаж ATAMURA Group. Программа с ведущими 12:00-15:00.",
-      "END:VEVENT", "END:VCALENDAR"
-    ].join("\r\n");
-    var url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
-    btn.setAttribute("href", url);
-  }
+  /* ---------- «Добавить в календарь» (по платформе) ----------
+     Android → Google Календарь (template-URL, открывается приложением).
+     iOS → статичный .ics: Safari показывает событие с кнопкой «Добавить».
+     Десктоп → скачивание .ics (Outlook / Apple Calendar).
+     Время в Google-URL — UTC: 10:00/19:00 Алматы (+05) = 05:00Z/14:00Z. */
+  var GCAL_URL = "https://calendar.google.com/calendar/render?action=TEMPLATE" +
+    "&text=" + encodeURIComponent("Старт продаж AMAIA — ATAMURA Group") +
+    "&dates=20260718T050000Z/20260718T140000Z" +
+    "&ctz=Asia/Almaty" +
+    "&location=" + encodeURIComponent("Алматы, ул. Толе би, 12, 1 этаж") +
+    "&details=" + encodeURIComponent("Центральный офис продаж ATAMURA Group. Программа с ведущими 12:00–15:00. https://atamuragroup.kz/start/");
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-add-calendar]"); if (!btn) return;
+    pixelTrack("AddToWishlist", { content_name: "start_amaia_calendar" });
+    if (/android/i.test(navigator.userAgent)) {
+      e.preventDefault();
+      window.open(GCAL_URL, "_blank", "noopener");
+    }
+    /* iOS/десктоп: пропускаем штатный переход по href на .ics */
+  });
 
   /* ---------- Meta ViewContent при заходе ---------- */
   pixelTrack("ViewContent", { content_name: "start_amaia", complex: COMPLEX });
