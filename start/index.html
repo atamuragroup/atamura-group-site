@@ -20,7 +20,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:description" content="18 июля 2026, 10:00–19:00 · Офис продаж ATAMURA Group, Алматы, ул. Толе би, 12."/>
 <meta property="og:image" content="https://atamuragroup.kz/assets/img/og/home-plain.jpg"/>
 <meta name="theme-color" content="#97795C"/>
-<link rel="stylesheet" href="start.css?v=2f8ba0bb"/>
+<link rel="stylesheet" href="start.css?v=2719256d"/>
 <!-- TODO[pixel]: вставить реальный Meta Pixel ID (уточнить у ответственного за кабинет KZ_Atamura) -->
 <script>
 window.__PIXEL_ID__ = ""; /* TODO: '1234567890' */
@@ -201,7 +201,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="lightbox" id="planLightbox" aria-hidden="true">
       <button type="button" class="lightbox-close" aria-label="Закрыть">×</button>
+      <button type="button" class="lightbox-nav lightbox-prev" aria-label="Предыдущая планировка">‹</button>
       <img src="" alt="Планировка AMAIA крупно"/>
+      <button type="button" class="lightbox-nav lightbox-next" aria-label="Следующая планировка">›</button>
     </div>
     <div class="feature-note">
       <span class="ico" aria-hidden="true">
@@ -386,20 +388,37 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <script>
-/* Лайтбокс планировок: клик по .plan-card[data-plan] → крупный просмотр */
+/* Лайтбокс планировок: клик по .plan-card[data-plan] → крупный просмотр, стрелки ‹ › для переключения */
 (function(){
   var lb=document.getElementById('planLightbox'); if(!lb) return;
   var img=lb.querySelector('img');
-  function open(src,alt){ img.src=src; if(alt) img.alt=alt; lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+  var cards=[].slice.call(document.querySelectorAll('.plan-card[data-plan]'));
+  var idx=0;
+  function show(i){
+    if(!cards.length) return;
+    idx=(i%cards.length+cards.length)%cards.length;
+    var card=cards[idx], pi=card.querySelector('img');
+    img.src=card.getAttribute('data-plan');
+    img.alt=pi?pi.getAttribute('alt'):'';
+  }
+  function open(i){ show(i); lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
   function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
   document.addEventListener('click',function(e){
     var card=e.target.closest('.plan-card[data-plan]');
-    if(card){ var pi=card.querySelector('img'); open(card.getAttribute('data-plan'), pi?pi.getAttribute('alt'):''); return; }
+    if(card){ open(cards.indexOf(card)); return; }
+    if(!lb.classList.contains('open')) return;
+    if(e.target.closest('.lightbox-prev')){ show(idx-1); return; }
+    if(e.target.closest('.lightbox-next')){ show(idx+1); return; }
     if(e.target.closest('.lightbox-close')||e.target===lb) close();
   });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&lb.classList.contains('open')) close(); });
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('open')) return;
+    if(e.key==='Escape') close();
+    else if(e.key==='ArrowLeft') show(idx-1);
+    else if(e.key==='ArrowRight') show(idx+1);
+  });
 })();
 </script>
-<script src="start.js?v=dd4d64ff"></script>
+<script src="start.js?v=28c935bd"></script>
 </body>
 </html>

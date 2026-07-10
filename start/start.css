@@ -256,7 +256,14 @@ body.theme-dion  .dion-only{display:block;}
 .lightbox.open{display:flex;}
 .lightbox img{max-width:100%; max-height:100%; border-radius:var(--r); background:#fff; box-shadow:var(--shadow-pop);}
 .lightbox-close{position:absolute; top:14px; right:14px; width:42px; height:42px; border-radius:50%;
-  background:rgba(255,255,255,.92); color:var(--ink); font-size:22px; line-height:1; z-index:1;}
+  background:rgba(255,255,255,.92); color:var(--ink); font-size:22px; line-height:1; z-index:2;}
+.lightbox-nav{position:absolute; top:50%; transform:translateY(-50%); width:48px; height:48px; border-radius:50%;
+  background:rgba(255,255,255,.92); color:var(--ink); font-size:30px; line-height:1; z-index:2;
+  display:grid; place-items:center; box-shadow:var(--shadow-pop); cursor:pointer; padding-bottom:4px;}
+.lightbox-nav:hover{background:#fff;}
+.lightbox-prev{left:14px;}
+.lightbox-next{right:14px;}
+@media (min-width:760px){ .lightbox-prev{left:28px;} .lightbox-next{right:28px;} }
 
 .feature-note{margin-top:22px; display:flex; gap:12px; align-items:flex-start; background:var(--accent-soft);
   border-radius:var(--r-lg); padding:18px 20px;}

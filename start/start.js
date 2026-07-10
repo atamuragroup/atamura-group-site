@@ -62,6 +62,7 @@
   var formStep = document.getElementById("formStep");
   var thanksStep = document.getElementById("thanksStep");
   function openForm() {
+    try { sessionStorage.setItem("amaia_form_seen", "1"); } catch (e) {}
     formStep.style.display = ""; thanksStep.style.display = "none";
     modal.classList.add("open"); modal.setAttribute("aria-hidden", "false");
     body.style.overflow = "hidden";
@@ -76,6 +77,24 @@
     else if (e.target.closest("[data-close-form]") || e.target === modal) closeForm();
   });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape" && modal.classList.contains("open")) closeForm(); });
+
+  /* ---------- Автопоказ формы через 10 c (один раз за сессию) ---------- */
+  var formSeen = false; try { formSeen = !!sessionStorage.getItem("amaia_form_seen"); } catch (e) {}
+  if (!formSeen) {
+    var autoTries = 0;
+    (function scheduleAutoForm(delay) {
+      setTimeout(function () {
+        try { if (sessionStorage.getItem("amaia_form_seen")) return; } catch (e) {}
+        if (modal.classList.contains("open")) return;          // уже открыта вручную
+        var lb = document.getElementById("planLightbox");
+        if (lb && lb.classList.contains("open")) {             // смотрят планировку — подождём и покажем после
+          if (++autoTries < 40) scheduleAutoForm(2000);
+          return;
+        }
+        openForm();
+      }, delay);
+    })(10000);
+  }
 
   /* ---------- Маска телефона (KZ, +7) ---------- */
   var phone = document.getElementById("f-phone");
