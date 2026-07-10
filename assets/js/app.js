@@ -179,6 +179,25 @@
     return data;
   }
 
+  /* ---------- Таймер на карточке AMAIA (#projects → старт продаж 18.07) ---------- */
+  document.querySelectorAll(".pcard-timer[data-deadline]").forEach(function (el) {
+    var dl = new Date(el.getAttribute("data-deadline")).getTime();
+    var d = el.querySelector("[data-d]"), h = el.querySelector("[data-h]"),
+        m = el.querySelector("[data-m]"), s = el.querySelector("[data-s]");
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function tick() {
+      var diff = dl - Date.now();
+      if (diff <= 0) { el.textContent = "Старт продаж идёт!"; return true; }
+      var sec = Math.floor(diff / 1000);
+      d.textContent = Math.floor(sec / 86400);
+      h.textContent = pad(Math.floor(sec % 86400 / 3600));
+      m.textContent = pad(Math.floor(sec % 3600 / 60));
+      s.textContent = pad(sec % 60);
+    }
+    if (tick()) return;
+    var iv = setInterval(function () { if (tick()) clearInterval(iv); }, 1000);
+  });
+
   /* ---------- Catalog popup (form → auto-download PDF → success-стадия) ----------
      Без бэкенда. Лид сохраняется в localStorage (atamura_leads) до момента подключения Bitrix24. */
   (function () {

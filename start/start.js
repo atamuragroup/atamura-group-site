@@ -108,20 +108,24 @@
     if (!consent) { setErr("consent", true); ok = false; } else setErr("consent", false);
     if (!ok) return;
 
+    /* Отправка в CRM — тот же вебхук, что у форм основного сайта
+       (calculator.atamuragroup.kz → файл + Bitrix24 crm.lead.add).
+       Время визита кладём в source: оно попадает в название лида. */
     var payload = {
       name: name,
       phone: "+" + digits,
-      visit: form.visit.value || "не указано",
       complex: COMPLEX,
+      source: "start-amaia" + (form.visit.value ? " · визит " + form.visit.value : ""),
       page: location.pathname,
-      submitted_at: new Date().toISOString(),
-      track: TRACK
+      ref: document.referrer || "прямой заход",
+      utm: location.search || "",
+      ts: new Date().toISOString()
     };
-
-    /* TODO[form-endpoint]: подключить приём заявок (email / CRM / Google Sheets / Bitrix).
-       Пока — заглушка: логируем и показываем экран благодарности. */
-    console.log("[lead]", payload);
-    // fetch(ENDPOINT, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "fbclid", "gclid", "fbc"].forEach(function (k) {
+      if (TRACK[k]) payload[k] = TRACK[k];
+    });
+    try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(payload); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
+    fetch("https://calculator.atamuragroup.kz/api/site-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
 
     pixelTrack("Lead", { content_name: "start_amaia", complex: COMPLEX });
 

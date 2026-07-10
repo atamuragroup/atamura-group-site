@@ -461,6 +461,11 @@
   /* #3 markup-review: сданные/скоро — длинный статус как компактная подпись (не 18px-цена), чтобы не налезал на .pcard-info */
   .pcard-price.is-status { font-size: 12px; max-width: 13ch; line-height: 1.25; }
   .pcard-price.is-status strong { font-size: 12px; font-weight: 600; color: var(--ink-soft); margin: 0; letter-spacing: 0; }
+  /* Карточка AMAIA — старт продаж 18.07: бронзовая рамка, ведёт на /start/, таймер отдельной строкой */
+  .pcard-amaia { border: 2px solid #97795C; box-shadow: 0 8px 26px rgba(151, 121, 92, 0.28); }
+  .pcard-amaia .pcard-body { flex-wrap: wrap; }
+  .pcard-timer { flex-basis: 100%; font-size: 13px; font-weight: 600; color: #7C6144; font-variant-numeric: tabular-nums; }
+  .pcard-timer b { font-weight: 700; }
 
   /* ============ "Поможем с выбором" CTA ============ */
   .help-cta {
