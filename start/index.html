@@ -20,7 +20,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:description" content="18 июля 2026, 10:00–19:00 · Офис продаж ATAMURA Group, Алматы, ул. Толе би, 12."/>
 <meta property="og:image" content="https://atamuragroup.kz/assets/img/og/home-plain.jpg"/>
 <meta name="theme-color" content="#97795C"/>
-<link rel="stylesheet" href="start.css?v=fc38d2f1"/>
+<link rel="stylesheet" href="start.css?v=e9006b2e"/>
 <!-- TODO[pixel]: вставить реальный Meta Pixel ID (уточнить у ответственного за кабинет KZ_Atamura) -->
 <script>
 window.__PIXEL_ID__ = ""; /* TODO: '1234567890' */
@@ -49,11 +49,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section class="intro">
   <div class="wrap intro-inner">
     <div class="intro-brand">
-      <img class="intro-mark" src="img/amaia-mark.png" alt="" aria-hidden="true"/>
-      <div class="intro-brand-text">
+      <div class="intro-brand-row">
+        <img class="intro-mark" src="img/amaia-mark.png" alt="" aria-hidden="true"/>
         <img class="intro-word" src="img/amaia-word.png" alt="AMAIA" width="1000" height="201" fetchpriority="high"/>
-        <h1 class="intro-slogan">Место, где снова растут сады</h1>
       </div>
+      <h1 class="intro-slogan">Место, где снова растут сады</h1>
     </div>
     <div class="event-panel">
       <div class="ev-info">
@@ -173,16 +173,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
            sizes="(min-width:960px) 44vw, 100vw"
            alt="Двор-сад AMAIA — таунхаусы на фоне гор" loading="lazy" decoding="async"/>
     </div>
-    <table class="units">
-      <thead><tr><th>Тип</th><th>Площадь</th><th>В 1-й очереди</th></tr></thead>
-      <tbody>
-        <tr><td>Таунхаус</td><td>120 м²</td><td>44</td></tr>
-        <tr><td>Дуплекс</td><td>137 м²</td><td>28</td></tr>
-        <tr><td>Дуплекс</td><td>180 м²</td><td>20</td></tr>
-        <tr><td>Таунхаус</td><td>166 м²</td><td>13</td></tr>
-        <tr><td>Таунхаус</td><td>149 м²</td><td>10</td></tr>
-      </tbody>
-    </table>
+    <div class="plans">
+      <h3 class="plans-title">Планировки 1-й очереди</h3>
+      <div class="plans-grid">
+        <button type="button" class="plan-card" data-plan="img/plans/taunhaus-120.jpg" aria-label="Планировка: таунхаус 120 м²">
+          <span class="plan-img"><img src="img/plans/taunhaus-120.jpg" alt="Планировка таунхауса 120 м² — AMAIA" loading="lazy"/></span>
+          <span class="plan-meta"><b>Таунхаус · 120 м²</b><span>В 1-й очереди — 44</span></span>
+        </button>
+        <button type="button" class="plan-card" data-plan="img/plans/duplex-137.jpg" aria-label="Планировка: дуплекс 137 м²">
+          <span class="plan-img"><img src="img/plans/duplex-137.jpg" alt="Планировка дуплекса 137 м² — AMAIA" loading="lazy"/></span>
+          <span class="plan-meta"><b>Дуплекс · 137 м²</b><span>В 1-й очереди — 28</span></span>
+        </button>
+        <button type="button" class="plan-card" data-plan="img/plans/duplex-180.jpg" aria-label="Планировка: дуплекс 180 м²">
+          <span class="plan-img"><img src="img/plans/duplex-180.jpg" alt="Планировка дуплекса 180 м² — AMAIA" loading="lazy"/></span>
+          <span class="plan-meta"><b>Дуплекс · 180 м²</b><span>В 1-й очереди — 20</span></span>
+        </button>
+        <button type="button" class="plan-card" data-plan="img/plans/taunhaus-166.jpg" aria-label="Планировка: таунхаус 166 м²">
+          <span class="plan-img"><img src="img/plans/taunhaus-166.jpg" alt="Планировка таунхауса 166 м² — AMAIA" loading="lazy"/></span>
+          <span class="plan-meta"><b>Таунхаус · 166 м²</b><span>В 1-й очереди — 13</span></span>
+        </button>
+        <button type="button" class="plan-card" data-plan="img/plans/taunhaus-149.jpg" aria-label="Планировка: таунхаус 149 м²">
+          <span class="plan-img"><img src="img/plans/taunhaus-149.jpg" alt="Планировка таунхауса 149 м² — AMAIA" loading="lazy"/></span>
+          <span class="plan-meta"><b>Таунхаус · 149 м²</b><span>В 1-й очереди — 10</span></span>
+        </button>
+      </div>
+      <p class="plans-note">Нажмите на планировку, чтобы рассмотреть подробнее. Оба этажа — на одной схеме.</p>
+    </div>
+    <div class="lightbox" id="planLightbox" aria-hidden="true">
+      <button type="button" class="lightbox-close" aria-label="Закрыть">×</button>
+      <img src="" alt="Планировка AMAIA крупно"/>
+    </div>
     <div class="feature-note">
       <span class="ico" aria-hidden="true">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21c-4-2-6-5-6-9a6 6 0 0 1 12 0c0 4-2 7-6 9z"/><path d="M12 12v9M9 15l3-3 3 3"/></svg>
@@ -365,6 +385,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </div>
 
+<script>
+/* Лайтбокс планировок: клик по .plan-card[data-plan] → крупный просмотр */
+(function(){
+  var lb=document.getElementById('planLightbox'); if(!lb) return;
+  var img=lb.querySelector('img');
+  function open(src,alt){ img.src=src; if(alt) img.alt=alt; lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+  function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+  document.addEventListener('click',function(e){
+    var card=e.target.closest('.plan-card[data-plan]');
+    if(card){ var pi=card.querySelector('img'); open(card.getAttribute('data-plan'), pi?pi.getAttribute('alt'):''); return; }
+    if(e.target.closest('.lightbox-close')||e.target===lb) close();
+  });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&lb.classList.contains('open')) close(); });
+})();
+</script>
 <script src="start.js?v=dd4d64ff"></script>
 </body>
 </html>

@@ -95,8 +95,8 @@ h3{font-size:clamp(19px,3.4vw,24px);}
 .intro-word{width:clamp(240px,62vw,470px); height:auto;}
 .intro-slogan{margin-top:clamp(14px,2.6vw,26px); font-size:clamp(17px,3.4vw,26px); font-weight:500;
   letter-spacing:.06em; text-transform:uppercase; color:var(--accent-deep); line-height:1.4;}
-.intro-brand{display:flex; align-items:center; justify-content:center; gap:clamp(14px,2vw,22px);}
-.intro-brand-text{display:flex; flex-direction:column; align-items:center;}
+.intro-brand{display:flex; flex-direction:column; align-items:center;}
+.intro-brand-row{display:flex; align-items:flex-start; justify-content:center; gap:clamp(7px,1vw,11px);}
 .intro-mark{display:none;}
 
 /* ---- Панель события: бейдж + инфо слева, таймер в ячейках справа ---- */
@@ -135,11 +135,10 @@ h3{font-size:clamp(19px,3.4vw,24px);}
 /* десктоп/планшет: знак+лого и слоган по центру, панель события в одну линию */
 @media (min-width:760px){
   .intro-inner{display:flex; flex-direction:column; align-items:center;}
-  .intro-brand{justify-content:center;}
-  .intro-brand-text{align-items:flex-start;}
-  .intro-mark{display:block; height:clamp(52px,7vw,78px); width:auto;}
+  /* знак = высота надписи AMAIA (у надписи 1000×201 → высота = ширина×0.201), верх в один уровень */
+  .intro-mark{display:block; height:calc(clamp(280px,30vw,440px)*0.201); width:auto;}
   .intro-word{width:clamp(280px,30vw,440px);}
-  .intro-slogan{margin-top:16px; font-size:clamp(18px,2.2vw,26px); text-align:left;}
+  .intro-slogan{margin-top:16px; font-size:clamp(18px,2.2vw,26px); text-align:center;}
   .event-panel{width:100%; margin-top:38px; flex-direction:row; align-items:center;
     justify-content:space-between; gap:clamp(20px,3vw,44px); padding:24px clamp(20px,3.4vw,38px);}
   .ev-info{flex:1 1 auto;}
@@ -230,6 +229,32 @@ body.theme-dion  .dion-only{display:block;}
 .units th{background:var(--paper-2); font-weight:600; font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-mute);}
 .units tr:last-child td{border-bottom:0;}
 .units td:last-child,.units th:last-child{text-align:right; font-variant-numeric:tabular-nums;}
+/* ---- Планировки 1-й очереди ---- */
+.plans{margin-top:30px;}
+.plans-title{margin-bottom:16px;}
+.plans-grid{display:grid; gap:14px;}
+.plan-card{display:flex; flex-direction:column; text-align:left; background:var(--white);
+  border:1px solid var(--line); border-radius:var(--r-lg); overflow:hidden; padding:0;
+  transition:border-color .2s, box-shadow .2s, transform .18s var(--ease);}
+.plan-card:hover{border-color:var(--accent); box-shadow:var(--shadow); transform:translateY(-2px);}
+.plan-img{display:block; background:#fff; padding:10px;}
+.plan-img img{width:100%; height:auto; display:block;}
+.plan-meta{display:flex; justify-content:space-between; align-items:center; gap:10px; width:100%;
+  padding:12px 16px; border-top:1px solid var(--line); font-size:14px;}
+.plan-meta b{font-weight:600; color:var(--ink);}
+.plan-meta span{color:var(--ink-mute); font-size:13px; white-space:nowrap;}
+.plans-note{margin-top:12px; font-size:13px; color:var(--ink-mute);}
+@media (min-width:640px){ .plans-grid{grid-template-columns:1fr 1fr;} }
+@media (min-width:960px){ .plans-grid{grid-template-columns:repeat(3,1fr);} }
+
+/* лайтбокс планировки */
+.lightbox{position:fixed; inset:0; z-index:110; display:none; align-items:center; justify-content:center;
+  background:rgba(20,18,14,.72); backdrop-filter:blur(3px); padding:clamp(12px,3vw,40px); cursor:zoom-out;}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:100%; max-height:100%; border-radius:var(--r); background:#fff; box-shadow:var(--shadow-pop);}
+.lightbox-close{position:absolute; top:14px; right:14px; width:42px; height:42px; border-radius:50%;
+  background:rgba(255,255,255,.92); color:var(--ink); font-size:22px; line-height:1; z-index:1;}
+
 .feature-note{margin-top:22px; display:flex; gap:12px; align-items:flex-start; background:var(--accent-soft);
   border-radius:var(--r-lg); padding:18px 20px;}
 .feature-note .ico{flex:0 0 auto; color:var(--accent-deep);}
