@@ -142,7 +142,7 @@
     "&dates=20260718T050000Z/20260718T140000Z" +
     "&ctz=Asia/Almaty" +
     "&location=" + encodeURIComponent("Алматы, ул. Толе би, 12, 1 этаж") +
-    "&details=" + encodeURIComponent("Центральный офис продаж ATAMURA Group. Программа с ведущими 12:00–15:00. https://atamuragroup.kz/start/");
+    "&details=" + encodeURIComponent("Центральный офис продаж ATAMURA Group. https://atamuragroup.kz/start/");
   document.addEventListener("click", function (e) {
     var btn = e.target.closest("[data-add-calendar]"); if (!btn) return;
     pixelTrack("AddToWishlist", { content_name: "start_amaia_calendar" });
