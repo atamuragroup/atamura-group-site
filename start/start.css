@@ -232,7 +232,10 @@ body.theme-dion  .dion-only{display:block;}
 /* ---- Планировки 1-й очереди ---- */
 .plans{margin-top:30px;}
 .plans-title{margin-bottom:16px;}
-.plans-grid{display:grid; gap:14px;}
+/* мобильный: горизонтальный скролл-карусель планировок */
+.plans-grid{display:flex; gap:14px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding-bottom:10px; scroll-padding-inline:var(--gutter); scrollbar-width:thin;}
+.plans-grid > .plan-card{flex:0 0 78%; max-width:320px; scroll-snap-align:start;}
+.plans-grid::-webkit-scrollbar{height:6px;} .plans-grid::-webkit-scrollbar-thumb{background:var(--line); border-radius:3px;}
 .plan-card{display:flex; flex-direction:column; text-align:left; background:var(--white);
   border:1px solid var(--line); border-radius:var(--r-lg); overflow:hidden; padding:0;
   transition:border-color .2s, box-shadow .2s, transform .18s var(--ease);}
@@ -244,7 +247,7 @@ body.theme-dion  .dion-only{display:block;}
 .plan-meta b{font-weight:600; color:var(--ink);}
 .plan-meta span{color:var(--ink-mute); font-size:13px; white-space:nowrap;}
 .plans-note{margin-top:12px; font-size:13px; color:var(--ink-mute);}
-@media (min-width:640px){ .plans-grid{grid-template-columns:1fr 1fr;} }
+@media (min-width:640px){ .plans-grid{display:grid; grid-template-columns:1fr 1fr; overflow:visible;} .plans-grid > .plan-card{flex:none; max-width:none;} }
 @media (min-width:960px){ .plans-grid{grid-template-columns:repeat(3,1fr);} }
 
 /* лайтбокс планировки */
