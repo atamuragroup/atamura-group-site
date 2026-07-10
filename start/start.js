@@ -25,9 +25,8 @@
     if (window.fbq && window.__PIXEL_ID__) { try { window.fbq("track", event, data || {}); } catch (e) {} }
   }
 
-  /* ---------- Таймер обратного отсчёта ---------- */
-  (function timer() {
-    var box = document.getElementById("timer"); if (!box) return;
+  /* ---------- Таймеры обратного отсчёта (все экземпляры .t-grid[data-deadline]) ---------- */
+  document.querySelectorAll(".t-grid[data-deadline]").forEach(function (box) {
     var deadline = new Date(box.getAttribute("data-deadline")).getTime();
     var d = box.querySelector("[data-d]"), h = box.querySelector("[data-h]"),
         m = box.querySelector("[data-m]"), s = box.querySelector("[data-s]");
@@ -36,7 +35,7 @@
       var diff = deadline - Date.now();
       if (diff <= 0) {
         d.textContent = h.textContent = m.textContent = s.textContent = "0";
-        var lbl = document.querySelector(".t-label"); if (lbl) lbl.textContent = "Старт продаж идёт!";
+        var lbl = box.parentElement.querySelector(".t-label"); if (lbl) lbl.textContent = "Старт продаж идёт!";
         return;
       }
       var sec = Math.floor(diff / 1000);
@@ -46,7 +45,7 @@
       s.textContent = pad(sec % 60);
     }
     tick(); setInterval(tick, 1000);
-  })();
+  });
 
   /* ---------- FAQ ---------- */
   var faq = document.getElementById("faq");

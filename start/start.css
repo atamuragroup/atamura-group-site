@@ -88,7 +88,64 @@ h3{font-size:clamp(19px,3.4vw,24px);}
 @media (max-width:380px){ .head-cta .cta-full{display:none;} .head-cta .cta-short{display:inline;} }
 .cta-short{display:none;}
 
-/* ============ Блок 1 — Hero ============ */
+/* ============ Блок 1 — Интро (лого + слоган) ============ */
+.intro{background:var(--paper); text-align:center; padding-block:clamp(36px,7vw,64px) clamp(28px,5vw,44px);}
+.intro-inner{display:flex; flex-direction:column; align-items:center;}
+.intro-left{display:flex; flex-direction:column; align-items:center;}
+.intro-word{width:clamp(240px,62vw,470px); height:auto;}
+.intro-slogan{margin-top:clamp(14px,2.6vw,26px); font-size:clamp(17px,3.4vw,26px); font-weight:500;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--accent-deep); line-height:1.4;}
+.intro-place{margin-top:clamp(16px,3vw,24px); display:inline-flex; align-items:flex-start; gap:9px;
+  text-align:left; background:var(--white); border:1px solid var(--line); border-radius:var(--r);
+  padding:12px 16px; font-size:14px; color:var(--ink-soft); max-width:560px;}
+.intro-place svg{flex:0 0 auto; margin-top:1px; color:var(--accent);}
+.intro-brand{display:flex; align-items:center; justify-content:center; gap:clamp(14px,2vw,22px);}
+.intro-mark{display:none;}
+.intro-side{display:none;}
+/* мобильный: слоган → сразу фото; кнопка и адрес — под фото (.mobile-cta) */
+.mobile-cta{padding-block:24px 8px; text-align:center;}
+.mobile-cta .intro-place{margin-top:16px;}
+@media (max-width:759px){
+  .intro{padding-block:clamp(32px,7vw,48px) clamp(20px,5vw,30px);}
+  .intro-inner > .intro-place{display:none;}
+}
+@media (min-width:760px){ .mobile-cta{display:none;} }
+/* десктоп/планшет: знак+лого и инфо слева, кнопка и таймер справа от плашки */
+@media (min-width:760px){
+  .intro-inner{display:grid; grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"brand brand" "slogan slogan" "place side";
+    column-gap:clamp(32px,5vw,64px); align-content:start;}
+  .intro-brand{grid-area:brand; justify-self:center; justify-content:center;}
+  .intro-mark{display:block; height:clamp(52px,7vw,78px); width:auto;}
+  .intro-word{width:clamp(280px,30vw,440px);}
+  .intro-slogan{grid-area:slogan; justify-self:center; margin-top:16px;
+    font-size:clamp(18px,2.2vw,26px); text-align:center;}
+  .intro-place{grid-area:place; justify-self:start; align-self:center; margin-top:34px;
+    font-size:16px; padding:16px 20px; max-width:640px; gap:11px;}
+  .intro-place svg{width:21px; height:21px;}
+  .intro-side{grid-area:side; display:flex; flex-direction:column; align-self:center;
+    margin-top:34px; min-width:280px;}
+  .intro-timer{text-align:center;}
+  .intro-timer .t-label{font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-mute); margin-bottom:8px;}
+  .intro-timer .t-grid{display:inline-flex; gap:clamp(12px,1.6vw,22px);}
+  .intro-timer .t-cell{min-width:52px;}
+  .intro-timer .t-num{font-size:clamp(26px,2.6vw,34px); font-weight:700; line-height:1;
+    color:var(--accent-deep); font-variant-numeric:tabular-nums;}
+  .intro-timer .t-word{font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--ink-mute); margin-top:4px;}
+  /* лента таймера ниже фото — только для мобильного */
+  .timer{display:none;}
+}
+
+/* ============ Блок 1b — Хиро-баннер (фото) ============ */
+.hero-banner{padding:0;}
+.hero-banner img{width:100%; height:auto; display:block; max-height:78svh; object-fit:cover; object-position:center 62%;}
+@media (min-width:760px){
+  .hero-banner .hero-banner-frame{max-width:var(--wrap); margin-inline:auto; padding-inline:var(--gutter);}
+}
+
+/* ============ (старый Hero — оставлен для истории, в разметке не используется) ============ */
 .hero{position:relative; overflow:hidden; padding:0; color:var(--white);
   min-height:min(88svh,760px); display:flex; align-items:flex-end;}
 .hero-bg{position:absolute; inset:0; z-index:0;
@@ -96,10 +153,12 @@ h3{font-size:clamp(19px,3.4vw,24px);}
 .hero-bg::after{content:''; position:absolute; inset:0; opacity:.5; mix-blend-mode:soft-light;
   background-image:var(--hero-texture); background-size:cover; background-position:center;}
 body.theme-amaia .hero-bg{--hero-texture:none;}
-.hero-bg .hero-motif{position:absolute; inset:0; opacity:.16;}
+.hero-bg .hero-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 62%;}
 .hero-scrim{position:absolute; inset:0; z-index:1;
-  background:linear-gradient(180deg,rgba(20,18,14,.15) 0%,rgba(20,18,14,.12) 40%,rgba(20,18,14,.7) 100%);}
+  background:linear-gradient(180deg,rgba(20,18,14,.22) 0%,rgba(20,18,14,.18) 40%,rgba(20,18,14,.78) 100%);}
 .hero-inner{position:relative; z-index:2; padding-block:120px 54px; max-width:760px;}
+.hero-logo{width:clamp(150px,24vw,220px); height:auto; margin-bottom:24px;
+  filter:drop-shadow(0 2px 12px rgba(20,18,14,.35));}
 .hero-badge{display:inline-flex; align-items:center; gap:8px; padding:7px 14px; border-radius:var(--r-pill);
   background:rgba(255,255,255,.16); backdrop-filter:blur(4px); font-size:12px; font-weight:600;
   letter-spacing:.1em; text-transform:uppercase; margin-bottom:18px;}
