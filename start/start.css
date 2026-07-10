@@ -99,7 +99,9 @@ h3{font-size:clamp(19px,3.4vw,24px);}
   text-align:left; background:var(--white); border:1px solid var(--line); border-radius:var(--r);
   padding:12px 16px; font-size:14px; color:var(--ink-soft); max-width:560px;}
 .intro-place svg{flex:0 0 auto; margin-top:1px; color:var(--accent);}
+.intro-place .pl-row{display:block; line-height:1.6;}
 .intro-brand{display:flex; align-items:center; justify-content:center; gap:clamp(14px,2vw,22px);}
+.intro-brand-text{display:flex; flex-direction:column; align-items:center;}
 .intro-mark{display:none;}
 .intro-side{display:none;}
 /* мобильный: слоган → сразу фото; кнопка и адрес — под фото (.mobile-cta) */
@@ -113,16 +115,16 @@ h3{font-size:clamp(19px,3.4vw,24px);}
 /* десктоп/планшет: знак+лого и инфо слева, кнопка и таймер справа от плашки */
 @media (min-width:760px){
   .intro-inner{display:grid; grid-template-columns:minmax(0,1fr) auto;
-    grid-template-areas:"brand brand" "slogan slogan" "place side";
+    grid-template-areas:"brand brand" "place side";
     column-gap:clamp(32px,5vw,64px); align-content:start;}
   .intro-brand{grid-area:brand; justify-self:center; justify-content:center;}
+  .intro-brand-text{align-items:flex-start;}
   .intro-mark{display:block; height:clamp(52px,7vw,78px); width:auto;}
   .intro-word{width:clamp(280px,30vw,440px);}
-  .intro-slogan{grid-area:slogan; justify-self:center; margin-top:16px;
-    font-size:clamp(18px,2.2vw,26px); text-align:center;}
+  .intro-slogan{margin-top:16px; font-size:clamp(18px,2.2vw,26px); text-align:left;}
   .intro-place{grid-area:place; justify-self:start; align-self:center; margin-top:34px;
-    font-size:16px; padding:16px 20px; max-width:640px; gap:11px;}
-  .intro-place svg{width:21px; height:21px;}
+    font-size:18px; padding:20px 26px; max-width:640px; gap:13px;}
+  .intro-place svg{width:24px; height:24px; margin-top:3px;}
   .intro-side{grid-area:side; display:flex; flex-direction:column; align-self:center;
     margin-top:34px; min-width:280px;}
   .intro-timer{text-align:center;}
@@ -199,6 +201,12 @@ body.theme-dion  .dion-only{display:block;}
 
 /* ============ Блок 4 — О комплексе ============ */
 .about{background:var(--paper-2);}
+.about-top{display:grid; gap:24px;}
+.about-photo{width:100%; height:auto; border-radius:var(--r-lg); display:block;}
+@media (min-width:960px){
+  .about-top{grid-template-columns:1.1fr 1fr; gap:clamp(28px,4vw,56px); align-items:stretch;}
+  .about-photo{height:100%; object-fit:cover;}
+}
 .about-head .tagline{font-size:clamp(18px,3vw,24px); font-style:italic; color:var(--accent-deep); margin-top:8px;}
 .about-concept{margin-top:16px; font-size:clamp(15px,2.2vw,17px); color:var(--ink-soft); max-width:64ch;}
 .formula{margin-top:14px; display:inline-block; font-weight:600; color:var(--ink);
@@ -253,6 +261,12 @@ body.theme-dion  .dion-only{display:block;}
 .price-card .pc-val{font-size:clamp(26px,5vw,36px); font-weight:700; margin-top:6px;}
 .price-card .pc-sub{font-size:14px; opacity:.8; margin-top:4px;}
 .price .btn-accent{background:#fff; color:var(--accent-deep);} .price .btn-accent:hover{background:var(--accent-soft);}
+.price-timer{margin-top:30px;}
+.price-timer .t-label{font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.85; margin-bottom:10px;}
+.price-timer .t-grid{display:inline-flex; gap:clamp(14px,3vw,28px);}
+.price-timer .t-cell{min-width:56px;}
+.price-timer .t-num{font-size:clamp(30px,6vw,44px); font-weight:700; line-height:1; color:#fff; font-variant-numeric:tabular-nums;}
+.price-timer .t-word{font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.8; margin-top:5px;}
 @media (min-width:640px){ .price-cards{grid-template-columns:1fr 1fr;} }
 
 /* ============ Блок 8 — Программа дня ============ */
