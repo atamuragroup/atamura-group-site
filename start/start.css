@@ -261,7 +261,8 @@ body.theme-dion  .dion-only{display:block;}
 .price-card .pc-val{font-size:clamp(26px,5vw,36px); font-weight:700; margin-top:6px;}
 .price-card .pc-sub{font-size:14px; opacity:.8; margin-top:4px;}
 .price .btn-accent{background:#fff; color:var(--accent-deep);} .price .btn-accent:hover{background:var(--accent-soft);}
-.price-timer{margin-top:30px;}
+.price-timer{margin-top:30px; text-align:center;}
+.price-cta{margin-top:26px; text-align:center;}
 .price-timer .t-label{font-size:12px; letter-spacing:.14em; text-transform:uppercase; opacity:.85; margin-bottom:10px;}
 .price-timer .t-grid{display:inline-flex; gap:clamp(14px,3vw,28px);}
 .price-timer .t-cell{min-width:56px;}
