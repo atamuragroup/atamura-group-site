@@ -20,7 +20,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <meta property="og:description" content="18 июля 2026, 10:00–19:00 · Офис продаж ATAMURA Group, Алматы, ул. Толе би, 12."/>
 <meta property="og:image" content="https://atamuragroup.kz/assets/img/og/home-plain.jpg"/>
 <meta name="theme-color" content="#97795C"/>
-<link rel="stylesheet" href="start.css?v=7b7b1590"/>
+<link rel="stylesheet" href="start.css?v=5d13b793"/>
 <!-- TODO[pixel]: вставить реальный Meta Pixel ID (уточнить у ответственного за кабинет KZ_Atamura) -->
 <script>
 window.__PIXEL_ID__ = ""; /* TODO: '1234567890' */
@@ -86,9 +86,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- ============ Блок 1b — Хиро-баннер (фото) ============ -->
 <section class="hero-banner">
   <div class="hero-banner-frame">
-    <img src="img/hero3-1706.jpg"
-         srcset="img/hero3-768.jpg 768w, img/hero3-1280.jpg 1280w, img/hero3-1706.jpg 1706w"
-         sizes="100vw" alt="Таунхаусы AMAIA — фасады на фоне гор Алатау" fetchpriority="high" decoding="async"/>
+    <img src="img/hero4-1706.jpg"
+         srcset="img/hero4-768.jpg 768w, img/hero4-1280.jpg 1280w, img/hero4-1706.jpg 1706w"
+         sizes="100vw" alt="Таунхаусы AMAIA — разноцветные фасады на фоне гор Алатау" fetchpriority="high" decoding="async"/>
   </div>
 </section>
 
@@ -200,6 +200,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="plans-note">Нажмите на планировку, чтобы рассмотреть подробнее. Оба этажа — на одной схеме.</p>
     </div>
     <div class="lightbox" id="planLightbox" aria-hidden="true">
+      <div class="lightbox-cap" aria-live="polite"></div>
       <button type="button" class="lightbox-close" aria-label="Закрыть">×</button>
       <button type="button" class="lightbox-nav lightbox-prev" aria-label="Предыдущая планировка">‹</button>
       <img src="" alt="Планировка AMAIA крупно"/>
@@ -395,14 +396,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 (function(){
   var lb=document.getElementById('planLightbox'); if(!lb) return;
   var img=lb.querySelector('img');
+  var cap=lb.querySelector('.lightbox-cap');
   var cards=[].slice.call(document.querySelectorAll('.plan-card[data-plan]'));
   var idx=0;
   function show(i){
     if(!cards.length) return;
     idx=(i%cards.length+cards.length)%cards.length;
-    var card=cards[idx], pi=card.querySelector('img');
+    var card=cards[idx], pi=card.querySelector('img'), b=card.querySelector('.plan-meta b');
     img.src=card.getAttribute('data-plan');
     img.alt=pi?pi.getAttribute('alt'):'';
+    if(cap) cap.textContent=b?b.textContent:'';
   }
   function open(i){ show(i); lb.classList.add('open'); lb.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
   function close(){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
