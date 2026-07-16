@@ -18,6 +18,18 @@
   function money(n) { return Math.round(n).toLocaleString("ru-RU").replace(/,/g, " "); }
   function byId(id) { return document.getElementById(id); }
 
+  /* Дискретные utm_* из адреса страницы. leads-api ждёт их отдельными полями и мапит
+     в родные UTM_* лида Bitrix; сырая строка data.utm остаётся для читаемой сводки. */
+  var UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+  function utmFields() {
+    var q = new URLSearchParams(location.search), out = {};
+    UTM_KEYS.forEach(function (k) {
+      var v = (q.get(k) || "").trim();
+      if (v) out[k] = v;
+    });
+    return out;
+  }
+
   /* Акция ЖК Aura (зачёркнутая база + цена со скидкой + стикер «СКИДКА») ОТКЛЮЧЕНА по запросу:
      Aura показывает обычную цену, как остальные ЖК — ВЕЗДЕ (главная, страница ЖК, каталог).
      Единый переключатель: все места ниже проверяют === SALE_SLUG. Чтобы вернуть акцию: SALE_SLUG = "aura". */
@@ -202,6 +214,7 @@
       data.page = location.pathname;
       data.ref = document.referrer || "прямой заход";
       data.utm = location.search || "";
+      Object.assign(data, utmFields());
       data.ts = new Date().toISOString();
       try {
         var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]");
@@ -277,6 +290,7 @@
         var data = {}; new FormData(f).forEach(function (v, k) { data[k] = v; });
         data.source = f.getAttribute("data-form") || "form"; data.page = location.pathname;
         data.ref = document.referrer || "прямой заход"; data.utm = location.search || ""; data.ts = new Date().toISOString();
+        Object.assign(data, utmFields());
         try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
         track("form_submitted", { form_type: data.source, page: data.page, messenger: data.messenger || "" });
         var done = function(){ location.href = rel("spasibo.html"); };
@@ -340,6 +354,7 @@
       data.page = location.pathname;
       data.ref = document.referrer || "прямой заход";
       data.utm = location.search || "";
+      Object.assign(data, utmFields());
       data.ts = new Date().toISOString();
       try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
       track("soon_submit", { source: src, page: data.page });
@@ -1287,7 +1302,7 @@
         if (honey && honey.value) return;
         if (!nameValid(nameI.value)) { showFieldError(nameI, "Введите имя (минимум 2 буквы)"); nameI.focus(); return; }
         if (!phoneValid(phoneI.value)) { showFieldError(phoneI, "Введите номер: +7 7XX XXX-XX-XX"); phoneI.focus(); return; }
-        var data = { name: (nameI.value || "").trim(), phone: phoneI.value, source: src, page: location.pathname, ref: document.referrer || "прямой заход", utm: location.search || "", ts: new Date().toISOString() };
+        var data = Object.assign({ name: (nameI.value || "").trim(), phone: phoneI.value, source: src, page: location.pathname, ref: document.referrer || "прямой заход", utm: location.search || "", ts: new Date().toISOString() }, utmFields());
         try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
         track("lead_submit", { source: src, page: data.page });
         stForm.hidden = true; stOk.hidden = false;
