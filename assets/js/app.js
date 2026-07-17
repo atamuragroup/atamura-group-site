@@ -18,18 +18,6 @@
   function money(n) { return Math.round(n).toLocaleString("ru-RU").replace(/,/g, " "); }
   function byId(id) { return document.getElementById(id); }
 
-  /* Дискретные utm_* из адреса страницы. leads-api ждёт их отдельными полями и мапит
-     в родные UTM_* лида Bitrix; сырая строка data.utm остаётся для читаемой сводки. */
-  var UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
-  function utmFields() {
-    var q = new URLSearchParams(location.search), out = {};
-    UTM_KEYS.forEach(function (k) {
-      var v = (q.get(k) || "").trim();
-      if (v) out[k] = v;
-    });
-    return out;
-  }
-
   /* Акция ЖК Aura (зачёркнутая база + цена со скидкой + стикер «СКИДКА») ОТКЛЮЧЕНА по запросу:
      Aura показывает обычную цену, как остальные ЖК — ВЕЗДЕ (главная, страница ЖК, каталог).
      Единый переключатель: все места ниже проверяют === SALE_SLUG. Чтобы вернуть акцию: SALE_SLUG = "aura". */
@@ -169,6 +157,47 @@
     });
   })();
 
+  /* ---------- UTM: сохраняем метки визита и добавляем к заявкам ----------
+     Метки из URL живут в localStorage 30 дней (last-touch), чтобы не теряться при
+     переходах по сайту. В заявку идут отдельными полями utm_source…utm_term —
+     сервер site-lead маппит их в поля UTM лида Bitrix24 (не только в комментарий). */
+  var UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+  (function () {
+    try {
+      var p = new URLSearchParams(location.search), got = {};
+      UTM_KEYS.forEach(function (k) { var v = p.get(k); if (v) got[k] = v; });
+      if (got.utm_source) { got._ts = Date.now(); localStorage.setItem("atamura_utm", JSON.stringify(got)); }
+    } catch (e) {}
+  })();
+  function mergeUTM(data) {
+    try {
+      var s = JSON.parse(localStorage.getItem("atamura_utm") || "null");
+      if (s && Date.now() - (s._ts || 0) < 30 * 864e5) UTM_KEYS.forEach(function (k) { if (s[k]) data[k] = s[k]; });
+      var p = new URLSearchParams(location.search);
+      UTM_KEYS.forEach(function (k) { var v = p.get(k); if (v) data[k] = v; });
+    } catch (e) {}
+    return data;
+  }
+
+  /* ---------- Таймер на карточке AMAIA (#projects → старт продаж 18.07) ---------- */
+  document.querySelectorAll(".pcard-timer[data-deadline]").forEach(function (el) {
+    var dl = new Date(el.getAttribute("data-deadline")).getTime();
+    var d = el.querySelector("[data-d]"), h = el.querySelector("[data-h]"),
+        m = el.querySelector("[data-m]"), s = el.querySelector("[data-s]");
+    function pad(n) { return (n < 10 ? "0" : "") + n; }
+    function tick() {
+      var diff = dl - Date.now();
+      if (diff <= 0) { el.textContent = "Старт продаж идёт!"; return true; }
+      var sec = Math.floor(diff / 1000);
+      d.textContent = Math.floor(sec / 86400);
+      h.textContent = pad(Math.floor(sec % 86400 / 3600));
+      m.textContent = pad(Math.floor(sec % 3600 / 60));
+      s.textContent = pad(sec % 60);
+    }
+    if (tick()) return;
+    var iv = setInterval(function () { if (tick()) clearInterval(iv); }, 1000);
+  });
+
   /* ---------- Catalog popup (form → auto-download PDF → success-стадия) ----------
      Без бэкенда. Лид сохраняется в localStorage (atamura_leads) до момента подключения Bitrix24. */
   (function () {
@@ -214,8 +243,8 @@
       data.page = location.pathname;
       data.ref = document.referrer || "прямой заход";
       data.utm = location.search || "";
-      Object.assign(data, utmFields());
       data.ts = new Date().toISOString();
+      mergeUTM(data);
       try {
         var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]");
         q.push(data);
@@ -226,7 +255,7 @@
       /* Отправка заявки в CRM (site-lead → Bitrix24) — как у остальных форм.
          Fire-and-forget: не блокируем скачивание; при ошибке лид остаётся в localStorage. */
       if (LEAD_WEBHOOK) {
-        fetch(LEAD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true }).catch(function () {});
+        sendLead(data).catch(function () {});
       }
 
       /* Переключаем стадию + автоскачивание PDF */
@@ -277,6 +306,44 @@
   /* Endpoint доставки заявок: свой leads-api на том же origin (nginx проксирует /api/)
      → файл + Bitrix24 crm.lead.add + Telegram. Пусто → fallback только в localStorage. */
   var LEAD_WEBHOOK = "/api/site-lead";
+
+  /* Отправка лида + отметка о доставке в очереди atamura_leads (_sent по ts). */
+  function sendLead(data) {
+    if (!LEAD_WEBHOOK) return Promise.resolve();
+    return fetch(LEAD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true })
+      .then(function (r) {
+        if (r && r.ok) {
+          try {
+            var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]");
+            q.forEach(function (L) { if (L.ts === data.ts) L._sent = 1; });
+            localStorage.setItem("atamura_leads", JSON.stringify(q));
+          } catch (e) {}
+        }
+        return r;
+      });
+  }
+
+  /* Дослать недоставленные заявки. 12.06–08.07 CORS на calculator.atamuragroup.kz
+     блокировал доставку — лиды осели в localStorage посетителей. При возврате
+     посетителя на сайт дошлём их в CRM (флаг resend, до 3 попыток). */
+  (function () {
+    if (!LEAD_WEBHOOK) return;
+    var CORS_FIXED = "2026-07-08T09:32:00.000Z";
+    try {
+      var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"), dirty = false;
+      q.forEach(function (L) {
+        if (L._sent || !L.ts || !L.phone) return;
+        if (L.ts >= CORS_FIXED) return; /* после фикса — доставлялись штатно, не дублируем */
+        if ((L._tries || 0) >= 3) return;
+        L._tries = (L._tries || 0) + 1; dirty = true;
+        var payload = {}; for (var k in L) if (k !== "_sent" && k !== "_tries") payload[k] = L[k];
+        payload.resend = true;
+        sendLead(payload).catch(function () {});
+      });
+      if (dirty) localStorage.setItem("atamura_leads", JSON.stringify(q));
+    } catch (e) {}
+  })();
+
   function bindForms(scope) {
     bindPhones(scope);
     (scope || document).querySelectorAll("form.lead-form").forEach(function (f) {
@@ -290,13 +357,13 @@
         var data = {}; new FormData(f).forEach(function (v, k) { data[k] = v; });
         data.source = f.getAttribute("data-form") || "form"; data.page = location.pathname;
         data.ref = document.referrer || "прямой заход"; data.utm = location.search || ""; data.ts = new Date().toISOString();
-        Object.assign(data, utmFields());
+        mergeUTM(data);
         try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
         track("form_submitted", { form_type: data.source, page: data.page, messenger: data.messenger || "" });
         var done = function(){ location.href = rel("spasibo.html"); };
         if (LEAD_WEBHOOK) {
-          // Отправляем в Telegram через Cloudflare Worker. Не блокируем UX: при ошибке всё равно ведём на «Спасибо» — заявка в localStorage не потерялась.
-          fetch(LEAD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true }).then(done).catch(done);
+          // Не блокируем UX: при ошибке всё равно ведём на «Спасибо» — заявка в localStorage не потерялась и будет дослана.
+          sendLead(data).then(done, done);
         } else { done(); }
       });
     });
@@ -354,14 +421,14 @@
       data.page = location.pathname;
       data.ref = document.referrer || "прямой заход";
       data.utm = location.search || "";
-      Object.assign(data, utmFields());
       data.ts = new Date().toISOString();
+      mergeUTM(data);
       try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
       track("soon_submit", { source: src, page: data.page });
       if (stageForm) stageForm.hidden = true;
       if (stageOk) stageOk.hidden = false;
       if (LEAD_WEBHOOK) {
-        fetch(LEAD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true }).catch(function () {});
+        sendLead(data).catch(function () {});
       }
     });
   })();
@@ -1302,11 +1369,11 @@
         if (honey && honey.value) return;
         if (!nameValid(nameI.value)) { showFieldError(nameI, "Введите имя (минимум 2 буквы)"); nameI.focus(); return; }
         if (!phoneValid(phoneI.value)) { showFieldError(phoneI, "Введите номер: +7 7XX XXX-XX-XX"); phoneI.focus(); return; }
-        var data = Object.assign({ name: (nameI.value || "").trim(), phone: phoneI.value, source: src, page: location.pathname, ref: document.referrer || "прямой заход", utm: location.search || "", ts: new Date().toISOString() }, utmFields());
+        var data = mergeUTM({ name: (nameI.value || "").trim(), phone: phoneI.value, source: src, page: location.pathname, ref: document.referrer || "прямой заход", utm: location.search || "", ts: new Date().toISOString() });
         try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(data); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
         track("lead_submit", { source: src, page: data.page });
         stForm.hidden = true; stOk.hidden = false;
-        if (LEAD_WEBHOOK) fetch(LEAD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data), keepalive: true }).catch(function () {});
+        if (LEAD_WEBHOOK) sendLead(data).catch(function () {});
       });
     }
     function close() { if (box) box.classList.remove("is-on"); }
