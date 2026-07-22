@@ -4,5 +4,30 @@ services:
     image: atamura-group-site
     container_name: atamura-group-site
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      - leads-api
     restart: unless-stopped
+
+  # Бэкенд заявок: принимает /api/lead и /api/site-lead, пишет JSONL,
+  # зеркалит в Bitrix24 + Telegram. nginx проксирует /api/ сюда по внутренней сети.
+  leads-api:
+    build: ./leads-api
+    image: atamura-leads-api
+    container_name: atamura-leads-api
+    env_file:
+      - path: ./leads-api/.env
+        required: false
+    environment:
+      HOST: 0.0.0.0
+      PORT: "3000"
+      LEADS_FILE: /app/data/leads.jsonl
+      SITE_LEADS_FILE: /app/data/site-leads.jsonl
+    volumes:
+      - leads-data:/app/data
+    expose:
+      - "3000"          # только внутренняя сеть; наружу торчит лишь nginx (8080)
+    restart: unless-stopped
+
+volumes:
+  leads-data:

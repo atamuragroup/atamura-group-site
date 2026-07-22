@@ -127,8 +127,8 @@
     if (!consent) { setErr("consent", true); ok = false; } else setErr("consent", false);
     if (!ok) return;
 
-    /* Отправка в CRM — тот же вебхук, что у форм основного сайта
-       (calculator.atamuragroup.kz → файл + Bitrix24 crm.lead.add).
+    /* Отправка в CRM — тот же эндпоинт, что у форм основного сайта:
+       свой leads-api на том же origin (/api/ проксирует nginx) → JSONL + Bitrix24 crm.lead.add.
        Время визита кладём в source: оно попадает в название лида. */
     var payload = {
       name: name,
@@ -144,7 +144,7 @@
       if (TRACK[k]) payload[k] = TRACK[k];
     });
     try { var q = JSON.parse(localStorage.getItem("atamura_leads") || "[]"); q.push(payload); localStorage.setItem("atamura_leads", JSON.stringify(q)); } catch (e2) {}
-    fetch("https://calculator.atamuragroup.kz/api/site-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
+    fetch("/api/site-lead", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), keepalive: true }).catch(function () {});
 
     pixelTrack("Lead", { content_name: "start_amaia", complex: COMPLEX });
 
