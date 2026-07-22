@@ -841,6 +841,10 @@
     .mortgage-grid { display: flex; flex-direction: column; gap: var(--s-5); }
     .mortgage .mortgage-info { display: none; }
     .mortgage h2 { font-size: 26px; }
+    /* На мобиле карточка отдаёт ширину калькулятору: паддинг 48px + внутренние
+       отступы iframe съедали ~145px и ломали вёрстку полей. */
+    .mort-card-embed { padding: var(--s-4); overflow: hidden; }
+    .mort-card-embed > iframe { width: 1px; min-width: 100%; max-width: 100%; }
     /* === Центрирование текстов и заголовков на мобиле (PM-фидбэк, run 5) === */
     .sect-title { justify-content: center !important; text-align: center !important; }
     .reviews-head h2, .sect-head h2, .faq h2 { text-align: center !important; }
