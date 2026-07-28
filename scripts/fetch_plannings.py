@@ -19,7 +19,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # projectName (Profitbase) -> slug каталога
 PROJ_MAP = {
     "Атмосфера": "atmosfera", "AURA": "aura", "KERUEN": "keruen",
-    "AQSAI RESORT": "aqsai", "Bravo": "bravo",
+    "AQSAI RESORT": "aqsai",
 }
 # мусорные/нежилые/дубль-дома (не в продаже): «копия», «архив», кладовые, паркинги, тест.
 # NB: фильтруем по ИМЕНИ дома, НЕ по isHouseArchive — иначе теряются легитимные
