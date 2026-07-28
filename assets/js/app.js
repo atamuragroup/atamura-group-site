@@ -571,7 +571,7 @@
       var hero = document.querySelector(".pagehero, .pagehero-zk");
       if (hero) hero.style.backgroundImage = "url(" + catAsset("assets/img/zhk/aura/hero149.jpg") + ")";
     }
-    var PRES = { aura: 1, bravo: 1, atmosfera: 1, keruen: 1, aqsai: 1 };  // #150-154
+    var PRES = { aura: 1, atmosfera: 1, keruen: 1, aqsai: 1 };  // #150-154 (bravo скрыт — как dion)
     if (PRES[slug]) {
       var btn = document.querySelector(".catalog-card [data-open-catalog], .catalog-card .btn, .catalog-card button");
       if (btn) {
