@@ -27,7 +27,7 @@ LOGO = ROOT / "assets/img/logo-mark-navy.png"
 OUT = ROOT / "catalog/atamura-catalog.pdf"
 
 HIDDEN = {"discovery", "tengri-park"}
-SEGMENT_FIX = {"aqsai": "Таунхаусы"}   # на сайте Aqsai подписан «Таунхаусы», не «Делюкс»
+SEGMENT_FIX = {}   # slug -> подпись сегмента, если на сайте она отличается от данных
 
 NAVY = colors.HexColor("#284157")
 TEAL = colors.HexColor("#007484")

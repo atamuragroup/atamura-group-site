@@ -72,7 +72,7 @@
   var ZK_REVIEWS = {
     atmosfera: { stars: "★★★★★", text: "Заехали в Атмосферу в марте. Двор не как в рекламе, а лучше: реально спокойно, дети играют, охрана работает. Поддержка отвечает в WhatsApp за 10 минут.", name: "Аида Н.", sub: "Атмосфера, 2 комн.", av: "АН" },
     aura: { stars: "★★★★★", text: "Сравнивал 4 застройщика. Atamura единственные, кто сразу показал точную стоимость с отделкой и ипотекой — без «от» и «примерно». Купили в Aura.", name: "Мирас К.", sub: "Aura, 3 комн.", av: "МК" },
-    aqsai: { stars: "★★★★☆", text: "Брали таунхаус в Aqsai. Сдали с задержкой 2 месяца, но честно предупредили. После заселения мелкие косяки исправили без споров.", name: "Дамир Т.", sub: "Aqsai Resort, таунхаус", av: "ДТ" }
+    keruen: { stars: "★★★★☆", text: "Сдали с задержкой 2 месяца, но честно предупредили. После заселения мелкие косяки исправили без споров.", name: "Дамир Т.", sub: "Керуен, 2 комн.", av: "ДТ" }
   };
 
   /* ---------- Burger / mobile drawer (+ a11y focus-trap, aria-modal) ---------- */
@@ -179,7 +179,7 @@
     return data;
   }
 
-  /* ---------- Таймер на карточке AMAIA (#projects → старт продаж 18.07) ---------- */
+  /* ---------- Таймер на карточке «Скоро» (#projects → старт продаж) ---------- */
   document.querySelectorAll(".pcard-timer[data-deadline]").forEach(function (el) {
     var dl = new Date(el.getAttribute("data-deadline")).getTime();
     var d = el.querySelector("[data-d]"), h = el.querySelector("[data-h]"),
@@ -387,7 +387,7 @@
 
     document.addEventListener("click", function (e) {
       var card = e.target.closest && e.target.closest("a.pcard");
-      // #157/#158/#159: футерные ссылки на «Скоро»-проекты (Discovery/AMAIA/DION) тоже открывают форму ожидания
+      // #157/#158/#159: футерные ссылки на «Скоро»-проекты тоже открывают форму ожидания
       var footLink = e.target.closest && e.target.closest(".foot-col-projects a");
       var slug, nm;
       if (card && card.querySelector(".badge.is-status.is-light")) {
@@ -453,7 +453,7 @@
   /* Координаты ЖК для карты — точки фирм из 2GIS (2026-06); Arlan = адресная (Бесагаш): 2GIS совпал на чужой «Арлан» */
   var ZK_COORDS = {
     atmosfera: [43.327372, 77.01886], aura: [43.358328, 77.131304], keruen: [43.35003, 77.065403],
-    aqsai: [43.166429, 76.786037], bravo: [43.429754, 77.025929], discovery: [43.392434, 77.025802],
+    discovery: [43.392434, 77.025802],
     monarch: [43.259488, 76.940266], arlan: [43.29903, 77.04075]
   };
   /* ТЗ 22.06 — грид планировок: КАЖДАЯ планировка отдельно (не группируя по комнатности),
@@ -571,7 +571,7 @@
       var hero = document.querySelector(".pagehero, .pagehero-zk");
       if (hero) hero.style.backgroundImage = "url(" + catAsset("assets/img/zhk/aura/hero149.jpg") + ")";
     }
-    var PRES = { aura: 1, atmosfera: 1, keruen: 1, aqsai: 1 };  // #150-154 (bravo скрыт — как dion)
+    var PRES = { aura: 1, atmosfera: 1, keruen: 1 };  // #150-154 (у скрытых ЖК презентации не показываем)
     if (PRES[slug]) {
       var btn = document.querySelector(".catalog-card [data-open-catalog], .catalog-card .btn, .catalog-card button");
       if (btn) {

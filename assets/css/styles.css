@@ -342,7 +342,6 @@
   .teaser:hover .teaser-arrow { background: var(--brand); color: oklch(98% 0 0); }
 
   .teaser.is-1 .teaser-bg { background-image: url('../img/hero/keruen.webp'); }
-  .teaser.is-2 .teaser-bg { background-image: url('../img/hero/bravo.webp'); }
   .teaser.is-3 .teaser-bg { background-image: url('../img/hero/arlan.webp'); }
   .teaser.is-4 .teaser-bg { background-image: url('../img/hero/monarch.webp'); }
 
@@ -501,7 +500,6 @@
   .premium-card::after { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(180deg, oklch(0% 0 0 / 0.1) 0%, oklch(0% 0 0 / 0.55) 100%); }
   .premium-card > * { position: relative; z-index: 2; }
   .premium-card.is-prem::before { background-image: url('../img/zhk/atmosfera.jpg'); }
-  .premium-card.is-last::before { background-image: url('../img/zhk/bravo.jpg'); }
   .premium-card.is-discount { background: linear-gradient(160deg, var(--brand-deep) 0%, var(--brand) 100%); }
   .premium-card.is-discount::before, .premium-card.is-discount::after { display: none; }
   .premium-card.is-finish::before { background-image: url('../img/zhk/aura.jpg'); }
