@@ -19,7 +19,6 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # projectName (Profitbase) -> slug каталога
 PROJ_MAP = {
     "Атмосфера": "atmosfera", "AURA": "aura", "KERUEN": "keruen",
-    "AQSAI RESORT": "aqsai",
 }
 # мусорные/нежилые/дубль-дома (не в продаже): «копия», «архив», кладовые, паркинги, тест.
 # NB: фильтруем по ИМЕНИ дома, НЕ по isHouseArchive — иначе теряются легитимные
@@ -95,8 +94,6 @@ def img_url(p):
     return None
 
 def rooms_key(slug, p):
-    if slug == "aqsai":
-        return "Таунхаус"
     if p.get("isStudio"):
         return "Студия"
     n = p.get("roomsAmount")

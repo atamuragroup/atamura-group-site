@@ -17,11 +17,10 @@ PROJ_MAP = {
     'Атмосфера': 'atmosfera',
     'AURA': 'aura',
     'KERUEN': 'keruen',
-    'AQSAI RESORT': 'aqsai',
     'Арлан': 'arlan',
     'Monarch': 'monarch',
 }
-NAME = {'atmosfera':'Атмосфера','aura':'AURA','keruen':'KERUEN','aqsai':'AQSAI RESORT','arlan':'Арлан','monarch':'Monarch'}
+NAME = {'atmosfera':'Атмосфера','aura':'AURA','keruen':'KERUEN','arlan':'Арлан','monarch':'Monarch'}
 ORDER = ['студия','1-комн','2-комн','3-комн','4-комн+','Таунхаус']
 
 def http_json(url, method='GET', body=None):
@@ -72,7 +71,7 @@ def aggregate(items):
 
     out = {'_note': "Цены и площади «от» = минимум по AVAILABLE (квартиры + таунхаусы, residential) из Profitbase ATAMURA. Пересборка: python3 scripts/fetch_profitbase.py",
            'zk': {}}
-    for slug in ['atmosfera','aura','keruen','aqsai','arlan','monarch']:
+    for slug in ['atmosfera','aura','keruen','arlan','monarch']:
         rd = agg.get(slug, {})
         rooms_out = []
         overall_min = None
